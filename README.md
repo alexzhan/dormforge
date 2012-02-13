@@ -3,4 +3,12 @@
 
 <p>Project Dormforge is written in Tornado, and it's built by a lot of open source software,including but not resricted to Twitter Bootstrap,mysql,redis,redis-py,so after you clone or download Project Dormforge,you have to install the previous software.</p>
 
+-- To create the database:
+--   CREATE DATABASE df;
+--   GRANT ALL PRIVILEGES ON df.* TO 'df'@'localhost' IDENTIFIED BY 'df';
+--
+-- To reload the tables:
+--   mysql --user=df --password=df --database=df < schema.sql
+
+
 <p>Project Dormforge is licensed under BSD license.</p>
