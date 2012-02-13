@@ -10,7 +10,7 @@ class UserActivityGraph(object):
     #because of deletion, activity_key's must use max_activity_id + 1
     def add_activity(self, user, actdict):
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
-        max_activity = self.client.lindex(Activity_key, -1)
+        max_activity = self.client.lindex(Activity_key, 0)
         if not max_activity:
             max_activity = 0
         else:
