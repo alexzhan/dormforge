@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+    html, body {
+        background-color: #eee;
+    }
+    .container > .content {
+        background-color: #fff;
+        padding: 20px;
+        margin: 0 -20px;
+        -webkit-border-radius: 0 0 6px 6px;
+        -moz-border-radius: 0 0 6px 6px;
+        border-radius: 0 0 6px 6px;
+    }
+    .content .span10{
+        min-height: 200px;
+    }
+    .content .span10 {
+        width: 940px;
+    }
+    .topbar .btn {
+        border: 0;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="page-header">
+    <h1>反馈</h1>
+</div>
+<div class="row">
+    <div class="span10">
+        <form class="form-horizontal" id='contact' method='POST' action="{{ request.path }}">
+            <fieldset>
+                <div id="idcontrol-group" class="control-group">
+                    <label class="control-label" for="username">姓名</label>
+                    <div class="controls">
+                        <input  id="username" name="username" size="30" class="input-xlarge" type="text" value="{{ escape(current_user.name) if current_user else "" }}">
+                        <span id="usernamehelp" class="help-inline"></span>
+                    </div>
+                </div>
+                <div id='emailcontrol-group' class="control-group">
+                    <label class="control-label" for="email">邮箱</label>
+                    <div class="controls">
+                        <input  id="email" name="email" size="30" class="input-xlarge" type="text" value="{{ escape(current_user.email) if current_user else '' }}">
+                        <span id="emailhelp" class="help-inline"></span>
+                    </div>
+                </div>
+                <div id='subjectcontrol-group' class="control-group">
+                    <label class="control-label" for="subject">主题</label>
+                    <div class="controls">
+                        <input  id="subject" name="subject" size="30" class="input-xlarge" type="text">
+                        <span id="subjecthelp" class="help-inline"></span>
+                    </div>
+                </div>
+                <div id='commentcontrol-group' class="control-group">
+                    <label class="control-label" for="comment">内容</label>
+                    <div class="controls">
+                        <textarea style="height:150px" id="comment" name="comment" size="30" class="input-xlarge"></textarea>
+                        <span id="commenthelp" class="help-inline"></span>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" onclick="return submitfunction();">提交</button>
+            </div>
+            {{ xsrf_form_html() }}
+        </form>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url("js/contact.js") }}"></script>
+{% end %}

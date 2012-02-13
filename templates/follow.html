@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+    .hero-unit .avatar {
+        float: left;
+        width:150px;
+    }
+    .hero-unit .profile {
+        float: left;
+        margin-left:15px;
+    }
+    .col_header {
+        border-bottom: 1px solid #EAEAEA;
+        padding-bottom: 3px;
+    }
+    .profile-text {
+        font-size: 1.1em;
+        font-weight: bold;
+    }
+    .namefollowrow .btn .btn-primary, .namefollowrow .btn {
+        float:right;
+        margin-right:200px;
+        font-size: 12px;
+        width: 50px;
+        padding: 3px 5px 3px;
+
+    }
+    .namefollowrow {
+        clear: both;
+        float: left;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .span4 {
+        width: 415px;
+        margin-top: 10px;
+    }
+    .col_item {
+        padding: 10px 0;
+        width: 500px;
+        border-bottom: 1px solid #EAEAEA;
+        float: left;
+        margin: 0 0 0 50px;
+    }
+    .mavatar {
+        width: 50px;
+        float: left;
+    }
+    .mdesc {
+        width: 320px;
+        float: left;
+        margin: 0 0 0 10px;
+    }
+    .mfollow {
+        float: right;
+        width: 60px;
+        margin:0;
+    }
+    .mdesc-name {
+        margin-bottom: 3px;
+        font-size: 1.1em;
+        margin: 0 0 5px;
+        font-weight: bold;
+    }
+    .mfollow .btn {
+        clear: right;
+        float: right;
+        margin-top: -1px;
+        margin-right: 0;
+        width: 48px;
+    }
+    .btn-small {
+        padding:2px 5px;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="container">
+    <div class="hero-unit" style="margin-left:40px;padding:0;background-color:#FFF">
+        <div class="namefollowrow">
+            <h3 style="display:inline"><a style="color: #19558D" href="/people/{{ escape(template_values['username']) }}">{{ escape(template_values['username']) }}</a></h3>
+            {% if not template_values['is_self'] %}
+            {% if not template_values['is_follow'] %}
+            <a id="follow-btn" class="btn btn-primary" onclick="{% if current_user %}follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
+            <a id="unfollow-btn" class="btn" style="display:none" onclick="{% if current_user %}unfollow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">取消关注</a>
+            {% else %}
+            <a id="follow-btn" class="btn btn-primary" style="display:none" onclick="{% if current_user %}follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
+            <a id="unfollow-btn" class="btn" onclick="{% if current_user %}unfollow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">取消关注</a>
+            {% end  %}
+            {% end  %}
+        </div>
+        <div class="avatar">
+            <a href="/people/{{ escape(template_values['username']) }}">
+                <img width="150px" height="150px" src="{{ template_values['image'] }}">
+            </a>
+        </div>
+        <div class="profile">
+            <div class="span7">
+                <div class="col_header">
+                    <div class="profile-text">
+                        {% if template_values['type'] == 'following' %}
+                        {% if template_values['is_self'] and current_user %}你{% else %}ta{% end %}关注{{ template_values['follow_count'] }}人
+                        {% elif template_values['type'] == 'follower' %}
+                        {{ template_values['follower_count'] }}人关注{% if template_values['is_self'] and current_user %}你{% else %}ta{% end %}
+                        {% end %}
+                    </div>
+                </div>
+                {% for follow in template_values['follow'] %}
+                <div class="pagelist">
+                    <div class="col_item">
+                        <div class="mavatar">
+                            <a href="/people/{{ follow.name }}"><img class="mavatar" src="{{ follow.image }}" width="50" alt="{{ follow.name }}" height="50"></a>
+                        </div>
+                        <div class="mdesc">
+                            <div class="mdesc-name">
+                                <a style="color: #19558D" href="/people/{{ follow.name }}">{{ follow.name }}</a>
+                            </div>
+                        </div>
+                        <div class="mfollow">
+                            {% if current_user %}
+                            {% if handler.xsrf_token %}
+                            <div style="display:none">xsrf generated if logged in ready for follow/unfollow</div>
+                            {% end %}
+                            {% end %}
+                            {% if not follow.is_self %}
+                            {% if follow.is_follow %}
+                            <a id="following-btn{{ follow.id }}" class="btn btn-small btn-primary" style="display:none" onclick="{% if current_user %}follow('following-btn{{ follow.id }}', {{ current_user['id'] }}, {{ follow.id }}){% end %}">关注</a>
+                            <a id="unfollowing-btn{{ follow.id }}" class="btn btn-small" onclick="{% if current_user %}unfollow('following-btn{{ follow.id }}', {{ current_user['id'] }}, {{ follow.id }}){% end %}">取消关注</a>
+                            {% else %}
+                            <a id="following-btn{{ follow.id }}" class="btn btn-small btn-primary" onclick="{% if current_user %}follow('following-btn{{ follow.id }}', {{ current_user['id'] }}, {{ follow.id }}){% end %}">关注</a>
+                            <a id="unfollowing-btn{{ follow.id }}" class="btn btn-small" style="display:none" onclick="{% if current_user %}unfollow('following-btn{{ follow.id }}', {{ current_user['id'] }}, {{ follow.id }}){% end %}">取消关注</a>
+                            {% end %}
+                            {% end %}
+                        </div>
+                    </div>
+                </div>
+                {% end %}
+            </div>
+        </div>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
+{% end %}

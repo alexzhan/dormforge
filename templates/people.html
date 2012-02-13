@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+    .hero-unit .avatar {
+        float: left;
+        width:150px;
+    }
+    .hero-unit .profile {
+        float: left;
+        margin-left:15px;
+        width: 700px;
+    }
+    .hero-unit p {
+        margin: 0;
+    }
+    .hero-unit p.profile-text {
+        font-size: 15px;
+        color: #333;
+        line-height:18px;
+    }
+    .hero-unit p.education {
+        font-size: 14px;
+    }
+    a.dark {
+        color: #788887;
+    }
+    sup.reference {
+        font-weight: normal;
+        font-style: normal;
+        font-size: 11px;
+        color: #788887;
+    }
+    .namefollowrow .btn-primary, .namefollowrow .btn {
+        float:right;
+        margin-right:200px;
+        font-size: 12px;
+        width: 50px;
+        padding: 3px 5px 3px;
+    }
+    .namefollowrow {
+        clear: both;
+        float: left;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .row {
+        margin-left:0;
+        display:block;
+        clear: both;
+        width: 100%;
+    }
+    .span4 {
+        width: 415px;
+        margin-top: 10px;
+    }
+    .col_header {
+        border-bottom: 1px solid #EAEAEA;
+        padding-bottom: 5px;
+    }
+    .latest_activity {
+        margin-top: 5px;
+    }
+    a.tabtitle {
+        font-size: 1.1em;
+        color: #19558D;
+        font-weight: bold;
+    }
+    .light_gray a, .light_gray {
+        color: #999;
+    }
+    .light_gray a:hover {
+        color: #08C;
+    }
+    .status_preview_link {
+        clear: both;
+        float: left;
+        padding: 5px;
+        margin-left: -5px;
+        width: 100%;
+        color: #333;
+    }
+    div.timestamp {
+        font-size: .8em;
+        color: #999;
+    }
+    #description {
+        width: 690px;
+        height: 60px;
+        color: #333;
+        font-size: 14px;
+    }
+    .descaction {
+        text-align: right;
+    }
+    .descaction .btn {
+        margin-left: 10px;
+    }
+    #canceldesc {
+        color: #19558D;
+    }
+    .the-icons {
+        display: inline-block;
+        font-size: 10px;
+        margin-left: 5px;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="container">
+    <div class="hero-unit" style="margin-left:40px;padding:0;background-color:#FFF">
+        <div class="namefollowrow">
+            <h3 style="display:inline">{{ escape(template_values['username']) }}</h3>
+            {% if not template_values['is_self'] %}
+            {% if not template_values['is_follow'] %}
+            <a id="follow-btn" class="btn btn-primary" onclick="{% if current_user %}follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
+            <a id="unfollow-btn" class="btn" style="display:none" onclick="{% if current_user %}unfollow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">取消关注</a>
+            {% else %}
+            <a id="follow-btn" class="btn btn-primary" style="display:none" onclick="{% if current_user %}follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
+            <a id="unfollow-btn" class="btn" onclick="{% if current_user %}unfollow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">取消关注</a>
+            {% end  %}
+            {% end  %}
+        </div>
+        <div class="avatar">
+            <img width="150px" height="150px" src="{{ template_values['image'] }}">
+        </div>
+        <div class="profile">
+            {% if current_user %}
+            {% if handler.xsrf_token %}
+            <div style="display:none">xsrf generated if logged in ready for follow/unfollow</div>
+            {% end %}
+            {% end %}
+            {% if current_user and current_user.id == template_values['id'] and not template_values['has_selfdesc']%}
+            <p class="profile-text"><a href="#" id="activatedesc" onclick="return activatedesc();">描述下你自己</a></p>
+            <p class="profile-text" id="textdesc" style="display:none"></p>
+            <span class="the-icons" style="display:none"><a href="#" style="color:#788887;" onclick="return changedesc();"><i class="icon-edit"></i>修改</a></span>
+            {% end %}
+            {% if template_values['has_selfdesc'] %}
+            <p class="profile-text" id="textdesc" style="display:inline">{{ template_values['selfdesc'] }}</p>
+            {% if current_user and template_values['id'] == current_user.id %}
+            <span class="the-icons" style="display:inline-block"><a href="#" style="color:#788887;" onclick="return changedesc();"><i class="icon-edit"></i>修改</a></span>
+            {% end %}
+            {% end %}
+            <div class="descform" style="display:none">
+                <textarea id="description"></textarea>
+                <div class="descaction">
+                    <a href="#" id="canceldesc" onclick="return canceldesc();">取消</a>
+                    <a class="btn btn-primary" onclick="return submitdesc();">提交</a>
+                </div>
+            </div>
+            {% if template_values['college_type'] == 3 %}
+            <p class="education">
+            <a class="dark" href="/city/{{ escape(template_values['bs_city']) }}">{{ escape(template_values['bs_city']) }}</a>
+            <span class="splitter">/</span> <a class="dark" href="/college/{{ escape(template_values['bs_college']) }}">{{ escape(template_values['bs_college']) }}</a> 
+            <span class="splitter">/</span> <a class="dark" href="/major/{{ escape(template_values['bs_major']) }}">{{ escape(template_values['bs_major']) }}</a> 
+            <sup class='reference'> [博士] </sup>
+            </p>
+            {% end %}
+            {% if template_values['college_type'] in [2,3] %}
+            <p class="education">
+            <a class="dark" href="/city/{{ escape(template_values['ss_city']) }}">{{ escape(template_values['ss_city']) }}</a>
+            <span class="splitter">/</span> <a class="dark" href="/college/{{ escape(template_values['ss_college']) }}">{{ escape(template_values['ss_college']) }}</a> 
+            <span class="splitter">/</span> <a class="dark" href="/major/{{ escape(template_values['ss_major']) }}">{{ escape(template_values['ss_major']) }}</a> 
+            <sup class='reference'> [硕士] </sup>
+            </p>
+            {% end %}
+            {% if template_values['college_type'] in [1,2,3] %}
+            <p class="education">
+            <a class="dark" href="/city/{{ escape(template_values['city']) }}">{{ escape(template_values['city']) }}</a>
+            <span class="splitter">/</span> <a class="dark" href="/college/{{ escape(template_values['college']) }}">{{ escape(template_values['college']) }}</a> 
+            <span class="splitter">/</span> <a class="dark" href="/major/{{ escape(template_values['major']) }}">{{ escape(template_values['major']) }}</a> 
+            {% if template_values['college_type'] in [2,3] %}
+            <sup class='reference'> [本科] </sup>
+            {% end %}
+            </p>
+            {% end %}
+            {% if template_values['college_type'] == 4 %}
+            <p class="education">
+            <a class="dark" href="#">{{ escape(template_values['zx_province']) }}</a>
+            <span class="splitter">/</span> <a class="dark" href="#">{{ escape(template_values['zx_city']) }}</a> 
+            <span class="splitter">/</span> <a class="dark" href="#">{{ escape(template_values['zx_school']) }}</a> 
+            </p>
+            {% end %}
+            <p class="education">
+            <a class="dark" href="/people/{{ escape(template_values['username']) }}/following">关注{{ template_values['follow_count'] }}</a>
+            <span class="splitter">/</span> <a class="dark" href="/people/{{ template_values['username'] }}/follower">被关注{{ template_values['follower_count'] }}</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="span4">
+            <div class="col_header">
+                <a href="#" class="tabtitle">活动 {{ template_values['activity_count'] }}</a>
+            </div>
+            <div class="latest_activity">
+                {% for activity in template_values['activities']%}
+                <p class="light_gray">
+                {% if activity[0] == '1' %}
+                <a href="/people/{{ template_values['username'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[2] }}">{{ activity[2] }}</a>. <span class="timestamp">{{ activity[1] }}</span>
+                {% end %}
+                </p>
+                {% end %}
+                </p>
+            </div>
+        </div>
+        <div class="span4">
+            <div class="col_header">
+                <a href="#" class="tabtitle">状态 0</a>
+            </div>
+            <!--
+            <div class="row">
+                <a class="status_preview_link" href="#">
+                    <span class="cell">
+                        <div class="status_preview">
+                            终于调好了。洗洗睡了。
+                        </div>
+                        <div class="timestamp">
+                            2月3日04:44
+                        </div>
+                    </span>
+                </a>
+            </div>
+            <div class="row">
+                <a class="status_preview_link" href="#">
+                    <span class="cell">
+                        <div class="status_preview">
+                            今天改用Supervisor控制程序 http://t.cn/aCvxfj
+                        </div>
+                        <div class="timestamp">
+                            2月2日22:01
+                        </div>
+                    </span>
+                </a>
+            </div>
+            <div class="row">
+                <a class="status_preview_link" href="#">
+                    <span class="cell">
+                        <div class="status_preview">
+                            怎样才能将“山寨”移动应用扫地出门 | “山寨”并非国内独有，在App Store也有很多山寨应用。现在苹果决定不再放任，准备将这些山寨货踢...
+                        </div>
+                        <div class="timestamp">
+                            今天14:06
+                        </div>
+                    </a>
+                </div>
+                -->
+            </div>
+        </div>
+
+    </div>
+    {% end %}
+    {% block bottom %}
+    <script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
+    {% end %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+    html, body {
+        background-color: #eee;
+    }
+    .container > .content {
+        background-color: #fff;
+        padding: 20px;
+        margin: 0 -20px;
+        -webkit-border-radius: 0 0 6px 6px;
+        -moz-border-radius: 0 0 6px 6px;
+        border-radius: 0 0 6px 6px;
+    }
+    .content .span10{
+        min-height: 200px;
+    }
+    .content .span10 {
+        width: 940px;
+    }
+    .content .span10 h3 {
+        margin-bottom: 10px;
+    }
+    .content .span10 p {
+        margin: 0 10px 10px 0;
+        font-size: 14px;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="page-header">
+    <h1>关于</h1>
+</div>
+<div class="row">
+    <div class="span10">
+        <h3>关于18周</h3>
+        <p>18周是一个开源的、只由在校大学生开发、参与、并且基于弱关系的大学生社区，最终目标是使参与进来的同学找到跟自己兴趣类似的人，并创造机会把线上关系发展到线下。</p>
+        <p>原则上，18周只允许学生注册。</p>
+        <p>喜欢编程的同学可以参与进18周的开发。<!--项目代号:Project DormForge--></p>
+        <h3>为什么叫18周</h3>
+        <p>18周是一个时间概念，大学里，一般有18个教学周。</p>
+        <p>18周开始于2011年下半学年的第18个周。</p>
+        <h3>关于18周logo</h3>
+        <p><img src="{{ static_url("img/logo.png") }}"></p>
+        <p>logo下方的绿色长方形代表18周这个平台，上方的红色和蓝色椭圆代表参与进18周的同学，我们希望18周能作为一个平台让大家互相认识，促进交流。</p>
+        <p>logo使用的3种颜色是光的三元色:红、绿、蓝。</p>
+        <p>logo右旋90度之后是一个数字:18。</p>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url("js/contact.js") }}"></script>
+{% end %}

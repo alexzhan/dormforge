@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+    .marketing {
+        margin: 120px 0 200px;
+    }
+    .marketing h1 {
+        font-size: 30px;
+        font-weight: 300;
+        text-align: center;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="marketing">
+    <h1>{{ template_values['message'] }}</h1>
+</div>
+{% end %}

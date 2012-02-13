@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+    html, body {
+        background-color: #eee;
+    }
+    .container > .content {
+        background-color: #fff;
+        padding: 20px;
+        margin: 0 -20px;
+        -webkit-border-radius: 0 0 6px 6px;
+        -moz-border-radius: 0 0 6px 6px;
+        border-radius: 0 0 6px 6px;
+    }
+    .content .span10,
+    .content .span4 {
+        min-height: 200px;
+    }
+    .content .span10 {
+        width: 650px;
+    }
+    .content .span4 {
+        width: 250px;
+    }
+    .content .span4 ul {
+        margin-top: 10px; 
+    }
+    .content .span4 ul li {
+        line-height: 20px; 
+    }
+    .content .span4 {
+        margin-left: 0;
+        padding-left: 19px;
+    }
+    .content .span4 h3{
+        border-bottom: 1px solid #DDD;
+    }
+    .topbar .btn {
+        border: 0;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="page-header">
+    <h1>注册</h1>
+</div>
+<div class="row">
+    <div class="span10">
+        <form class="form-horizontal" id='signup' method='POST' action="{{ request.path }}">
+            <fieldset>
+                <div id="idcontrol-group" class="control-group {{ _('error') if 'username_error' in template_values and template_values['username_error'] else '' }}">
+                    <label class="control-label" for="username">用户名</label>
+                    <div class="controls">
+                        <input  id="username" name="username" size="30" type="text" value="{{ escape(template_values['username']) if 'username' in template_values and template_values['username'] else "" }}" onblur="usernameinfo();">
+                        <span id="usernamehelp" class="help-inline">{{ escape(template_values['username_error_message']) if 'username_error' in template_values and template_values['username_error'] else "" }}</span>
+                    </div>
+                </div>
+                <div id="emailcontrol-group" class="control-group {{ _('error') if 'email_error' in template_values and template_values['email_error'] else '' }}">
+                    <label class="control-label" for="email">邮箱</label>
+                    <div class="controls">
+                        <input  id="email" name="email" size="30" type="text" value="{{ escape(template_values['email']) if 'email' in template_values and template_values['email'] else "" }}" onblur="emailinfo();">
+                        <span id="emailhelp" class="help-inline">{{ escape(template_values['email_error_message']) if 'email_error' in template_values and template_values['email_error'] else "" }}</span>
+                    </div>
+                </div>
+                <div id='passwordcontrol-group' class="control-group {{ _('error') if 'password_error' in template_values and template_values['password_error'] and template_values['password_error'] != 3 else '' }}">
+                    <label class="control-label" for="password">密码</label>
+                    <div class="controls">
+                        <input  id="password" name="password" size="30" type="password" value="{{ escape(template_values['password']) if 'password' in template_values and template_values['password'] and template_values['password'] != 3 else '' }}" onblur="passwordinfo();">
+                        <span id="passwordhelp" class="help-inline">{{ escape(template_values['password_error_message']) if 'password_error' in template_values and template_values['password_error'] and template_values['password_error'] != 3 else '' }}</span>
+                    </div>
+                </div>
+                <div id='passwdcontrol-group' class="control-group {{ _('error') if 'password_error' in template_values and template_values['password_error'] else '' }}">
+                    <label class="control-label" for="password_again">确认密码</label>
+                    <div class="controls">
+                        <input  id="password_again" name="password_again" size="30" type="password" value="{{ escape(template_values['password_again']) if 'password_again' in template_values and template_values['password_again'] else '' }}" onblur="passwdinfo();">
+                        <span id="passwdhelp" class="help-inline">{{ escape(template_values['password_error_message']) if 'password_error' in template_values and template_values['password_error'] else '' }}</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="coltype">在读</label>
+                    <div class="controls">
+                        <select name="coltype" id="coltype" onchange="changefunction();">
+                            <option value="bk">本科</option>
+                            <option value="ss" {{ _(" selected='selected' ") if 'coltype' in template_values and template_values['coltype'] == 'ss' else '' }}>硕士</option>
+                            <option value="bs" {{ _(" selected='selected' ") if 'coltype' in template_values and template_values['coltype'] == 'bs' else '' }}>博士</option>
+                            <option value="zx" {{ _(" selected='selected' ") if 'coltype' in template_values and template_values['coltype'] == 'zx' else '' }}>中学</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="bk" class={{ _("show") if ('coltype' in template_values and template_values['coltype'] == 'bk') or ('coltype' not in template_values) else "hide" }}>
+                    <div id="bkbkcollegecontrol-group" class="control-group {{ _('error') if 'bkbkcollege_error' in template_values and template_values['bkbkcollege_error'] else '' }}">
+                        <label class="control-label" for="bkbkcollege">学校</label>
+                        <div class="controls">
+                            <input  id="bkbkcollege" name="bkbkcollege" size="30" type="text" value="{{ escape(template_values['bkbkcollege']) if 'bkbkcollege' in template_values and template_values['bkbkcollege'] else '' }}" onblur="collegeinfo('bkbkcollege');">
+                            <span id="bkbkcollegehelp" class="help-inline">{{ escape(template_values['bkbkcollege_error_message']) if 'bkbkcollege_error' in template_values and template_values['bkbkcollege_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="bkbkmajorcontrol-group" class="control-group {{ _('error') if 'bkbkmajor_error' in template_values and template_values['bkbkmajor_error'] else '' }}">
+                        <label class="control-label" for="bkbkmajor">专业</label>
+                        <div class="controls">
+                            <input  id="bkbkmajor" name="bkbkmajor" size="30" type="text" value="{{ escape(template_values['bkbkmajor']) if 'bkbkmajor' in template_values and template_values['bkbkmajor'] else '' }}" onblur="clearinfo('bkbkmajor');">
+                            <span id="bkbkmajorhelp" class="help-inline">{{ escape(template_values['bkbkmajor_error_message']) if 'bkbkmajor_error' in template_values and template_values['bkbkmajor_error'] else "" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="ss" class={{ _("show") if 'coltype' in template_values and template_values['coltype'] == 'ss' else "hide" }}>
+                    <div id="sssscollegecontrol-group" class="control-group {{ _('error') if 'sssscollege_error' in template_values and template_values['sssscollege_error'] else '' }}">
+                        <label class="control-label" for="sssscollege">硕士学校</label>
+                        <div class="controls">
+                            <input  id="sssscollege" name="sssscollege" size="30" type="text" value="{{ escape(template_values['sssscollege']) if 'sssscollege' in template_values and template_values['sssscollege'] else '' }}" onblur="collegeinfo('sssscollege');">
+                            <span id="sssscollegehelp" class="help-inline">{{ escape(template_values['sssscollege_error_message']) if 'sssscollege_error' in template_values and template_values['sssscollege_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="ssssmajorcontrol-group" class="control-group {{ _('error') if 'ssssmajor_error' in template_values and template_values['ssssmajor_error'] else '' }}">
+                        <label class="control-label" for="ssssmajor">硕士专业</label>
+                        <div class="controls">
+                            <input  id="ssssmajor" name="ssssmajor" size="30" type="text" value="{{ escape(template_values['ssssmajor']) if 'ssssmajor' in template_values and template_values['ssssmajor'] else '' }}" onblur="clearinfo('ssssmajor');">
+                            <span id="ssssmajorhelp" class="help-inline">{{ escape(template_values['ssssmajor_error_message']) if 'ssssmajor_error' in template_values and template_values['ssssmajor_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="ssbkcollegecontrol-group" class="control-group {{ _('error') if 'ssbkcollege_error' in template_values and template_values['ssbkcollege_error'] else '' }}">
+                        <label class="control-label" for="ssbkcollege">本科学校</label>
+                        <div class="controls">
+                            <input  id="ssbkcollege" name="ssbkcollege" size="30" type="text" value="{{ escape(template_values['ssbkcollege']) if 'ssbkcollege' in template_values and template_values['ssbkcollege'] else '' }}" onblur="collegeinfo('ssbkcollege');">
+                            <span id="ssbkcollegehelp" class="help-inline">{{ escape(template_values['ssbkcollege_error_message']) if 'ssbkcollege_error' in template_values and template_values['ssbkcollege_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="ssbkmajorcontrol-group" class="control-group {{ _('error') if 'ssbkmajor_error' in template_values and template_values['ssbkmajor_error'] else '' }}">
+                        <label class="control-label" for="ssbkmajor">本科专业</label>
+                        <div class="controls">
+                            <input  id="ssbkmajor" name="ssbkmajor" size="30" type="text" value="{{ escape(template_values['ssbkmajor']) if 'ssbkmajor' in template_values and template_values['ssbkmajor'] else '' }}" onblur="clearinfo('ssbkmajor');">
+                            <span id="ssbkmajorhelp" class="help-inline">{{ escape(template_values['ssbkmajor_error_message']) if 'ssbkmajor_error' in template_values and template_values['ssbkmajor_error'] else "" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="bs" class={{ _("show") if 'coltype' in template_values and template_values['coltype'] == 'bs' else "hide" }}>
+                    <div id="bsbscollegecontrol-group" class="control-group {{ _('error') if 'bsbscollege_error' in template_values and template_values['bsbscollege_error'] else '' }}">
+                        <label class="control-label" for="bsbscollege">博士学校</label>
+                        <div class="controls">
+                            <input  id="bsbscollege" name="bsbscollege" size="30" type="text" value="{{ escape(template_values['bsbscollege']) if 'bsbscollege' in template_values and template_values['bsbscollege'] else '' }}" onblur="collegeinfo('bsbscollege');">
+                            <span id="bsbscollegehelp" class="help-inline">{{ escape(template_values['bsbscollege_error_message']) if 'bsbscollege_error' in template_values and template_values['bsbscollege_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="bsbsmajorcontrol-group" class="control-group {{ _('error') if 'bsbsmajor_error' in template_values and template_values['bsbsmajor_error'] else '' }}">
+                        <label class="control-label" for="bsbsmajor">博士专业</label>
+                        <div class="controls">
+                            <input  id="bsbsmajor" name="bsbsmajor" size="30" type="text" value="{{ escape(template_values['bsbsmajor']) if 'bsbsmajor' in template_values and template_values['bsbsmajor'] else '' }}" onblur="clearinfo('bsbsmajor');">
+                            <span id="bsbsmajorhelp" class="help-inline">{{ escape(template_values['bsbsmajor_error_message']) if 'bsbsmajor_error' in template_values and template_values['bsbsmajor_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="bssscollegecontrol-group" class="control-group {{ _('error') if 'bssscollege_error' in template_values and template_values['bssscollege_error'] else '' }}">
+                        <label class="control-label" for="bssscollege">硕士学校</label>
+                        <div class="controls">
+                            <input  id="bssscollege" name="bssscollege" size="30" type="text" value="{{ escape(template_values['bssscollege']) if 'bssscollege' in template_values and template_values['bssscollege'] else '' }}" onblur="collegeinfo('bssscollege');">
+                            <span id="bssscollegehelp" class="help-inline">{{ escape(template_values['bssscollege_error_message']) if 'bssscollege_error' in template_values and template_values['bssscollege_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="bsssmajorcontrol-group" class="control-group {{ _('error') if 'bsssmajor_error' in template_values and template_values['bsssmajor_error'] else '' }}">
+                        <label class="control-label" for="bsssmajor">硕士专业</label>
+                        <div class="controls">
+                            <input  id="bsssmajor" name="bsssmajor" size="30" type="text" value="{{ escape(template_values['bsssmajor']) if 'bsssmajor' in template_values and template_values['bsssmajor'] else '' }}" onblur="clearinfo('bsssmajor');">
+                            <span id="bsssmajorhelp" class="help-inline">{{ escape(template_values['bsssmajor_error_message']) if 'bsssmajor_error' in template_values and template_values['bsssmajor_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="bsbkcollegecontrol-group" class="control-group {{ _('error') if 'bsbkcollege_error' in template_values and template_values['bsbkcollege_error'] else '' }}">
+                        <label class="control-label" for="bsbkcollege">本科学校</label>
+                        <div class="controls">
+                            <input  id="bsbkcollege" name="bsbkcollege" size="30" type="text" value="{{ escape(template_values['bsbkcollege']) if 'bsbkcollege' in template_values and template_values['bsbkcollege'] else '' }}" onblur="collegeinfo('bsbkcollege');">
+                            <span id="bsbkcollegehelp" class="help-inline">{{ escape(template_values['bsbkcollege_error_message']) if 'bsbkcollege_error' in template_values and template_values['bsbkcollege_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="bsbkmajorcontrol-group" class="control-group {{ _('error') if 'bsbkmajor_error' in template_values and template_values['bsbkmajor_error'] else '' }}">
+                        <label class="control-label" for="bsbkmajor">本科专业</label>
+                        <div class="controls">
+                            <input  id="bsbkmajor" name="bsbkmajor" size="30" type="text" value="{{ escape(template_values['bsbkmajor']) if 'bsbkmajor' in template_values and template_values['bsbkmajor'] else '' }}" onblur="clearinfo('bsbkmajor');">
+                            <span id="bsbkmajorhelp" class="help-inline">{{ escape(template_values['bsbkmajor_error_message']) if 'bsbkmajor_error' in template_values and template_values['bsbkmajor_error'] else "" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="zx" class={{ _("show") if 'coltype' in template_values and template_values['coltype'] == 'zx' else "hide" }}>
+                    <div id="zxschoolcontrol-group" class="control-group {{ _('error') if 'zxschool_error' in template_values and template_values['zxschool_error'] else '' }}">
+                        <label class="control-label" for="zxschool">学校</label>
+                        <div class="controls">
+                            <input  id="zxschool" name="zxschool" size="30" type="text" value="{{ escape(template_values['zxschool']) if 'zxschool' in template_values and template_values['zxschool'] else '' }}" onblur="clearinfo('zxschool');">
+                            <span id="zxschoolhelp" class="help-inline">{{ escape(template_values['zxschool_error_message']) if 'zxschool_error' in template_values and template_values['zxschool_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="zxprovincecontrol-group" class="control-group {{ _('error') if 'zxprovince_error' in template_values and template_values['zxprovince_error'] else '' }}">
+                        <label class="control-label" for="zxprovince">省份</label>
+                        <div class="controls">
+                            <input  id="zxprovince" name="zxprovince" size="30" type="text" value="{{ escape(template_values['zxprovince']) if 'zxprovince' in template_values and template_values['zxprovince'] else '' }}" onblur="clearinfo('zxprovince');">
+                            <span id="zxprovincehelp" class="help-inline">{{ escape(template_values['zxprovince_error_message']) if 'zxprovince_error' in template_values and template_values['zxprovince_error'] else "" }}</span>
+                        </div>
+                    </div>
+                    <div id="zxcitycontrol-group" class="control-group {{ _('error') if 'zxcity_error' in template_values and template_values['zxcity_error'] else '' }}">
+                        <label class="control-label" for="zxcity">城市</label>
+                        <div class="controls">
+                            <input  id="zxcity" name="zxcity" size="30" type="text" value="{{ escape(template_values['zxcity']) if 'zxcity' in template_values and template_values['zxcity'] else '' }}" onblur="clearinfo('zxcity');">
+                            <span id="zxcityhelp" class="help-inline">{{ escape(template_values['zxcity_error_message']) if 'zxcity_error' in template_values and template_values['zxcity_error'] else "" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="domaincontrol-group" class="control-group {{ _('error') if 'domain_error' in template_values and template_values['domain_error'] else '' }}">
+                    <label class="control-label" for="domain">个性域名</label>
+                    <div class="controls">
+                        http://18zhou.com/people/<input class="input-mini" id="domain" name="domain" size="30" type="text" value="{{ escape(template_values['domain']) if 'domain' in template_values and template_values['domain'] else '' }}" onblur="domaininfo();">
+                        <span id="domainhelp" class="help-inline">{{ escape(template_values['domain_error_message']) if 'domain_error' in template_values and template_values['domain_error'] else "" }}</span>
+                    </div>
+                </div>
+            </fieldset>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" onclick="return submitfunction();">注册</button>
+            </div>
+            {{ xsrf_form_html() }}
+        </form>
+    </div>
+    <div class="span4">
+        <h3>关于注册18周</h3>
+        <ul>
+            <li>注册并登录后，你可以和别人分享发现，共同学习，认识其他同学</li>
+            <li>原则上，18周只允许学生注册</li>
+            <li>请使用真实邮箱注册</li>
+        </ul>            
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url("js/signup.js") }}"></script>
+{% end %}
