@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
+<title>18周 › {% if template_values['is_self'] and template_values['type'] == 'following' %}我关注的人{% elif template_values['is_self'] and template_values['type'] == 'follower' %}关注我的人{% elif not template_values['is_self'] and template_values['type'] == 'following' %}{{ template_values['username'] }}关注的人{% elif not template_values['is_self'] and template_values['type'] == 'follower' %}关注{{ template_values['username'] }}的人{% end %}</title>
 <style type="text/css">
     .hero-unit .avatar {
         float: left;
@@ -101,9 +102,9 @@
                 <div class="col_header">
                     <div class="profile-text">
                         {% if template_values['type'] == 'following' %}
-                        {% if template_values['is_self'] and current_user %}你{% else %}ta{% end %}关注{{ template_values['follow_count'] }}人
+                        {% if template_values['is_self'] and current_user %}我{% else %}ta{% end %}关注{{ template_values['follow_count'] }}人
                         {% elif template_values['type'] == 'follower' %}
-                        {{ template_values['follower_count'] }}人关注{% if template_values['is_self'] and current_user %}你{% else %}ta{% end %}
+                        {{ template_values['follower_count'] }}人关注{% if template_values['is_self'] and current_user %}我{% else %}ta{% end %}
                         {% end %}
                     </div>
                 </div>
