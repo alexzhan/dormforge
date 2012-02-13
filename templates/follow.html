@@ -102,9 +102,9 @@
                 <div class="col_header">
                     <div class="profile-text">
                         {% if template_values['type'] == 'following' %}
-                        {% if template_values['is_self'] and current_user %}我{% else %}ta{% end %}关注{{ template_values['follow_count'] }}人
+                        {% if template_values['is_self'] and current_user %}我{% else %}{{ template_values['username'] }}{% end %}关注{{ template_values['follow_count'] }}人
                         {% elif template_values['type'] == 'follower' %}
-                        {{ template_values['follower_count'] }}人关注{% if template_values['is_self'] and current_user %}我{% else %}ta{% end %}
+                        {{ template_values['follower_count'] }}人关注{% if template_values['is_self'] and current_user %}我{% else %}{{ template_values['username'] }}{% end %}
                         {% end %}
                     </div>
                 </div>
