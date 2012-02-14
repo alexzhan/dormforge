@@ -45,8 +45,14 @@ function submitdesc() {
     return false;
 }
 function follow(button_id, from_user, to_user){
+    if($("#" + button_id).attr("disabled") == "disabled" || $("#" + button_id).attr("disabled") == "true")
+        return false;
+    $("#" + button_id).addClass("disabled");
+    $("#" + button_id).attr("disabled",true);
+    $("#un" + button_id).removeClass("disabled");
+    $("#un" + button_id).attr("disabled",false);
     $.ajax({
-        type:"POST",
+    type:"POST",
     url:"/follow",
     data:{from_user:from_user,to_user:to_user,_xsrf:getCookie("_xsrf")},
     success:function(data){
@@ -58,8 +64,14 @@ function follow(button_id, from_user, to_user){
 }
 
 function unfollow(button_id, from_user, to_user){
+    if($("#un" + button_id).attr("disabled") == "disabled" || $("#un" + button_id).attr("disabled") == "true")
+        return false;
+    $("#un" + button_id).addClass("disabled");
+    $("#un" + button_id).attr("disabled",true);
+    $("#" + button_id).removeClass("disabled");
+    $("#" + button_id).attr("disabled",false);
     $.ajax({
-        type:"POST",
+    type:"POST",
     url:"/unfollow",
     data:{from_user:from_user,to_user:to_user,_xsrf:getCookie("_xsrf")},
     success:function(data){
