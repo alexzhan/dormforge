@@ -110,12 +110,13 @@
 {% end %}
 {% block body %}
 <div class="container">
+    {% if not current_user %}{% module Template("modules/followpopup.html") %}{% end %}
     <div class="hero-unit" style="margin-left:40px;padding:0;background-color:#FFF">
         <div class="namefollowrow">
             <h3 style="display:inline">{{ escape(template_values['username']) }}</h3>
             {% if not template_values['is_self'] %}
             {% if not template_values['is_follow'] %}
-            <a id="follow-btn" class="btn btn-primary" onclick="{% if current_user %}follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
+            <a id="follow-btn" data-toggle="modal" href="#myModal" class="btn btn-primary" onclick="{% if current_user %}return follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
             <a id="unfollow-btn" class="btn" style="display:none" onclick="{% if current_user %}unfollow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">取消关注</a>
             {% else %}
             <a id="follow-btn" class="btn btn-primary" style="display:none" onclick="{% if current_user %}follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
@@ -253,4 +254,5 @@
     {% end %}
     {% block bottom %}
     <script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
+    <script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
     {% end %}

@@ -54,6 +54,7 @@ function follow(button_id, from_user, to_user){
         $("#un" + button_id).show();
     }       
     });
+    return false;
 }
 
 function unfollow(button_id, from_user, to_user){

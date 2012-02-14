@@ -71,6 +71,7 @@
 {% end %}
 {% block body %}
 <div class="container">
+    {% if not current_user %}{% module Template("modules/followpopup.html") %}{% end %}
     <div class="hero-unit" style="margin-left:40px;padding:0;background-color:#FFF">
         <div class="namefollowrow">
             <h3 style="display:inline">{{ escape(template_values['region']) }}</h3>
@@ -107,7 +108,7 @@
                             <a id="following-btn{{ follow.id }}" class="btn btn-small btn-primary" style="display:none" onclick="follow('following-btn{{ follow.id }}', {{ current_user['id'] if current_user else 0 }}, {{ follow.id }})">关注</a>
                             <a id="unfollowing-btn{{ follow.id }}" class="btn btn-small" onclick="unfollow('following-btn{{ follow.id }}', {{ current_user['id'] if current_user else 0 }}, {{ follow.id }})">取消关注</a>
                             {% else %}
-                            <a id="following-btn{{ follow.id }}" class="btn btn-small btn-primary" onclick="follow('following-btn{{ follow.id }}', {{ current_user['id'] if current_user else 0 }}, {{ follow.id }})">关注</a>
+                            <a id="following-btn{{ follow.id }}" class="btn btn-small btn-primary" data-toggle="modal" href="#myModal" onclick="return follow('following-btn{{ follow.id }}', {{ current_user['id'] if current_user else 0 }}, {{ follow.id }})">关注</a>
                             <a id="unfollowing-btn{{ follow.id }}" class="btn btn-small" style="display:none" onclick="unfollow('following-btn{{ follow.id }}', {{ current_user['id'] if current_user else 0 }}, {{ follow.id }})">取消关注</a>
                             {% end %}
                             {% end %}
@@ -122,4 +123,5 @@
 {% end %}
 {% block bottom %}
 <script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
+<script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
 {% end %}
