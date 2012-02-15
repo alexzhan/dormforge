@@ -20,15 +20,21 @@ class UserActivityGraph(object):
         addresult = self.client.lpush(Activity_key, activity_key)
         return addresult
 
-    def del_activity(self, user, actto):
+    def del_activity(self, user, acttype, actto):
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
-        activity_key = '%s:%s:%s' % (self.activity_KEY, user, self.client.llen(Activity_key) + 1)
+        mark = 1
         for activity_key in self.client.lrange(Activity_key, 0, -1):
-            if self.client.hmget(activity_key, ['to'])[0] == actto:
-                #here we don't hmdel the activity,because:1,there is no hmdel command for now
+            if self.client.hmget(activity_key, ['type', 'to']) == [acttype, actto]:
+                #here 1,we don't hmdel the activity,because:there is no hmdel command for now
                 #in redis2.9.3 and there is no need to del it if your memory is enough
+                #2,we must put a mark here because there may not exist the key we want to del,
+                #but without a mark,we have to del the largest key as the loop goes
+                mark = 0
                 break
-        return self.client.lrem(Activity_key, 0, activity_key)
+        if mark:
+            return false
+        else:
+            return self.client.lrem(Activity_key, 0, activity_key)
 
     #get top 5 activities
     def get_top_activities(self, user):

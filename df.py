@@ -891,11 +891,13 @@ class FollowHandler(BaseHandler):
         to_user = self.get_argument("to_user",None)
         if from_user == to_user or from_user == 0 or to_user == 0: raise tornado.web.HTTPError(405)
         ufg = UserFollowGraph(self.rd)
-        ufg.follow(from_user, to_user)
-        acttime = time.strftime('%Y-%m-%d %X', time.localtime()) 
-        actto = self.db.get("select name from fd_People where id = %s", to_user).name
-        actdict = { 'type':1, 'time':acttime, 'to':actto }
-        add_activity(self.rd, from_user, actdict)
+        if ufg.follow(from_user, to_user):
+            acttime = time.strftime('%Y-%m-%d %X', time.localtime()) 
+            actto = self.db.get("select name from fd_People where id = %s", to_user).name
+            actdict = { 'type':1, 'time':acttime, 'to':actto }
+            add_activity(self.rd, from_user, actdict)
+        else:
+            self.write('already')
 
 class UnfollowHandler(BaseHandler):
     @tornado.web.authenticated
@@ -904,9 +906,11 @@ class UnfollowHandler(BaseHandler):
         to_user = self.get_argument("to_user",None)
         if from_user == to_user or from_user == 0 or to_user == 0: raise tornado.web.HTTPError(405)
         ufg = UserFollowGraph(self.rd)
-        ufg.unfollow(from_user, to_user)
-        actto = self.db.get("select name from fd_People where id = %s", to_user).name
-        del_activity(self.rd, from_user, actto)
+        if ufg.unfollow(from_user, to_user):
+            actto = self.db.get("select name from fd_People where id = %s", to_user).name
+            del_activity(self.rd, from_user, "1", actto)
+        else:
+            self.write('already')
 
 class SelfdescHandler(BaseHandler):
     @tornado.web.authenticated
@@ -932,9 +936,9 @@ def add_activity(client, actuser, actdict):
     uag = UserActivityGraph(client)
     return uag.add_activity(actuser, actdict)
 
-def del_activity(client, actuser, actto):
+def del_activity(client, actuser ,acttype, actto):
     uag = UserActivityGraph(client)
-    return uag.del_activity(actuser, actto)
+    return uag.del_activity(actuser, acttype, actto)
 
 def main():
     tornado.options.parse_command_line()
