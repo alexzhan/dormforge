@@ -11,6 +11,8 @@ class UserFollowGraph(object):
     #forward_key' format : 'u:F:1' ('u:F:user_id')
     #reverse_key' format : 'u:f:1' ('u:f:user_id')
     def follow(self, from_user, to_user):
+        if to_user in self.get_follows(from_user):
+            return False
         forward_key = 'u:%s:%s' % (self.FOLLOWS_KEY, from_user)
         forward = self.client.lpush(forward_key, to_user)
         reverse_key = 'u:%s:%s' % (self.FOLLOWERS_KEY, to_user)
@@ -18,6 +20,8 @@ class UserFollowGraph(object):
         return forward and reverse
 
     def unfollow(self, from_user, to_user):
+        if to_user not in self.get_follows(from_user):
+            return False
         forward_key = 'u:%s:%s' % (self.FOLLOWS_KEY, from_user)
         forward = self.client.lrem(forward_key, 0, to_user)
         reverse_key = 'u:%s:%s' % (self.FOLLOWERS_KEY, to_user)
