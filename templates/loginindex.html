@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>18周--首页</title>
+<style type="text/css">
+    .container .row .span3 {
+        float: right;
+        margin-right:10px;
+    }
+    .publish {
+        margin: 0 0 10px 40px;
+    }
+    .btn-small {
+        padding: 2px 5px;
+        width: 55px;
+    }
+    i {
+        margin-right: 3px;
+    }
+    .pubbox {
+        margin-top: 10px;
+    }
+    #pubtextarea {
+        height: 18px;
+    }
+    .main-tab {
+        color: #666;
+        background: #E0E0E0;
+        border-color: #E0E0E0;
+    }
+    .feed-title {
+        margin-left: 40px;
+        color: #666;
+        font-weight: bold;
+        border-bottom: 1px solid #B0B0B0;
+        padding-bottom: 5px;
+    }
+    .submit-btn {
+        text-align: right;
+        margin-right: 60px;
+        display: none;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="span6">
+            <div class="publish">
+                <div class="pubbtn">
+                    <a class="btn btn-small main-tab"><i class="icon-plus-sign"></i>状态</a>
+                    <a class="btn btn-small"><i class="icon-pencil"></i>日志</a>
+                    <a class="btn btn-small"><i class="icon-picture"></i>图片</a>
+                    <a class="btn btn-small"><i class="icon-bookmark"></i>链接</a>
+                </div>
+                <div class="pubbox">
+                    <!--<input id="pubinput" type="text" style="width:460px">-->
+                    <textarea id="pubtextarea" placeholder="   你在想什么?" style="width:460px;" onfocus="showbtn();"></textarea>
+                    <div class="submit-btn">
+                        <a href="#" id="cancelsubmit" onclick="return cancelsubmit();">取消</a>
+                        <a class="btn btn-primary btn-small" style="width: 30px;margin-left: 5px"  onclick="return submit();">提交</a>
+                    </div>
+                </div>
+            </div>
+            <div class="feed">
+                <div class="feed-title">
+                    最新动态
+                </div>
+            </div>
+        </div>
+        <div class="span3">Level 2</div>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url("js/loginindex.js") }}"></script>
+{% end %}

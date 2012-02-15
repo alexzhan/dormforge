@@ -204,7 +204,10 @@ class FollowBaseHandler(BaseHandler):
 
 class HomeHandler(BaseHandler):
     def get(self):
-        self.render("index.html")
+        if self.current_user:
+            self.render("loginindex.html")
+        else:
+            self.render("index.html")
 
 class SignupHandler(BaseHandler):
     def get(self):
