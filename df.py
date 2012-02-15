@@ -184,9 +184,10 @@ class FollowBaseHandler(BaseHandler):
         if len(follows) == 0:
             follow_people = []
         else:
-            idstr = "".join(["(", "%s,"*(len(follows)-1), "%s", ")"])
-            #logging.info("SELECT name from fd_People where id in " + idstr % tuple(follows))
-            follow_people = self.db.query("SELECT id,name from fd_People where id in " + idstr % tuple(follows)) 
+            for i in range(len(follows)):
+                follows[i] = int(follows[i])
+            orderstr = str(follows)[1:-1].replace(" ","")
+            follow_people = self.db.query("SELECT id,name from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
             for i in range(len(follow_people)):
                 follow_people[i].is_follow = ufg.is_follow(self.get_secure_cookie("user"), follow_people[i].id)
                 follow_people[i].image = self.static_url("img/no_avatar.jpg")
