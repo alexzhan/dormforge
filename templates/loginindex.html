@@ -94,9 +94,8 @@
                 {% end %}
                 <div class="pubbox">
                     <!--<input id="pubinput" type="text" style="width:460px">-->
-                    <textarea id="pubtextarea" placeholder="   你在想什么?" onfocus="showbtn();"></textarea>
+                    <textarea id="pubtextarea" placeholder="   你在想什么?" onfocusin="showbtn();" onfocusout="hidebtn();"></textarea>
                     <div class="submit-btn">
-                        <a href="#" id="cancelsubmit" onclick="return cancelsubmit();">取消</a>
                         <a class="btn btn-primary btn-small" style="width: 30px;margin-left: 5px"  onclick="return submit();">提交</a>
                     </div>
                 </div>
@@ -106,6 +105,7 @@
                     最新动态
                 </div>
                 <div class="feed-body">
+                    <!--
                     <div class="feed-item">
                         <div class="avatar">
                             <a href="#"><img width="50px" height="50px" src="../static/img/no_avatar.jpg"></a>
@@ -127,31 +127,38 @@
                             </div>
                         </div>
                     </div>
+                    -->
+                    {% for activity in template_values['all_activities'] %}
+                    {% if activity[-1] == 'status' %}
                     <div class="feed-item">
                         <div class="avatar">
                             <a href="#"><img width="50px" height="50px" src="../static/img/no_avatar.jpg"></a>
                         </div>
                         <div class="feed-item-content">
                             <div class="feed-item-title">
-                                <a class="feed-item-title name" href="/people/alex">alex</a>
+                                <a class="feed-item-title name" href="/people/{{ activity[-2] }}">{{ activity[-2] }}</a>
                                 <span class="feed-item-title desc">更新了状态:</span>
                             </div>
                             <div class="feed-item-body">
-                                <p>从林书豪现象想到</p>
+                                <p>{{ activity[2] }}</p>
                             </div>
                             <div class="feed-item-footer">
+                                <span><a class="footerlink" href="#"><i class="icon-remove"></i>删除</a></span>
+                                <span class="splitter">•</span>
                                 <span><a class="footerlink" href="#"><i class="icon-retweet"></i>推荐1</a></span>
                                 <span class="splitter">•</span>
                                 <span><a class="footerlink" href="#"><i class="icon-comment"></i>评论1</a></span>
                                 <span class="splitter">•</span>
-                                <span><a class="footerlink" href="#"><i class="icon-time"></i>2012-02-15 14:59:57</a></span>
+                                <span><a class="footerlink" href="/people/{{ activity[-2] }}/status/{{ activity[1] }}"><i class="icon-time"></i>{{ activity[0] }}</a></span>
                             </div>
                         </div>
                     </div>
+                    {% end %}
+                    {% end %}
                 </div>
             </div>
         </div>
-        <div class="span3">Level 2</div>
+        <div class="span3"></div>
     </div>
 </div>
 {% end %}
