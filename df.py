@@ -48,6 +48,7 @@ class Application(tornado.web.Application):
                 (r"/follow", FollowHandler),
                 (r"/unfollow", UnfollowHandler),
                 (r"/selfdesc", SelfdescHandler),
+                (r"/pubstatus", PubstatusHandler),
                 (r"/3e224bd553a3bfca3c7cb92c9806cd04\.html", CdnzzVerifyHandler),
                 ]
         settings = dict(
@@ -934,6 +935,22 @@ class SelfdescHandler(BaseHandler):
             if selfdesc_id:
                 self.db.execute("update fd_People set has_selfdesc"
                         " = 1 where id = %s", self.current_user.id)
+
+class PubstatusHandler(BaseHandler):
+    @tornado.web.authenticated
+    def post(self):
+        status = self.get_argument("statustext",None)
+        if not status: raise tornado.web.HTTPError(405)
+        pubdate = time.strftime('%Y-%m-%d %X', time.localtime())
+        user_id = self.current_user.id
+        user_name = self.current_user.name
+        status_id = self.db.execute("insert into fd_Status (user_id, user_name, "
+                    " status, pubdate) values (%s,%s,%s,%s)", user_id, user_name,
+                    status, pubdate)
+        if status_id:
+            self.write(pubdate)
+        else:
+            self.write("Something wrong...")
 
 class CdnzzVerifyHandler(tornado.web.RequestHandler):
     def get(self):

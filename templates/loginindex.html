@@ -41,6 +41,7 @@
         display: none;
     }
     .avatar {
+        padding-top: 5px;
         float: left;
     }
     .feed-item-content {
@@ -58,6 +59,9 @@
     .feed-item-title .desc {
         color: #999;
         font-size: 12px;
+    }
+    .feed-item-body{
+        margin-top: 5px;
     }
     .feed-item-body p{
         margin-bottom: 5px;
@@ -85,6 +89,9 @@
                     <a class="btn btn-small"><i class="icon-picture"></i>图片</a>
                     <a class="btn btn-small"><i class="icon-bookmark"></i>链接</a>
                 </div>
+                {% if handler.xsrf_token %}
+                <div style="display:none">xsrf generated if logged in ready for publish</div>                   
+                {% end %}
                 <div class="pubbox">
                     <!--<input id="pubinput" type="text" style="width:460px">-->
                     <textarea id="pubtextarea" placeholder="   你在想什么?" onfocus="showbtn();"></textarea>
