@@ -8,7 +8,7 @@
         margin-right:10px;
     }
     .publish {
-        margin: 0 0 10px 40px;
+        margin: 0 0 10px 60px;
     }
     .btn-small {
         padding: 2px 5px;
@@ -22,6 +22,7 @@
     }
     #pubtextarea {
         height: 18px;
+        width: 500px;
     }
     .main-tab {
         color: #666;
@@ -29,7 +30,7 @@
         border-color: #E0E0E0;
     }
     .feed-title {
-        margin-left: 40px;
+        margin-left: 60px;
         color: #666;
         font-weight: bold;
         border-bottom: 1px solid #B0B0B0;
@@ -37,8 +38,43 @@
     }
     .submit-btn {
         text-align: right;
-        margin-right: 60px;
         display: none;
+    }
+    .avatar {
+        padding-top: 5px;
+        float: left;
+    }
+    .feed-item-content {
+        margin-left: 10px;
+        float: left;
+        width: 510px;
+        border-bottom: 1px solid #E0E0E0;
+        padding: 5px 0 5px;
+    }
+    .feed-item-title .name {
+        color: #333;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .feed-item-title .desc {
+        color: #999;
+        font-size: 12px;
+    }
+    .feed-item-body{
+        margin-top: 5px;
+    }
+    .feed-item-body p{
+        margin-bottom: 5px;
+    }
+    .feed-item-footer {
+        font-size: 13px;
+        color: #999;
+    }
+    .footerlink {
+        color: #999;
+    }
+    .splitter {
+        padding: 0 4px;
     }
 </style>
 {% end %}
@@ -53,9 +89,12 @@
                     <a class="btn btn-small"><i class="icon-picture"></i>图片</a>
                     <a class="btn btn-small"><i class="icon-bookmark"></i>链接</a>
                 </div>
+                {% if handler.xsrf_token %}
+                <div style="display:none">xsrf generated if logged in ready for publish</div>                   
+                {% end %}
                 <div class="pubbox">
                     <!--<input id="pubinput" type="text" style="width:460px">-->
-                    <textarea id="pubtextarea" placeholder="   你在想什么?" style="width:460px;" onfocus="showbtn();"></textarea>
+                    <textarea id="pubtextarea" placeholder="   你在想什么?" onfocus="showbtn();"></textarea>
                     <div class="submit-btn">
                         <a href="#" id="cancelsubmit" onclick="return cancelsubmit();">取消</a>
                         <a class="btn btn-primary btn-small" style="width: 30px;margin-left: 5px"  onclick="return submit();">提交</a>
@@ -65,6 +104,50 @@
             <div class="feed">
                 <div class="feed-title">
                     最新动态
+                </div>
+                <div class="feed-body">
+                    <div class="feed-item">
+                        <div class="avatar">
+                            <a href="#"><img width="50px" height="50px" src="../static/img/no_avatar.jpg"></a>
+                        </div>
+                        <div class="feed-item-content">
+                            <div class="feed-item-title">
+                                <a class="feed-item-title name" href="/people/alex">alex</a>
+                                <span class="feed-item-title desc">更新了状态:</span>
+                            </div>
+                            <div class="feed-item-body">
+                                <p>从林书豪现象想到的：1 兴趣很重要。无法想象林对篮球没兴趣的话怎么坚持数年；2 把握机会能力很重要；3找到自己的优势所在很重要，扬长避短；4 从teamleader的角度，慧眼识英雄很重要。有时候总觉得挖人才能解决问题，其实内部已经有千里马。</p>
+                            </div>
+                            <div class="feed-item-footer">
+                                <span><a class="footerlink" href="#"><i class="icon-retweet"></i>推荐1</a></span>
+                                <span class="splitter">•</span>
+                                <span><a class="footerlink" href="#"><i class="icon-comment"></i>评论1</a></span>
+                                <span class="splitter">•</span>
+                                <span><a class="footerlink" href="#"><i class="icon-time"></i>2012-02-15 14:59:57</a></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feed-item">
+                        <div class="avatar">
+                            <a href="#"><img width="50px" height="50px" src="../static/img/no_avatar.jpg"></a>
+                        </div>
+                        <div class="feed-item-content">
+                            <div class="feed-item-title">
+                                <a class="feed-item-title name" href="/people/alex">alex</a>
+                                <span class="feed-item-title desc">更新了状态:</span>
+                            </div>
+                            <div class="feed-item-body">
+                                <p>从林书豪现象想到</p>
+                            </div>
+                            <div class="feed-item-footer">
+                                <span><a class="footerlink" href="#"><i class="icon-retweet"></i>推荐1</a></span>
+                                <span class="splitter">•</span>
+                                <span><a class="footerlink" href="#"><i class="icon-comment"></i>评论1</a></span>
+                                <span class="splitter">•</span>
+                                <span><a class="footerlink" href="#"><i class="icon-time"></i>2012-02-15 14:59:57</a></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
