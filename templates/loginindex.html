@@ -129,27 +129,29 @@
                     </div>
                     -->
                     {% for activity in template_values['all_activities'] %}
-                    {% if activity[-1] == 'status' %}
-                    <div class="feed-item">
+                    {% if activity[-2] == 'status' %}
+                    <div class="feed-item{{ activity[-1] }}">
                         <div class="avatar">
                             <a href="#"><img width="50px" height="50px" src="../static/img/no_avatar.jpg"></a>
                         </div>
                         <div class="feed-item-content">
                             <div class="feed-item-title">
-                                <a class="feed-item-title name" href="/people/{{ activity[-2] }}">{{ activity[-2] }}</a>
+                                <a class="feed-item-title name" href="/people/{{ activity[-3] }}">{{ activity[-3] }}</a>
                                 <span class="feed-item-title desc">更新了状态:</span>
                             </div>
                             <div class="feed-item-body">
                                 <p>{{ activity[2] }}</p>
                             </div>
                             <div class="feed-item-footer">
-                                <span><a class="footerlink" href="#"><i class="icon-remove"></i>删除</a></span>
+                                {% if template_values['username'] == activity[-3] %}
+                                <span><a class="footerlink" href="#" onclick="deletestatus({{ activity[-1] }},'{{ activity[-3] }}', {{ activity[1] }});"><i class="icon-remove"></i>删除</a></span>
                                 <span class="splitter">•</span>
+                                {% end %}
                                 <span><a class="footerlink" href="#"><i class="icon-retweet"></i>推荐1</a></span>
                                 <span class="splitter">•</span>
                                 <span><a class="footerlink" href="#"><i class="icon-comment"></i>评论1</a></span>
                                 <span class="splitter">•</span>
-                                <span><a class="footerlink" href="/people/{{ activity[-2] }}/status/{{ activity[1] }}"><i class="icon-time"></i>{{ activity[0] }}</a></span>
+                                <span><a class="footerlink" href="/people/{{ activity[-3] }}/status/{{ activity[1] }}"><i class="icon-time"></i>{{ activity[0] }}</a></span>
                             </div>
                         </div>
                     </div>
