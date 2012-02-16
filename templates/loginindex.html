@@ -143,8 +143,10 @@
                                 <p>{{ activity[2] }}</p>
                             </div>
                             <div class="feed-item-footer">
+                                {% if template_values['username'] == activity[-2] %}
                                 <span><a class="footerlink" href="#"><i class="icon-remove"></i>删除</a></span>
                                 <span class="splitter">•</span>
+                                {% end %}
                                 <span><a class="footerlink" href="#"><i class="icon-retweet"></i>推荐1</a></span>
                                 <span class="splitter">•</span>
                                 <span><a class="footerlink" href="#"><i class="icon-comment"></i>评论1</a></span>

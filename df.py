@@ -209,7 +209,8 @@ class HomeHandler(BaseHandler):
             template_values = {}
             uag = UserActivityGraph(self.rd)
             template_values['all_activities'] = uag.get_all_activities(self.db)
-            logging.info("%s--length", len(template_values['all_activities']))
+            template_values['username'] = self.current_user.name
+            #logging.info("%s--length", len(template_values['all_activities']))
             self.render("loginindex.html", template_values=template_values)
         else:
             self.render("index.html")
@@ -922,7 +923,7 @@ class UnfollowHandler(BaseHandler):
         ufg = UserFollowGraph(self.rd)
         if ufg.unfollow(from_user, to_user):
             actto = self.db.get("select name from fd_People where id = %s", to_user).name
-            del_activity(self.rd, from_user, "1", actto)
+            del_activity(self.rd, from_user, 0, actto)
         else:
             self.write('already')
 

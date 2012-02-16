@@ -24,18 +24,32 @@ class UserActivityGraph(object):
     def del_activity(self, user, acttype, actto):
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
         mark = 1
-        for activity_key in self.client.lrange(Activity_key, 0, -1):
-            if self.client.hmget(activity_key, ['type', 'to']) == [acttype, actto]:
-                #here 1,we don't hmdel the activity,because:there is no hmdel command for now
-                #in redis2.9.3 and there is no need to del it if your memory is enough
-                #2,we must put a mark here because there may not exist the key we want to del,
-                #but without a mark,we have to del the largest key as the loop goes
-                mark = 0
-                break
-        if mark:
-            return false
-        else:
-            return self.client.lrem(Activity_key, 0, activity_key)
+        if acttype == 0:
+            for activity_key in self.client.lrange(Activity_key, 0, -1):
+                logging.info("key%s", activity_key)
+                logging.info("to%s", self.client.hmget(activity_key, ['to'])[0])
+                logging.info("actto%s", actto)
+                if self.client.hmget(activity_key, ['to'])[0] == actto:
+                    #here 1,we don't hmdel the activity,because:there is no hmdel command for now
+                    #in redis2.9.3 and there is no need to del it if your memory is enough
+                    #2,we must put a mark here because there may not exist the key we want to del,
+                    #but without a mark,we have to del the largest key as the loop goes
+                    mark = 0
+                    break
+            if mark:
+                return False
+            else:
+                return self.client.lrem(Activity_key, 0, activity_key)
+        elif acttype == 1:
+            Status_key = 'u:S:%s' % user
+            for status_key in self.client.lrange(Status_key, 0, -1):
+                if self.client.hmget(status_key, ['to'])[0] == actto:
+                    mark = 0
+                    break
+            if mark:
+                return False
+            else:
+                return self.client.lrem(Status_key, 0, status_key) and self.client.lrem(Activity_key, 0, status_key)
 
     #acttype:{follow:0;status:1}
     def add_sub_activity(self, user, acttype, actdict):
@@ -83,10 +97,8 @@ class UserActivityGraph(object):
     def get_all_activities(self, db):
         all_activities = []
         activities_list = self.client.lrange("all", 0, -1)
-        logging.info("%s", len(activities_list))
         for activity in activities_list:
             acttype = activity.split(":")[0]
-            logging.info("%s", acttype)
             act_userid = activity.split(":")[1]
             if self.client.get('u:' + act_userid):
                 act_username = self.client.get('u:' + act_userid)
