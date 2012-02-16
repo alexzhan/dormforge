@@ -206,7 +206,11 @@ class FollowBaseHandler(BaseHandler):
 class HomeHandler(BaseHandler):
     def get(self):
         if self.current_user:
-            self.render("loginindex.html")
+            template_values = {}
+            uag = UserActivityGraph(self.rd)
+            template_values['all_activities'] = uag.get_all_activities(self.db)
+            logging.info("%s--length", len(template_values['all_activities']))
+            self.render("loginindex.html", template_values=template_values)
         else:
             self.render("index.html")
 
@@ -771,6 +775,8 @@ class PeopleHandler(UserBaseHandler):
         uag = UserActivityGraph(self.rd)
         template_values['activities'] = uag.get_top_activities(template_values['id']) 
         template_values['activity_count'] = uag.count_activity(template_values['id']) 
+        template_values['statuses'] = uag.get_top_sub_activities(template_values['id'], 1) 
+        template_values['status_count'] = uag.count_sub_activity(template_values['id'], 1) 
         self.render("people.html", template_values=template_values)
 
 class FollowingHandler(FollowBaseHandler):
@@ -902,8 +908,8 @@ class FollowHandler(BaseHandler):
         if ufg.follow(from_user, to_user):
             acttime = time.strftime('%Y-%m-%d %X', time.localtime()) 
             actto = self.db.get("select name from fd_People where id = %s", to_user).name
-            actdict = { 'type':1, 'time':acttime, 'to':actto }
-            add_activity(self.rd, from_user, actdict)
+            actdict = {'time':acttime, 'to':actto}
+            add_activity(self.rd, from_user, 0, actdict)
         else:
             self.write('already')
 
@@ -947,7 +953,13 @@ class PubstatusHandler(BaseHandler):
         status_id = self.db.execute("insert into fd_Status (user_id, user_name, "
                     " status, pubdate) values (%s,%s,%s,%s)", user_id, user_name,
                     status, pubdate)
-        if status_id:
+        #redis
+        #actto's format is like the kind as follow,change it to id for memory,let tempalte make the link
+        #actto = "".join(["/people/", str(self.current_user.name), "/status/", str(status_id)])
+        actto = status_id
+        actdict = {'time':pubdate, 'to':actto, 'status':status}
+        addresult = add_activity(self.rd, user_id, 1, actdict)
+        if status_id and addresult:
             self.write(pubdate)
         else:
             self.write("Something wrong...")
@@ -956,9 +968,9 @@ class CdnzzVerifyHandler(tornado.web.RequestHandler):
     def get(self):
         self.write('e1faafa0c2f808702da5c1b7fda8e919')
 
-def add_activity(client, actuser, actdict):
+def add_activity(client, actuser, acttype, actdict):
     uag = UserActivityGraph(client)
-    return uag.add_activity(actuser, actdict)
+    return uag.add_activity(actuser,acttype ,actdict)
 
 def del_activity(client, actuser ,acttype, actto):
     uag = UserActivityGraph(client)
@@ -969,7 +981,6 @@ def main():
     http_server = tornado.httpserver.HTTPServer(Application(), xheaders=True)
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
-
 
 if __name__ == "__main__":
     main()

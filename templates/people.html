@@ -47,7 +47,7 @@
         padding: 0;
     }
     .row {
-        margin-left:10px;
+        margin-left:0;
         display:block;
         clear: both;
         width: 100%;
@@ -80,7 +80,6 @@
         padding: 5px;
         margin-left: -5px;
         width: 100%;
-        color: #333;
     }
     div.timestamp {
         font-size: .8em;
@@ -190,7 +189,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" style="margin-left: 10px">
         <div class="span4">
             <div class="col_header">
                 <a href="#" class="tabtitle">活动 {{ template_values['activity_count'] }}</a>
@@ -198,8 +197,10 @@
             <div class="latest_activity">
                 {% for activity in template_values['activities']%}
                 <p class="light_gray">
-                {% if activity[0] == '1' %}
-                <a href="/people/{{ template_values['username'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[2] }}">{{ activity[2] }}</a>. <span class="timestamp">{{ activity[1] }}</span>
+                {% if activity[-1] == 0 %}
+                <a href="/people/{{ template_values['username'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[1] }}">{{ activity[1] }}</a>. <span class="timestamp">{{ activity[0] }}</span>
+                {% elif activity[-1] == 1 %}
+                <a href="/people/{{ template_values['username'] }}">{{ template_values['username'] }}</a> <a href="/people/{{ template_values['username'] }}/status/{{ activity[1] }}">更新了状态.</a> <span class="timestamp">{{ activity[0] }}</span>
                 {% end %}
                 </p>
                 {% end %}
@@ -208,46 +209,22 @@
         </div>
         <div class="span4">
             <div class="col_header">
-                <a href="#" class="tabtitle">状态 0</a>
+                <a href="#" class="tabtitle">状态 {{ template_values['status_count'] }}</a>
             </div>
-            <!--
+            {% for status in template_values['statuses'] %}
             <div class="row">
-                <a class="status_preview_link" href="#">
+                <div class="status_preview_link">
                     <span class="cell">
                         <div class="status_preview">
-                            终于调好了。洗洗睡了。
+                            {{ status[2] }} 
                         </div>
                         <div class="timestamp">
-                            2月3日04:44
+                            <a href="/people/{{ template_values['username']}}/status/{{ status[1] }}" style="color:#999">{{ status[0] }}</a>
                         </div>
                     </span>
-                </a>
-            </div>
-            <div class="row">
-                <a class="status_preview_link" href="#">
-                    <span class="cell">
-                        <div class="status_preview">
-                            今天改用Supervisor控制程序 http://t.cn/aCvxfj
-                        </div>
-                        <div class="timestamp">
-                            2月2日22:01
-                        </div>
-                    </span>
-                </a>
-            </div>
-            <div class="row">
-                <a class="status_preview_link" href="#">
-                    <span class="cell">
-                        <div class="status_preview">
-                            怎样才能将“山寨”移动应用扫地出门 | “山寨”并非国内独有，在App Store也有很多山寨应用。现在苹果决定不再放任，准备将这些山寨货踢...
-                        </div>
-                        <div class="timestamp">
-                            今天14:06
-                        </div>
-                    </a>
                 </div>
-                -->
             </div>
+            {% end %}
         </div>
 
     </div>
