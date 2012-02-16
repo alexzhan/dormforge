@@ -1,4 +1,3 @@
-import logging
 class UserActivityGraph(object):
 
     def __init__(self, client):
@@ -26,9 +25,6 @@ class UserActivityGraph(object):
         mark = 1
         if acttype == 0:
             for activity_key in self.client.lrange(Activity_key, 0, -1):
-                logging.info("key%s", activity_key)
-                logging.info("to%s", self.client.hmget(activity_key, ['to'])[0])
-                logging.info("actto%s", actto)
                 if self.client.hmget(activity_key, ['to'])[0] == actto:
                     #here 1,we don't hmdel the activity,because:there is no hmdel command for now
                     #in redis2.9.3 and there is no need to del it if your memory is enough
@@ -41,7 +37,7 @@ class UserActivityGraph(object):
             else:
                 return self.client.lrem(Activity_key, 0, activity_key)
         elif acttype == 1:
-            Status_key = 'u:S:%s' % user
+            Status_key = 'u:Status:%s' % user
             for status_key in self.client.lrange(Status_key, 0, -1):
                 if self.client.hmget(status_key, ['to'])[0] == actto:
                     mark = 0
@@ -49,7 +45,7 @@ class UserActivityGraph(object):
             if mark:
                 return False
             else:
-                return self.client.lrem(Status_key, 0, status_key) and self.client.lrem(Activity_key, 0, status_key)
+                return self.client.lrem(Status_key, 0, status_key) and self.client.lrem(Activity_key, 0, status_key) and self.client.lrem("all", 0, status_key)
 
     #acttype:{follow:0;status:1}
     def add_sub_activity(self, user, acttype, actdict):
@@ -97,6 +93,7 @@ class UserActivityGraph(object):
     def get_all_activities(self, db):
         all_activities = []
         activities_list = self.client.lrange("all", 0, -1)
+        index = 1
         for activity in activities_list:
             acttype = activity.split(":")[0]
             act_userid = activity.split(":")[1]
@@ -109,6 +106,8 @@ class UserActivityGraph(object):
                 real_activity = self.client.hmget(activity, ["time","to",'status'])
                 real_activity.append(act_username)
                 real_activity.append(acttype)
+                real_activity.append(index)
+            index = index + 1
             all_activities.append(real_activity)
         return all_activities
 

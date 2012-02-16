@@ -45,6 +45,7 @@ class Application(tornado.web.Application):
                 (r"/isemailexist", EmailExistHandler),
                 (r"/isdomainexist", DomainExistHandler),
                 (r"/iscollegeexist", CollegeExistHandler),
+                (r"/deletestatus", DeleteStatusHandler),
                 (r"/follow", FollowHandler),
                 (r"/unfollow", UnfollowHandler),
                 (r"/selfdesc", SelfdescHandler),
@@ -898,6 +899,16 @@ class CollegeExistHandler(BaseHandler):
             self.write("可以注册")
         else: 
             self.write("学校不存在或不是全称")
+
+class DeleteStatusHandler(BaseHandler):
+    def post(self):
+        user = self.get_argument("user",None)
+        actto = self.get_argument("actto",None)
+        user_id = self.db.get("select id from fd_People where name = %s", user).id
+        if user_id != self.current_user.id:
+            raise tornado.web.HTTPError(405)
+        # don't remove in db now because data is not got wholy in redis
+        del_activity(self.rd, user_id, 1, actto)
 
 class FollowHandler(BaseHandler):
     @tornado.web.authenticated
