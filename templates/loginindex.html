@@ -17,6 +17,9 @@
     i {
         margin-right: 3px;
     }
+    .publish {
+        width: 510px;
+    }
     .pubbox {
         margin-top: 10px;
     }
@@ -29,12 +32,16 @@
         background: #E0E0E0;
         border-color: #E0E0E0;
     }
+    .feed-item {
+        width:570px;
+    }
     .feed-title {
         margin-left: 60px;
         color: #666;
         font-weight: bold;
         border-bottom: 1px solid #B0B0B0;
         padding-bottom: 5px;
+        width:510px;
     }
     .submit-btn {
         text-align: right;
@@ -43,6 +50,7 @@
     .avatar {
         padding-top: 5px;
         float: left;
+        width: 50px;
     }
     .feed-item-content {
         margin-left: 10px;
@@ -130,7 +138,7 @@
                     -->
                     {% for activity in template_values['all_activities'] %}
                     {% if activity[-2] == 'status' %}
-                    <div class="feed-item{{ activity[-1] }}">
+                    <div id="feed-item{{ activity[-1] }}" class="feed-item">
                         <div class="avatar">
                             <a href="#"><img width="50px" height="50px" src="{{ static_url("img/no_avatar.jpg") }}"></a>
                         </div>
