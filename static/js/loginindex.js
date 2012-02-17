@@ -34,7 +34,7 @@ function deletestatus(item_id, user, status_id){
     url:'/deletestatus',
     data:{user:user,actto:status_id,_xsrf:getCookie('_xsrf')},
     success:function(data){
-        $(".feed-item" + item_id).hide('slow');
+        $("#feed-item" + item_id).hide('slow');
     }       
     });
 }
