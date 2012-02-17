@@ -104,7 +104,7 @@
                 {% end %}
                 <div class="pubbox">
                     <!--<input id="pubinput" type="text" style="width:460px">-->
-                    <textarea id="pubtextarea" placeholder="你在想什么?" onfocusin="showbtn();" onfocusout="hidebtn();"></textarea>
+                    <textarea id="pubtextarea" placeholder="你在想什么?"></textarea>
                     <div class="submit-btn">
                         <a class="btn btn-primary btn-small" style="width: 30px;margin-left: 5px"  onclick="return submit();">提交</a>
                     </div>
@@ -131,7 +131,7 @@
                             </div>
                             <div class="feed-item-footer">
                                 {% if template_values['username'] == activity[-3] %}
-                                <span><a class="footerlink" href="#" onclick="deletestatus({{ activity[-1] }},'{{ activity[-3] }}', {{ activity[1] }});"><i class="icon-remove"></i>删除</a></span>
+                                <span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-3] }}', {{ activity[1] }});"><i class="icon-remove"></i>删除</a></span>
                                 <span class="splitter">•</span>
                                 {% end %}
                                 <!--
@@ -154,5 +154,5 @@
 </div>
 {% end %}
 {% block bottom %}
-<script type="text/javascript" src="{{ static_url("js/loginindex.js") }}"></script>
+<script type="text/javascript" src="{{ static_url("js/logindex.js") }}"></script>
 {% end %}
