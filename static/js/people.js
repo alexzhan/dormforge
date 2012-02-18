@@ -7,7 +7,7 @@ function changedesc() {
     $("#textdesc").hide();
     $(".the-icons").hide();
     $(".descform").show();
-    $('#description').val($("#textdesc").text());
+    $('#description').val($("#textdesc").html().replace(/<br>/gi,'\n'));
     return false;
 }
 function canceldesc() {
@@ -24,11 +24,10 @@ function submitdesc() {
     var selfdesc = $('#description').val();
     if(selfdesc == '')
         return false;
-    if($("#textdesc").text() != "" && $("#textdesc").text() == $('#description').val()){
+    if($("#textdesc").text() != "" && $("#textdesc").html().replace(/<br>/gi,'\n') == selfdesc){
         $(".descform").hide();
         $("#textdesc").css("display", "inline");
         $(".the-icons").show();
-        $("#textdesc").html(selfdesc);
         return false;
     }
     $.ajax({
@@ -39,7 +38,7 @@ function submitdesc() {
             $(".descform").hide();
             $("#textdesc").css("display", "inline");
             $(".the-icons").show();
-            $("#textdesc").html(selfdesc);
+            $("#textdesc").html(selfdesc.replace(/\n/gi, '<br>'));
         }       
     });
     return false;

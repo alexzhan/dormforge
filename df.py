@@ -943,7 +943,9 @@ class SelfdescHandler(BaseHandler):
     def post(self):
         selfdesc = self.get_argument("selfdesc",None)
         if not selfdesc: raise tornado.web.HTTPError(405)
-        #logging.info("%s", self.current_user.has_selfdesc)
+        logging.info("%s", selfdesc)
+        selfdesc = selfdesc.replace("\n", "<br>")
+        logging.info("%s", selfdesc)
         if self.current_user.has_selfdesc:
             self.db.execute("update fd_Selfdesc set selfdesc = %s"
                     "where user_id = %s", selfdesc, self.current_user.id)
