@@ -589,7 +589,7 @@ class SignupHandler(BaseHandler):
 
         signup_ip = self.request.remote_ip
         login_ip = signup_ip
-        signup_date = time.strftime('%Y-%m-%d %X', time.localtime())
+        signup_date = time.strftime('%y-%m-%d %H:%M', time.localtime())
         login_date = signup_date
         uuid_ = binascii.b2a_hex(uuid.uuid4().bytes)
         if not (signup_ip and signup_date and uuid_):
@@ -717,7 +717,7 @@ class LoginHandler(BaseHandler):
             return self.render("login.html", template_values=template_values)
         else:
             login_ip = self.request.remote_ip
-            login_date = time.strftime('%Y-%m-%d %X', time.localtime())
+            login_date = time.strftime('%y-%m-%d %H:%M', time.localtime())
             self.db.execute(
                     "UPDATE fd_People SET login_ip = %s, login_date = %s WHERE id = %s", login_ip, login_date, people['id'])
             self.set_secure_cookie("user", str(people['id']))
@@ -737,7 +737,7 @@ class ContactHandler(BaseHandler):
         comments = self.get_argument("comment", None)
         ip = self.request.remote_ip
         user_agent = self.request.headers.get("User-Agent")
-        nowtime = time.strftime('%Y-%m-%d %X', time.localtime())
+        nowtime = time.strftime('%y-%m-%d %H:%M', time.localtime())
         is_login = 1 if self.current_user else 0
         if not username or not email or not subject or not comments:
             raise tornado.web.HTTPError(404)
@@ -918,9 +918,10 @@ class FollowHandler(BaseHandler):
         if from_user == to_user or from_user == 0 or to_user == 0: raise tornado.web.HTTPError(405)
         ufg = UserFollowGraph(self.rd)
         if ufg.follow(from_user, to_user):
-            acttime = time.strftime('%Y-%m-%d %X', time.localtime()) 
+            acttime = time.strftime('%y-%m-%d %H:%M', time.localtime())
+            redacttime = acttime[4:] if acttime[3] == '0' else acttime[3:]
             actto = self.db.get("select name from fd_People where id = %s", to_user).name
-            actdict = {'time':acttime, 'to':actto}
+            actdict = {'time':redacttime, 'to':actto}
             add_activity(self.rd, from_user, 0, actdict)
         else:
             self.write('already')
@@ -959,7 +960,8 @@ class PubstatusHandler(BaseHandler):
     def post(self):
         status = self.get_argument("statustext",None)
         if not status: raise tornado.web.HTTPError(405)
-        pubdate = time.strftime('%Y-%m-%d %X', time.localtime())
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+        redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
         user_id = self.current_user.id
         user_name = self.current_user.name
         status_id = self.db.execute("insert into fd_Status (user_id, user_name, "
@@ -969,7 +971,7 @@ class PubstatusHandler(BaseHandler):
         #actto's format is like the kind as follow,change it to id for memory,let tempalte make the link
         #actto = "".join(["/people/", str(self.current_user.name), "/status/", str(status_id)])
         actto = status_id
-        actdict = {'time':pubdate, 'to':actto, 'status':status}
+        actdict = {'time':redpubdate, 'to':actto, 'status':status}
         addresult = add_activity(self.rd, user_id, 1, actdict)
         if status_id and addresult:
             self.write(pubdate)
