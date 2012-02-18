@@ -78,7 +78,6 @@
     .feed-item-footer {
         font-size: 13px;
         color: #999;
-        float: right;
     }
     .footerlink {
         color: #999;
@@ -130,17 +129,19 @@
                                 <p>{{ activity[2] }}</p>
                             </div>
                             <div class="feed-item-footer">
+                                <div style="float:left"><span><a class="footerlink" href="/people/{{ activity[-3] }}/status/{{ activity[1] }}">{{ activity[0] }}</a></span>
+                                </div>
+                                <div style="float:right">
                                 {% if template_values['username'] == activity[-3] %}
-                                <span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-3] }}', {{ activity[1] }});"><i class="icon-remove"></i>删除</a></span>
+                                <span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-3] }}', {{ activity[1] }});">删除</a></span>
                                 <span class="splitter">•</span>
                                 {% end %}
                                 <!--
-                                <span><a class="footerlink" href="#"><i class="icon-retweet"></i>推荐0</a></span>
+                                <span><a class="footerlink" href="#"><i class="icon-retweet"></i>转发</a></span>
                                 <span class="splitter">•</span>
                                 -->
-                                <span><a class="footerlink" href="#"><i class="icon-comment"></i>评论0</a></span>
-                                <span class="splitter">•</span>
-                                <span><a class="footerlink" href="/people/{{ activity[-3] }}/status/{{ activity[1] }}"><i class="icon-time"></i>{{ activity[0] }}</a></span>
+                                <span><a class="footerlink" href="#">评论</a></span>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -23,23 +23,24 @@ class UserActivityGraph(object):
     def del_activity(self, user, acttype, actto):
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
         mark = 1
-        if acttype == 0:
-            for activity_key in self.client.lrange(Activity_key, 0, -1):
-                if self.client.hmget(activity_key, ['to'])[0] == actto:
-                    #here 1,we don't hmdel the activity,because:there is no hmdel command for now
-                    #in redis2.9.3 and there is no need to del it if your memory is enough
-                    #2,we must put a mark here because there may not exist the key we want to del,
+        if acttype == 0:# follow somepeople
+            Follow_key = 'u:Follow:%s' %user
+            for follow_key in self.client.lrange(Follow_key, 0, -1):
+                if self.client.hmget(follow_key, ['to'])[0] == actto:
+                    #we must put a mark here because there may not exist the key we want to del,
                     #but without a mark,we have to del the largest key as the loop goes
+                    self.client.delete(follow_key)
                     mark = 0
                     break
             if mark:
                 return False
             else:
-                return self.client.lrem(Activity_key, 0, activity_key)
-        elif acttype == 1:
+                return self.client.lrem(Follow_key, 0, follow_key) and self.client.lrem(Activity_key, 0, follow_key)
+        elif acttype == 1:# update status
             Status_key = 'u:Status:%s' % user
             for status_key in self.client.lrange(Status_key, 0, -1):
                 if self.client.hmget(status_key, ['to'])[0] == actto:
+                    self.client.delete(status_key)
                     mark = 0
                     break
             if mark:
