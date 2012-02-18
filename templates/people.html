@@ -201,8 +201,7 @@
                 <a href="/people/{{ template_values['username'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[1] }}">{{ activity[1] }}</a>. <span class="timestamp">{{ activity[0] }}</span>
                 {% elif activity[-1] == 1 %}
                 <a href="/people/{{ template_values['username'] }}">{{ template_values['username'] }}</a> <a href="/people/{{ template_values['username'] }}/status/{{ activity[1] }}">更新了状态.</a> <span class="timestamp">{{ activity[0] }}</span>
-                {% end %}
-                </p>
+                {% end %}         
                 {% end %}
                 </p>
             </div>
@@ -226,10 +225,10 @@
             </div>
             {% end %}
         </div>
-
-    </div>
-    {% end %}
-    {% block bottom %}
-    <script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
-    <script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
-    {% end %}
+      </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
+<script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
+{% end %}
