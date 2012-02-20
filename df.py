@@ -973,6 +973,7 @@ class DeleteStatusHandler(BaseHandler):
         if user_id != self.current_user.id:
             raise tornado.web.HTTPError(405)
         # don't remove in db now because data is not got wholy in redis,just mark it
+        self.db.execute("update fd_Status set status_ = 1 where id = %s", actto)
         del_activity(self.rd, user_id, 1, actto)
 
 class CdnzzVerifyHandler(tornado.web.RequestHandler):
