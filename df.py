@@ -775,7 +775,7 @@ class PeopleHandler(UserBaseHandler):
             if not selfdesc: raise tornado.web.HTTPError(405)
             template_values['selfdesc'] = selfdesc.selfdesc
         uag = UserActivityGraph(self.rd)
-        template_values['activities'] = uag.get_top_activities(template_values['id']) 
+        template_values['activities'] = uag.get_top_activities(template_values['id'], self.db) 
         template_values['activity_count'] = uag.count_activity(template_values['id']) 
         template_values['statuses'] = uag.get_top_sub_activities(template_values['id'], 1) 
         template_values['status_count'] = uag.count_sub_activity(template_values['id'], 1) 
@@ -900,16 +900,6 @@ class CollegeExistHandler(BaseHandler):
         else: 
             self.write("学校不存在或不是全称")
 
-class DeleteStatusHandler(BaseHandler):
-    def post(self):
-        user = self.get_argument("user",None)
-        actto = self.get_argument("actto",None)
-        user_id = self.db.get("select id from fd_People where name = %s", user).id
-        if user_id != self.current_user.id:
-            raise tornado.web.HTTPError(405)
-        # don't remove in db now because data is not got wholy in redis
-        del_activity(self.rd, user_id, 1, actto)
-
 class FollowHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self):
@@ -922,7 +912,7 @@ class FollowHandler(BaseHandler):
             redacttime = acttime[4:] if acttime[3] == '0' else acttime[3:]
             actto = self.db.get("select name from fd_People where id = %s", to_user).name
             actdict = {'time':redacttime, 'to':actto}
-            add_activity(self.rd, from_user, 0, actdict)
+            add_activity(self.rd, from_user, to_user, 0, actdict)
         else:
             self.write('already')
 
@@ -968,23 +958,30 @@ class PubstatusHandler(BaseHandler):
                     " status, pubdate) values (%s,%s,%s,%s)", user_id, user_name,
                     status, pubdate)
         #redis
-        #actto's format is like the kind as follow,change it to id for memory,let tempalte make the link
-        #actto = "".join(["/people/", str(self.current_user.name), "/status/", str(status_id)])
-        actto = status_id
-        actdict = {'time':redpubdate, 'to':actto, 'status':status}
-        addresult = add_activity(self.rd, user_id, 1, actdict)
+        actdict = {'time':redpubdate, 'status':status}
+        addresult = add_activity(self.rd, user_id, status_id, 1, actdict)
         if status_id and addresult:
             self.write(pubdate)
         else:
             self.write("Something wrong...")
 
+class DeleteStatusHandler(BaseHandler):
+    def post(self):
+        user = self.get_argument("user",None)
+        actto = self.get_argument("actto",None)
+        user_id = self.db.get("select id from fd_People where name = %s", user).id
+        if user_id != self.current_user.id:
+            raise tornado.web.HTTPError(405)
+        # don't remove in db now because data is not got wholy in redis,just mark it
+        del_activity(self.rd, user_id, 1, actto)
+
 class CdnzzVerifyHandler(tornado.web.RequestHandler):
     def get(self):
         self.write('e1faafa0c2f808702da5c1b7fda8e919')
 
-def add_activity(client, actuser, acttype, actdict):
+def add_activity(client, actuser, actto, acttype, actdict):
     uag = UserActivityGraph(client)
-    return uag.add_activity(actuser,acttype ,actdict)
+    return uag.add_activity(actuser, actto, acttype, actdict)
 
 def del_activity(client, actuser ,acttype, actto):
     uag = UserActivityGraph(client)
