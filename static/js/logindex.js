@@ -27,7 +27,7 @@ $('#pubtextarea').focus(function() {
         }
 });
 
-function submit() {
+function submit(name, domain) {
     var statustext = $('#pubtextarea').val();
     if (statustext == '')
         return false;
@@ -36,7 +36,7 @@ function submit() {
     url:'/pubstatus',
     data:{statustext:statustext,_xsrf:getCookie('_xsrf')},
     success:function(data){
-        $('.feed-body').prepend("<div class='feed-item'><div class='avatar'><a href='#'><img width='50px' height='50px' src='../static/img/no_avatar.jpg'></a></div><div class='feed-item-content'><div class='feed-item-title'><a class='feed-item-title name' href='/people/alex'>alex</a> <span class='feed-item-title desc'>更新了状态:</span></div><div class='feed-item-body'><p>"+statustext+"</p></div><div class='feed-item-footer'><div style='float:left'><span><a class='footerlink' href='#'>刚刚</a></span></div><div style='float:right'><span><a class='footerlink' href='#'>评论</a></span></div></div></div></div>");
+        $('.feed-body').prepend("<div class='feed-item'><div class='avatar'><a href='#'><img width='50px' height='50px' src='../static/img/no_avatar.jpg'></a></div><div class='feed-item-content'><div class='feed-item-title'><a class='feed-item-title name' href='/people/"+domain+"'>"+name+"</a> <span class='feed-item-title desc'>更新了状态:</span></div><div class='feed-item-body'><p>"+statustext+"</p></div><div class='feed-item-footer'><div style='float:left'><span><a class='footerlink' href='#'>刚刚</a></span></div><div style='float:right'><span><a class='footerlink' href='#'>评论</a></span></div></div></div></div>");
         $('.submit-btn').hide();
         $('#pubtextarea').val('');
         $('#pubtextarea').css('height','18');

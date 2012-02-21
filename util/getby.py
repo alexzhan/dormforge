@@ -1,7 +1,8 @@
-def get_username_by_id(db, client, userid):
-    if client.get('u:' + userid):
-        username = client.get('u:' + userid)
+def get_namedomain_by_id(db, client, userid):
+    if client.hmget('u:' + userid, ['name','domain'])[0]:
+        return client.hmget('u:' + userid, ['name','domain'])
     else:
-        username = db.get("select name from fd_People where id = %s", userid).name
-        client.set('u:' + userid, username)
-    return username
+        userinfo = db.get("select name,domain from fd_People where id = %s", userid)
+        logging.info(userinfo.domain)
+        client.hmset('u:' + userid, {"name":userinfo.name,"domain":userinfo.domain})
+        return [userinfo.name, userinfo.domain]
