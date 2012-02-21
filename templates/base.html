@@ -32,7 +32,7 @@
                     <div class="nav-collapse">
                         <ul class="nav pull-right">
                             {% if current_user %}
-                            <li><a href="/people/{{ _(current_user['name']) }}">{{ _(current_user['name']) }}</a></li>
+                            <li><a href="/people/{{ _(current_user['domain']) }}">{{ _(current_user['name']) }}</a></li>
                             <li><a href="/logout?next={{ url_escape(request.uri) }}">{{ _("退出") }}</a></li>
                             {% else %}
                             <li>{{ _('<a href="%(url)s">登录</a>') % {"url": "/login?next=" + url_escape(request.uri)} }}</li>
