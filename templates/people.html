@@ -184,8 +184,8 @@
             </p>
             {% end %}
             <p class="education">
-            <a class="dark" href="/people/{{ escape(template_values['username']) }}/following">关注{{ template_values['follow_count'] }}</a>
-            <span class="splitter">/</span> <a class="dark" href="/people/{{ template_values['username'] }}/follower">被关注{{ template_values['follower_count'] }}</a>
+            <a class="dark" href="/people/{{ escape(template_values['domain']) }}/following">关注{{ template_values['follow_count'] }}</a>
+            <span class="splitter">/</span> <a class="dark" href="/people/{{ template_values['domain'] }}/follower">被关注{{ template_values['follower_count'] }}</a>
         </div>
     </div>
 
@@ -198,9 +198,9 @@
                 {% for activity in template_values['activities']%}
                 <p class="light_gray">
                 {% if activity[-1] == 0 %}
-                <a href="/people/{{ template_values['username'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[1] }}">{{ activity[1] }}</a>. <span class="timestamp">{{ activity[0] }}</span>
+                <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[1] }}">{{ activity[1] }}</a>. <span class="timestamp">{{ activity[0] }}</span>
                 {% elif activity[-1] == 1 %}
-                <a href="/people/{{ template_values['username'] }}">{{ template_values['username'] }}</a> <a href="/people/{{ template_values['username'] }}/status/{{ activity[2] }}">更新了状态.</a> <span class="timestamp">{{ activity[0] }}</span>
+                <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/people/{{ template_values['username'] }}/status/{{ activity[2] }}">更新了状态.</a> <span class="timestamp">{{ activity[0] }}</span>
                 {% end %}         
                 {% end %}
                 </p>
