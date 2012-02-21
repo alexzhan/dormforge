@@ -95,6 +95,7 @@ class UserBaseHandler(BaseHandler):
             template_values['is_self'] = True
         template_values['id'] = people.id
         template_values['username'] = people.name
+        template_values['domain'] = people.domain
         template_values['has_selfdesc'] = people.has_selfdesc
         college_type = people.college_type
         template_values['college_type'] = college_type
@@ -165,7 +166,7 @@ class UserBaseHandler(BaseHandler):
 
 class FollowBaseHandler(BaseHandler):
     def follow(self, domain, follow_type):
-        people = self.db.get("SELECT id,name FROM fd_People WHERE domain = %s", domain) 
+        people = self.db.get("SELECT id,name,domain FROM fd_People WHERE domain = %s", domain) 
         if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         if not self.get_secure_cookie("user") or self.get_secure_cookie("user") and int(self.get_secure_cookie("user")) != int(people.id):
@@ -174,6 +175,7 @@ class FollowBaseHandler(BaseHandler):
             template_values['is_self'] = True
         template_values['id'] = people.id
         template_values['username'] = people.name
+        template_values['domain'] = people.domain
         template_values['image'] = self.static_url("img/no_avatar.jpg")
         ufg = UserFollowGraph(self.rd)
         template_values['follow_count'] = ufg.follow_count(people.id)
@@ -189,10 +191,10 @@ class FollowBaseHandler(BaseHandler):
             for i in range(len(follows)):
                 follows[i] = int(follows[i])
             if len(follows) == 1:
-                follow_people = self.db.query("SELECT id,name from fd_People where id = %s", follows[0]) 
+                follow_people = self.db.query("SELECT id,name,domain from fd_People where id = %s", follows[0]) 
             else:
                 orderstr = str(follows)[1:-1].replace(" ","")
-                follow_people = self.db.query("SELECT id,name from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
+                follow_people = self.db.query("SELECT id,name,domain from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
             for i in range(len(follow_people)):
                 follow_people[i].is_follow = ufg.is_follow(self.get_secure_cookie("user"), follow_people[i].id)
                 follow_people[i].image = self.static_url("img/no_avatar.jpg")
@@ -796,7 +798,7 @@ class CityHandler(BaseHandler):
         city_id = self.db.get("SELECT id FROM fd_City where name = %s", city)
         if not city_id: raise tornado.web.HTTPError(404)
         city_id = city_id.id
-        people = self.db.query("SELECT id,name FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3)", city_id, city_id, city_id) 
+        people = self.db.query("SELECT id,name,domain FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3)", city_id, city_id, city_id) 
         #if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         template_values['region_id'] = city_id
@@ -820,7 +822,7 @@ class CollegeHandler(BaseHandler):
         if not college_id: raise tornado.web.HTTPError(404)
         image_path = college_id.image_path
         college_id = college_id.id
-        people = self.db.query("SELECT id,name FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3)", college_id, college_id, college_id) 
+        people = self.db.query("SELECT id,name,domain FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3)", college_id, college_id, college_id) 
         #if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         template_values['region_id'] = college_id
@@ -846,7 +848,7 @@ class MajorHandler(BaseHandler):
         major_id = self.db.get("SELECT id FROM fd_Major where name = %s", major)
         if not major_id: raise tornado.web.HTTPError(404)
         major_id = major_id.id
-        people = self.db.query("SELECT id,name FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3)", major_id, major_id, major_id) 
+        people = self.db.query("SELECT id,name,domain FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3)", major_id, major_id, major_id) 
         #if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         template_values['region_id'] = major_id

@@ -82,7 +82,7 @@
     {% if not current_user %}{% module Template("modules/followpopup.html") %}{% end %}
     <div class="hero-unit" style="margin-left:40px;padding:0;background-color:#FFF">
         <div class="namefollowrow">
-            <h3 style="display:inline"><a style="color: #19558D" href="/people/{{ escape(template_values['username']) }}">{{ escape(template_values['username']) }}</a></h3>
+            <h3 style="display:inline"><a style="color: #19558D" href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a></h3>
             {% if not template_values['is_self'] %}
             {% if not template_values['is_follow'] %}
             <a id="follow-btn" class="btn btn-primary" data-toggle="modal" href="#myModal" onclick="{% if current_user %}return follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
@@ -94,7 +94,7 @@
             {% end  %}
         </div>
         <div class="avatar">
-            <a href="/people/{{ escape(template_values['username']) }}">
+            <a href="/people/{{ escape(template_values['domain']) }}">
                 <img width="150px" height="150px" src="{{ template_values['image'] }}">
             </a>
         </div>
@@ -113,11 +113,11 @@
                 <div class="pagelist">
                     <div class="col_item">
                         <div class="mavatar">
-                            <a href="/people/{{ follow.name }}"><img class="mavatar" src="{{ follow.image }}" width="50" alt="{{ follow.name }}" height="50"></a>
+                            <a href="/people/{{ follow.domain }}"><img class="mavatar" src="{{ follow.image }}" width="50" alt="{{ follow.name }}" height="50"></a>
                         </div>
                         <div class="mdesc">
                             <div class="mdesc-name">
-                                <a style="color: #19558D" href="/people/{{ follow.name }}">{{ follow.name }}</a>
+                                <a style="color: #19558D" href="/people/{{ follow.domain }}">{{ follow.name }}</a>
                             </div>
                         </div>
                         <div class="mfollow">
