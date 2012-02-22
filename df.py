@@ -956,7 +956,7 @@ class PubstatusHandler(BaseHandler):
         redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
         user_id = self.current_user.id
         status_id = self.db.execute("insert into fd_Status (user_id, "
-                    " status, pubdate) values (%s,%s,%s,%s)", user_id, 
+                    " status, pubdate) values (%s,%s,%s)", user_id, 
                     status, pubdate)
         #redis
         actdict = {'time':redpubdate, 'status':status}
