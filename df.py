@@ -45,11 +45,12 @@ class Application(tornado.web.Application):
                 (r"/isemailexist", EmailExistHandler),
                 (r"/isdomainexist", DomainExistHandler),
                 (r"/iscollegeexist", CollegeExistHandler),
-                (r"/deletestatus", DeleteStatusHandler),
                 (r"/follow", FollowHandler),
                 (r"/unfollow", UnfollowHandler),
                 (r"/selfdesc", SelfdescHandler),
                 (r"/pubstatus", PubstatusHandler),
+                (r"/deletestatus", DeleteStatusHandler),
+                (r"/people/([a-z0-9A-Z\_\-]+)/status/([0-9]+)", StatusHandler),
                 (r"/3e224bd553a3bfca3c7cb92c9806cd04\.html", CdnzzVerifyHandler),
                 ]
         settings = dict(
@@ -213,7 +214,7 @@ class HomeHandler(BaseHandler):
             uag = UserActivityGraph(self.rd)
             template_values['all_activities'] = uag.get_all_activities(self.db)
             #logging.info("%s--length", len(template_values['all_activities']))
-            self.render("loginindex.html", template_values=template_values)
+            self.render("home.html", template_values=template_values)
         else:
             self.render("index.html")
 
@@ -954,9 +955,8 @@ class PubstatusHandler(BaseHandler):
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
         redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
         user_id = self.current_user.id
-        user_name = self.current_user.name
-        status_id = self.db.execute("insert into fd_Status (user_id, user_name, "
-                    " status, pubdate) values (%s,%s,%s,%s)", user_id, user_name,
+        status_id = self.db.execute("insert into fd_Status (user_id, "
+                    " status, pubdate) values (%s,%s,%s,%s)", user_id, 
                     status, pubdate)
         #redis
         actdict = {'time':redpubdate, 'status':status}
@@ -976,6 +976,10 @@ class DeleteStatusHandler(BaseHandler):
         # don't remove in db now because data is not got wholy in redis,just mark it
         self.db.execute("update fd_Status set status_ = 1 where id = %s", actto)
         del_activity(self.rd, user_id, 1, actto)
+
+class StatusHandler(BaseHandler):
+    def get(self, username, status_id):
+        self.render("status.html")
 
 class CdnzzVerifyHandler(tornado.web.RequestHandler):
     def get(self):

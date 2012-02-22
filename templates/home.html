@@ -59,8 +59,13 @@
         border-bottom: 1px solid #E0E0E0;
         padding: 5px 0 5px;
     }
+    .feed-item-title a{
+        color: gray;
+    }
+    .feed-item-title a:hover{
+        color: #005580;
+    }
     .feed-item-title .name {
-        color: #333;
         font-weight: bold;
         font-size: 14px;
     }
@@ -155,5 +160,5 @@
 </div>
 {% end %}
 {% block bottom %}
-<script type="text/javascript" src="{{ static_url("js/logindex.js") }}"></script>
+<script type="text/javascript" src="{{ static_url("js/home.js") }}"></script>
 {% end %}
