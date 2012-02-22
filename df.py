@@ -962,7 +962,7 @@ class PubstatusHandler(BaseHandler):
         actdict = {'time':redpubdate, 'status':status}
         addresult = add_activity(self.rd, user_id, status_id, 1, actdict)
         if status_id and addresult:
-            self.write(pubdate)
+            self.write(str(status_id))
         else:
             self.write("Something wrong...")
 

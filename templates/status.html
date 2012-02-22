@@ -5,8 +5,8 @@
 <style type="text/css">
     .status-item {
         margin-left: 60px;
-        width: 600px;
         min-height: 50px;
+        width: 600px;
         border-bottom: 3px solid silver;
         margin-bottom: 1px;
     }
@@ -14,6 +14,7 @@
         font-size: 15px;
         width: 540px;
         margin-bottom: 10px;
+        word-break: break-all;
     }
     .pubavatar {
         float:right;
@@ -38,7 +39,7 @@
     }
     .status-comment .comment-item {
         border-top: 1px solid #E0E0E0;
-        min-height: 60px;
+        clear: both;
     }
     .status-comment .comment-item-content {
         float: left;
@@ -51,6 +52,7 @@
     .status-comment .comment-item-body p{
         margin-bottom: 5px;
         font-size: 14px;
+        word-break: break-all;
     }
     .status-comment .comment-item-title a {
         color: gray;
@@ -78,7 +80,6 @@
     .add-comment {
         margin-left: 60px;
         width: 600px;
-        border-top: 1px solid silver;
     }
     .clickable {
         cursor: pointer;
@@ -128,9 +129,9 @@
         <div style="display:none">xsrf generated if logged in ready for publish</div>                   
         {% end %}
         <div class="add-comment">
-            <form id="comment-form" method="post" action="{{ request.path }}">
+            <form id="comment-form" method="POST" action="{{ request.path }}" style="border-top: 1px solid silver;">
                 <textarea id="comment-box" name="comment" style="width:590px;height: 60px;margin-top:5px"></textarea>
-                <a href="#" class="btn" style="float:right" onclick="return submit('{{ request.path }}', '{{ current_user.name}}', '{{ current_user.domain }}', '{{ template_values['comments_length'] }}');">提交</a>
+                <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}');">提交</button>
             </form>
         </div>
     </div>
