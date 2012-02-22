@@ -50,7 +50,7 @@ class Application(tornado.web.Application):
                 (r"/selfdesc", SelfdescHandler),
                 (r"/pubstatus", PubstatusHandler),
                 (r"/deletestatus", DeleteStatusHandler),
-                (r"/people/([a-z0-9A-Z\_\-]+)/status/([0-9]+)", StatusHandler),
+                (r"/status/([0-9]+)", StatusHandler),
                 (r"/3e224bd553a3bfca3c7cb92c9806cd04\.html", CdnzzVerifyHandler),
                 ]
         settings = dict(
@@ -978,8 +978,26 @@ class DeleteStatusHandler(BaseHandler):
         del_activity(self.rd, user_id, 1, actto)
 
 class StatusHandler(BaseHandler):
-    def get(self, username, status_id):
-        self.render("status.html")
+    def get(self, status_id):
+        template_values = {}
+        status = self.db.get("select p.name,p.domain,s.status,s.pubdate "
+                "from fd_People p, fd_Status s where s.user_id = p.id and "
+                "s.id = %s", status_id)
+        template_values['status'] = status
+        comments = self.db.query("select p.name,p.domain,c.comments, "
+                "c.pubdate from fd_People p, fd_Stacomm c where p.id"
+                "=c.user_id and status_id = %s", status_id)
+        template_values['comments_length'] = len(comments)
+        template_values['comments'] = comments
+        self.render("status.html", template_values=template_values)
+    def post(self, status_id):
+        #logging.info("%s",status_id)
+        comments = self.get_argument("commenttext",None)
+        user_id = self.current_user.id
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+        comment_id = self.db.execute("insert into fd_Stacomm (user_id, "
+                    " status_id, comments, pubdate) values (%s,%s,%s,%s)", 
+                    user_id, status_id, comments, pubdate)
 
 class CdnzzVerifyHandler(tornado.web.RequestHandler):
     def get(self):

@@ -64,9 +64,10 @@
     }
     .status-comment .comment-item-title .time {
         float: right;
+        text-align: right;
         font-size: small;
         color: #999;
-        width: 85px;
+        width: 100px;
     }
     .status-comment .commavatar {
         padding-top: 5px;
@@ -90,62 +91,51 @@
     <div class="span7">
         <div class="status-item">
             <div class="pubavatar">
-                <a href="#"><img src="{{ static_url('img/no_avatar.jpg') }}" width="50px" height="50px"></img></a>
+                <a href="/people/{{ template_values['status'].domain }}"><img src="{{ static_url('img/no_avatar.jpg') }}" width="50px" height="50px"></img></a>
             </div>
             <div class="status-text">
-                发送到链接阿斯来的看
+                {{ template_values['status'].status }}
             </div>
             <div class="status-info">
-                <a href="/people/alex" style="color:#999">alex</a> 发布于 2-22 13:22
+                <a href="/people/{{ template_values['status'].domain }}" style="color:#999">{{ template_values['status'].name }}</a> 发布于 {{ str(template_values['status'].pubdate)[5:-3] if str(template_values['status'].pubdate)[5] != '0' else str(template_values['status'].pubdate)[6:-3] }}
             </div>
         </div>
         <div class="status-comment">
             <div class="comment-number">
-                <i class="icon-comment"></i>评论(2)
+                <i class="icon-comment"></i><span id="number">评论({{ template_values['comments_length'] }})</span>
             </div>
+            {% for comments in template_values['comments'] %}
             <div class="comment-item">
                 <div class="commavatar">
-                    <a href="#"><img width="50px" height="50px" src="/static/img/no_avatar.jpg?v=ebaa4"></a>
+                    <a href="/people/{{ comments.domain }}"><img width="50px" height="50px" src="/static/img/no_avatar.jpg?v=ebaa4"></a>
                 </div>
                 <div class="comment-item-content">
                     <div class="comment-item-title">
-                        <a class="name" href="/people/rongchuan">张荣川</a>
+                        <a class="name" href="/people/{{ comments.domain }}">{{ comments.name }}</a>
                         <span class="time">
-                            2-22 15:04   
-                            <img src="{{ static_url('img/reply.png') }}" align="absmiddle" border="0" alt="回复 张荣川" onclick="replyOne('ultragtx')" class="clickable">
+                            {{ str(comments.pubdate)[5:-3] if str(comments.pubdate)[5] != '0' else str(comments.pubdate)[6:-3] }}   
+                            <img src="{{ static_url('img/reply.png') }}" align="absmiddle" border="0" alt="回复 {{ comments.name }}" onclick="replyOne('{{ comments.name }}')" class="clickable">
                         </span>
                     </div>
                     <div class="comment-item-body">
-                        <p>test home</p>
+                        <p>{{ comments.comments }}</p>
                     </div>
                 </div>
             </div>
-            <div class="comment-item">
-                <div class="commavatar">
-                    <a href="#"><img width="50px" height="50px" src="/static/img/no_avatar.jpg?v=ebaa4"></a>
-                </div>
-                <div class="comment-item-content">
-                    <div class="comment-item-title">
-                        <a class="name" href="/people/rongchuan">张荣川</a>
-                        <span class="time">
-                            <span style="display:inline">2-22 15:04   </span>
-                            <span><img src="{{ static_url('img/reply.png') }}" align="absmiddle" border="0" alt="回复 张荣川" onclick="replyOne('ultragtx')" class="clickable"></span>
-                        </span>
-                    </div>
-                    <div class="comment-item-body">
-                        <p>test home</p>
-                    </div>
-                </div>
-            </div>
+            {% end %}
         </div>
+        {% if handler.xsrf_token %}
+        <div style="display:none">xsrf generated if logged in ready for publish</div>                   
+        {% end %}
         <div class="add-comment">
             <form id="comment-form" method="post" action="{{ request.path }}">
-                <textarea id="comment_box" name="comment" style="width:590px;height: 60px;margin-top:5px"></textarea>
-                <a href="#" class="btn" style="float:right">提交</a>
+                <textarea id="comment-box" name="comment" style="width:590px;height: 60px;margin-top:5px"></textarea>
+                <a href="#" class="btn" style="float:right" onclick="return submit('{{ request.path }}', '{{ current_user.name}}', '{{ current_user.domain }}', '{{ template_values['comments_length'] }}');">提交</a>
             </form>
         </div>
     </div>
 </div>
 {% end %}
 {% block bottom %}
+<script type="text/javascript" src="{{ static_url('js/status.js') }}"></script>
 {% end %}
