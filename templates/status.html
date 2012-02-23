@@ -88,7 +88,7 @@
 </style>
 {% end %}
 {% block body %}
-<div class="container">
+<div class="container" style="margin-left:60px;">
     <div class="span7">
         <div class="status-item">
             <div class="pubavatar">
@@ -129,7 +129,7 @@
         <div style="display:none">xsrf generated if logged in ready for publish</div>                   
         {% end %}
         <div class="add-comment">
-            <form id="comment-form" method="POST" action="{{ request.path }}" style="border-top: 1px solid silver;">
+            <form id="comment-form" method="POST" action="{{ request.path }}" >
                 <textarea id="comment-box" name="comment" style="width:590px;height: 60px;margin-top:5px"></textarea>
                 <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}');">提交</button>
             </form>
