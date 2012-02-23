@@ -135,18 +135,18 @@
                                 <p>{{ activity[1] }}</p>
                             </div>
                             <div class="feed-item-footer">
-                                <div style="float:left"><span><a class="footerlink" href="/status/{{ activity[2] }}">{{ activity[0] }}</a></span>
+                                <div style="float:left"><span><a class="footerlink" href="/status/{{ activity[3] }}">{{ activity[0] }}</a></span>
                                 </div>
                                 <div style="float:right">
                                 {% if current_user.name == activity[-3] %}
-                                <span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-3] }}', {{ activity[2] }});">删除</a></span>
+                                <span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-3] }}', {{ activity[3] }});">删除</a></span>
                                 <span class="splitter">•</span>
                                 {% end %}
                                 <!--
                                 <span><a class="footerlink" href="#"><i class="icon-retweet"></i>转发</a></span>
                                 <span class="splitter">•</span>
                                 -->
-                                <span><a class="footerlink" href="#">评论</a></span>
+                                <span><a class="footerlink" href="#">{% if not activity[2] or activity[2]=='0' %}评论{% else %}评论({{ activity[2] }}){% end %}</a></span>
                                 </div>
                             </div>
                         </div>
