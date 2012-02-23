@@ -102,7 +102,7 @@ class UserActivityGraph(object):
             acttype, act_userid, actto = activity.split(":")
             act_username,act_domain = get_namedomain_by_id(db, self.client, act_userid)
             if acttype == 'status':
-                real_activity = self.client.hmget(activity, ["time",'status'])
+                real_activity = self.client.hmget(activity, ["time",'status','comm'])
                 real_activity.append(actto)
                 real_activity.append(act_username)
                 real_activity.append(act_domain)

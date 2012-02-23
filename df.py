@@ -998,6 +998,14 @@ class StatusHandler(BaseHandler):
         comment_id = self.db.execute("insert into fd_Stacomm (user_id, "
                     " status_id, comments, pubdate) values (%s,%s,%s,%s)", 
                     user_id, status_id, comments, pubdate)
+        if comment_id:
+            status_key = self.rd.keys('status*%s' % status_id)[0]
+            prev_comments_num = self.rd.hget(status_key, 'comm')
+            if not prev_comments_num:
+                comments_num = 1
+            else:
+                comments_num = int(prev_comments_num) + 1
+            self.rd.hset(status_key, 'comm', comments_num)
 
 class CdnzzVerifyHandler(tornado.web.RequestHandler):
     def get(self):
