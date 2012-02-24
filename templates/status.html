@@ -54,6 +54,9 @@
         font-size: 14px;
         word-break: break-all;
     }
+    .status-comment .comment-item-body p a{
+        color: #19558D;;
+    }
     .status-comment .comment-item-title a {
         color: gray;
     }
@@ -119,7 +122,7 @@
                         </span>
                     </div>
                     <div class="comment-item-body">
-                        <p>{{ comments.comments }}</p>
+                        <p>{{ handler.at(comments.comments) }}</p>
                     </div>
                 </div>
             </div>
