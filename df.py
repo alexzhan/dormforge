@@ -229,7 +229,6 @@ class HomeHandler(BaseHandler):
             uag = UserActivityGraph(self.rd)
             template_values['all_activities'] = uag.get_all_activities(self.db)
             #logging.info("%s--length", len(template_values['all_activities']))
-            logging.info(type(self.current_user.name))
             self.render("home.html", template_values=template_values)
         else:
             self.render("index.html")

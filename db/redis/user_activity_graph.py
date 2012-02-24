@@ -1,4 +1,3 @@
-import logging
 from util.getby import get_namedomain_by_id
 
 class UserActivityGraph(object):
@@ -109,7 +108,6 @@ class UserActivityGraph(object):
                 real_activity.append(act_domain)
                 real_activity.append(acttype)
                 real_activity.append(index)
-                logging.info(type(act_username))
             index = index + 1
             all_activities.append(real_activity)
         return all_activities
