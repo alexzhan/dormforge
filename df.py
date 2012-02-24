@@ -16,6 +16,7 @@ import redis
 
 from tornado.options import define, options
 from util.encrypt import encrypt_password,validate_password
+from util.getby import get_domain_by_name
 from db.redis.user_follow_graph import UserFollowGraph
 from db.redis.user_activity_graph import UserActivityGraph
 
@@ -84,6 +85,17 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def set_default_headers(self): 
         self.set_header('Server', '18zhouServer/1.1')
+
+class FilterHandler(BaseHandler):
+    def at(self, value):
+        ms = re.findall(u'(@[\u4e00-\u9fa5A-Za-z0-9_-]{2,16})', value)
+        if (len(ms) > 0):
+            for m in ms:
+                username = m[1:]
+                domain = get_domain_by_name(self.db, self.rd, username)
+                if domain:
+                    value = value.replace(m, '@<a href="/people/' + domain + '">' + username + '</a>')
+        return value
 
 class UserBaseHandler(BaseHandler):
     def people(self, domain):
@@ -967,6 +979,7 @@ class PubstatusHandler(BaseHandler):
             self.write("Something wrong...")
 
 class DeleteStatusHandler(BaseHandler):
+    @tornado.web.authenticated
     def post(self):
         user = self.get_argument("user",None)
         actto = self.get_argument("actto",None)
@@ -977,7 +990,7 @@ class DeleteStatusHandler(BaseHandler):
         self.db.execute("update fd_Status set status_ = 1 where id = %s", actto)
         del_activity(self.rd, user_id, 1, actto)
 
-class StatusHandler(BaseHandler):
+class StatusHandler(FilterHandler):
     def get(self, status_id):
         template_values = {}
         status = self.db.get("select p.name,p.domain,s.status,s.pubdate "
@@ -987,9 +1000,12 @@ class StatusHandler(BaseHandler):
         comments = self.db.query("select p.name,p.domain,c.comments, "
                 "c.pubdate from fd_People p, fd_Stacomm c where p.id"
                 "=c.user_id and status_id = %s", status_id)
+        #for comment in comments:
+        #    at(self.db, self.rd, comment.comments)
         template_values['comments_length'] = len(comments)
         template_values['comments'] = comments
         self.render("status.html", template_values=template_values)
+    @tornado.web.authenticated
     def post(self, status_id):
         #logging.info("%s",status_id)
         comments = self.get_argument("commenttext",None)
@@ -1006,6 +1022,7 @@ class StatusHandler(BaseHandler):
             else:
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(status_key, 'comm', comments_num)
+            self.write(self.at(comments))
 
 class CdnzzVerifyHandler(tornado.web.RequestHandler):
     def get(self):
