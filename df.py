@@ -100,86 +100,6 @@ class FilterHandler(BaseHandler):
                     value = value.replace(m, '@<a href="/people/' + domain + '">' + username + '</a>')
         return value
 
-class UserBaseHandler(BaseHandler):
-    def people(self, domain):
-        people = self.db.get("SELECT * FROM fd_People WHERE domain = %s", domain) 
-        if not people: raise tornado.web.HTTPError(404)
-        template_values = {}
-        if not self.get_secure_cookie("user") or self.get_secure_cookie("user") and int(self.get_secure_cookie("user")) != int(people.id):
-            template_values['is_self'] = False
-        else:
-            template_values['is_self'] = True
-        template_values['id'] = people.id
-        template_values['username'] = people.name
-        template_values['domain'] = people.domain
-        template_values['has_selfdesc'] = people.has_selfdesc
-        college_type = people.college_type
-        template_values['college_type'] = college_type
-        if college_type == 1:
-            city = self.db.get("select name from fd_City where id = %s", people.city_id)
-            template_values['city_id'] = people.city_id
-            template_values['city'] = city.name 
-            college = self.db.get("select name from fd_College where id = %s", people.college_id)
-            template_values['college_id'] = people.college_id
-            template_values['college'] = college.name 
-            major = self.db.get("select name from fd_Major where id = %s", people.major_id)
-            template_values['major_id'] = people.major_id
-            template_values['major'] = major.name 
-        if college_type == 2:
-            cities = self.db.query("select name from fd_City where id in (%s,%s) order by find_in_set(id, '%s,%s')", people.city_id, people.ss_city_id, people.city_id, people.ss_city_id)
-            template_values['city_id'] = people.city_id
-            template_values['city'] = cities[0].name
-            template_values['ss_city_id'] = people.ss_city_id
-            template_values['ss_city'] = cities[len(cities)-1].name 
-
-            colleges = self.db.query("select name from fd_College where id in (%s,%s) order by find_in_set(id, '%s,%s')", people.college_id, people.ss_college_id, people.college_id, people.ss_college_id)
-            template_values['college_id'] = people.college_id
-            template_values['college'] = colleges[0].name
-            template_values['ss_college_id'] = people.ss_college_id
-            template_values['ss_college'] = colleges[len(colleges)-1].name 
-
-            majors = self.db.query("select name from fd_Major where id in (%s,%s) order by find_in_set(id, '%s,%s')", people.major_id, people.ss_major_id, people.major_id, people.ss_major_id)
-            template_values['major_id'] = people.major_id
-            template_values['major'] = majors[0].name
-            template_values['ss_major_id'] = people.ss_major_id
-            template_values['ss_major'] = majors[len(majors)-1].name 
-
-        if college_type == 3:
-            cities = self.db.query("select name from fd_City where id in (%s,%s,%s) order by find_in_set(id, '%s,%s,%s')", people.city_id, people.ss_city_id, people.bs_city_id, people.city_id, people.ss_city_id, people.bs_city_id)
-            template_values['city_id'] = people.city_id
-            template_values['city'] = cities[0].name
-            template_values['ss_city_id'] = people.ss_city_id
-            template_values['ss_city'] = cities[len(cities)-1 if len(cities)==2 and people.bs_city_id==people.ss_city_id else len(cities)-2].name 
-            template_values['bs_city_id'] = people.bs_city_id
-            template_values['bs_city'] = cities[len(cities)-1].name 
-
-            colleges = self.db.query("select name from fd_College where id in (%s,%s,%s) order by find_in_set(id, '%s,%s,%s')", people.college_id, people.ss_college_id, people.bs_college_id, people.college_id, people.ss_college_id, people.bs_college_id)
-            template_values['college_id'] = people.college_id
-            template_values['college'] = colleges[0].name
-            template_values['ss_college_id'] = people.ss_college_id
-            template_values['ss_college'] = colleges[len(colleges)-1 if len(colleges)==2 and people.bs_college_id==people.ss_college_id else len(colleges)-2].name 
-            template_values['bs_college_id'] = people.bs_college_id
-            template_values['bs_college'] = colleges[len(colleges)-1].name 
-
-            majors = self.db.query("select name from fd_Major where id in (%s,%s,%s) order by find_in_set(id, '%s,%s,%s')", people.major_id, people.ss_major_id, people.bs_major_id, people.major_id, people.ss_major_id, people.bs_major_id)
-            template_values['major_id'] = people.major_id
-            template_values['major'] = majors[0].name
-            template_values['ss_major_id'] = people.ss_major_id
-            template_values['ss_major'] = majors[len(majors)-1 if len(majors)==2 and people.bs_major_id==people.ss_major_id else len(majors)-2].name 
-            template_values['bs_major_id'] = people.bs_major_id
-            template_values['bs_major'] = majors[len(majors)-1].name 
-        if college_type == 4:
-            template_values['zx_city'] = people.zx_city
-            template_values['zx_school'] = people.zx_school
-            zx_province = self.db.get("select name from fd_Province where id = %s", people.zx_province_id)
-            template_values['zx_province'] = zx_province.name
-
-        ufg = UserFollowGraph(self.rd)
-        template_values['follow_count'] = ufg.follow_count(people.id)
-        template_values['follower_count'] = ufg.follower_count(people.id)
-        template_values['is_follow'] = ufg.is_follow(self.get_secure_cookie("user"), people.id)
-        return template_values
-
 class FollowBaseHandler(BaseHandler):
     def follow(self, domain, follow_type):
         people = self.db.get("SELECT id,name,domain FROM fd_People WHERE domain = %s", domain) 
@@ -222,7 +142,7 @@ class FollowBaseHandler(BaseHandler):
         template_values['type'] = follow_type 
         return template_values
 
-class HomeHandler(BaseHandler):
+class HomeHandler(FilterHandler):
     def get(self):
         if self.current_user:
             template_values = {}
@@ -781,9 +701,84 @@ class LogoutHandler(BaseHandler):
         self.clear_cookie("_xsrf")
         self.redirect(self.get_argument("next", "/"))
 
-class PeopleHandler(UserBaseHandler):
+class PeopleHandler(FilterHandler):
     def get(self, domain):
-        template_values = self.people(domain)    
+        people = self.db.get("SELECT * FROM fd_People WHERE domain = %s", domain) 
+        if not people: raise tornado.web.HTTPError(404)
+        template_values = {}
+        if not self.get_secure_cookie("user") or self.get_secure_cookie("user") and int(self.get_secure_cookie("user")) != int(people.id):
+            template_values['is_self'] = False
+        else:
+            template_values['is_self'] = True
+        template_values['id'] = people.id
+        template_values['username'] = people.name
+        template_values['domain'] = people.domain
+        template_values['has_selfdesc'] = people.has_selfdesc
+        college_type = people.college_type
+        template_values['college_type'] = college_type
+        if college_type == 1:
+            city = self.db.get("select name from fd_City where id = %s", people.city_id)
+            template_values['city_id'] = people.city_id
+            template_values['city'] = city.name 
+            college = self.db.get("select name from fd_College where id = %s", people.college_id)
+            template_values['college_id'] = people.college_id
+            template_values['college'] = college.name 
+            major = self.db.get("select name from fd_Major where id = %s", people.major_id)
+            template_values['major_id'] = people.major_id
+            template_values['major'] = major.name 
+        if college_type == 2:
+            cities = self.db.query("select name from fd_City where id in (%s,%s) order by find_in_set(id, '%s,%s')", people.city_id, people.ss_city_id, people.city_id, people.ss_city_id)
+            template_values['city_id'] = people.city_id
+            template_values['city'] = cities[0].name
+            template_values['ss_city_id'] = people.ss_city_id
+            template_values['ss_city'] = cities[len(cities)-1].name 
+
+            colleges = self.db.query("select name from fd_College where id in (%s,%s) order by find_in_set(id, '%s,%s')", people.college_id, people.ss_college_id, people.college_id, people.ss_college_id)
+            template_values['college_id'] = people.college_id
+            template_values['college'] = colleges[0].name
+            template_values['ss_college_id'] = people.ss_college_id
+            template_values['ss_college'] = colleges[len(colleges)-1].name 
+
+            majors = self.db.query("select name from fd_Major where id in (%s,%s) order by find_in_set(id, '%s,%s')", people.major_id, people.ss_major_id, people.major_id, people.ss_major_id)
+            template_values['major_id'] = people.major_id
+            template_values['major'] = majors[0].name
+            template_values['ss_major_id'] = people.ss_major_id
+            template_values['ss_major'] = majors[len(majors)-1].name 
+
+        if college_type == 3:
+            cities = self.db.query("select name from fd_City where id in (%s,%s,%s) order by find_in_set(id, '%s,%s,%s')", people.city_id, people.ss_city_id, people.bs_city_id, people.city_id, people.ss_city_id, people.bs_city_id)
+            template_values['city_id'] = people.city_id
+            template_values['city'] = cities[0].name
+            template_values['ss_city_id'] = people.ss_city_id
+            template_values['ss_city'] = cities[len(cities)-1 if len(cities)==2 and people.bs_city_id==people.ss_city_id else len(cities)-2].name 
+            template_values['bs_city_id'] = people.bs_city_id
+            template_values['bs_city'] = cities[len(cities)-1].name 
+
+            colleges = self.db.query("select name from fd_College where id in (%s,%s,%s) order by find_in_set(id, '%s,%s,%s')", people.college_id, people.ss_college_id, people.bs_college_id, people.college_id, people.ss_college_id, people.bs_college_id)
+            template_values['college_id'] = people.college_id
+            template_values['college'] = colleges[0].name
+            template_values['ss_college_id'] = people.ss_college_id
+            template_values['ss_college'] = colleges[len(colleges)-1 if len(colleges)==2 and people.bs_college_id==people.ss_college_id else len(colleges)-2].name 
+            template_values['bs_college_id'] = people.bs_college_id
+            template_values['bs_college'] = colleges[len(colleges)-1].name 
+
+            majors = self.db.query("select name from fd_Major where id in (%s,%s,%s) order by find_in_set(id, '%s,%s,%s')", people.major_id, people.ss_major_id, people.bs_major_id, people.major_id, people.ss_major_id, people.bs_major_id)
+            template_values['major_id'] = people.major_id
+            template_values['major'] = majors[0].name
+            template_values['ss_major_id'] = people.ss_major_id
+            template_values['ss_major'] = majors[len(majors)-1 if len(majors)==2 and people.bs_major_id==people.ss_major_id else len(majors)-2].name 
+            template_values['bs_major_id'] = people.bs_major_id
+            template_values['bs_major'] = majors[len(majors)-1].name 
+        if college_type == 4:
+            template_values['zx_city'] = people.zx_city
+            template_values['zx_school'] = people.zx_school
+            zx_province = self.db.get("select name from fd_Province where id = %s", people.zx_province_id)
+            template_values['zx_province'] = zx_province.name
+
+        ufg = UserFollowGraph(self.rd)
+        template_values['follow_count'] = ufg.follow_count(people.id)
+        template_values['follower_count'] = ufg.follower_count(people.id)
+        template_values['is_follow'] = ufg.is_follow(self.get_secure_cookie("user"), people.id)
         template_values['image'] = self.static_url("img/no_avatar.jpg")
         template_values['selfdesc'] = ""
         if template_values['has_selfdesc']:
@@ -962,7 +957,7 @@ class SelfdescHandler(BaseHandler):
                 self.db.execute("update fd_People set has_selfdesc"
                         " = 1 where id = %s", self.current_user.id)
 
-class PubstatusHandler(BaseHandler):
+class PubstatusHandler(FilterHandler):
     @tornado.web.authenticated
     def post(self):
         status = self.get_argument("statustext",None)
@@ -977,7 +972,7 @@ class PubstatusHandler(BaseHandler):
         actdict = {'time':redpubdate, 'status':status}
         addresult = add_activity(self.rd, user_id, status_id, 1, actdict)
         if status_id and addresult:
-            self.write(str(status_id))
+            self.write(''.join([str(status_id), ',', self.at(unicode(status))]))
         else:
             self.write("Something wrong...")
 
@@ -1003,14 +998,11 @@ class StatusHandler(FilterHandler):
         comments = self.db.query("select p.name,p.domain,c.comments, "
                 "c.pubdate from fd_People p, fd_Stacomm c where p.id"
                 "=c.user_id and status_id = %s", status_id)
-        #for comment in comments:
-        #    at(self.db, self.rd, comment.comments)
         template_values['comments_length'] = len(comments)
         template_values['comments'] = comments
         self.render("status.html", template_values=template_values)
     @tornado.web.authenticated
     def post(self, status_id):
-        #logging.info("%s",status_id)
         comments = self.get_argument("commenttext",None)
         user_id = self.current_user.id
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())

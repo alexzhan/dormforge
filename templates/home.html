@@ -81,6 +81,9 @@
         font-size: 14px;
         word-break: break-all;
     }
+    .feed-item-body p a {
+        color: #19558D;
+    }
     .feed-item-footer {
         font-size: 13px;
         color: #999;
@@ -108,7 +111,6 @@
                 <div style="display:none">xsrf generated if logged in ready for publish</div>                   
                 {% end %}
                 <div class="pubbox">
-                    <!--<input id="pubinput" type="text" style="width:460px">-->
                     <textarea id="pubtextarea" placeholder="你在想什么?"></textarea>
                     <div class="submit-btn">
                         <a class="btn btn-primary btn-small" style="width: 30px;margin-left: 5px"  onclick="return submit('{{ current_user.name }}', '{{ current_user.domain }}');">提交</a>
@@ -132,7 +134,7 @@
                                 <span class="feed-item-title desc">更新了状态:</span>
                             </div>
                             <div class="feed-item-body">
-                                <p>{{ activity[1] }}</p>
+                                <p>{{ handler.at(unicode(activity[1])) }}</p>
                             </div>
                             <div class="feed-item-footer">
                                 <div style="float:left"><span><a class="footerlink" href="/status/{{ activity[3] }}">{{ activity[0] }}</a></span>
