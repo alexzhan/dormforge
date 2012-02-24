@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import os.path
+import sys
 import re
 import time
 import uuid
@@ -26,6 +27,8 @@ define("mysql_database", default="df", help="blog database name")
 define("mysql_user", default="df", help="blog database user")
 define("mysql_password", default="df", help="blog database password")
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -226,6 +229,7 @@ class HomeHandler(BaseHandler):
             uag = UserActivityGraph(self.rd)
             template_values['all_activities'] = uag.get_all_activities(self.db)
             #logging.info("%s--length", len(template_values['all_activities']))
+            logging.info(type(self.current_user.name))
             self.render("home.html", template_values=template_values)
         else:
             self.render("index.html")
