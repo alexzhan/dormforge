@@ -77,6 +77,9 @@
     .status_preview {
         word-break: break-all;
     }
+    .status_preview a {
+        color: #19558D;
+    }
     .status_preview_link {
         clear: both;
         float: left;
@@ -218,7 +221,7 @@
                 <div class="status_preview_link">
                     <span class="cell">
                         <div class="status_preview">
-                            {{ status[1] }} 
+                            {{ handler.at(status[1]) }} 
                         </div>
                         <div class="timestamp">
                             <a href="/status/{{ status[2] }}" style="color:#999">{{ status[0] }}</a>
