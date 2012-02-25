@@ -991,9 +991,11 @@ class DeleteStatusHandler(BaseHandler):
 class StatusHandler(FilterHandler):
     def get(self, status_id):
         template_values = {}
-        status = self.db.get("select p.name,p.domain,s.status,s.pubdate "
+        status = self.db.get("select p.name,p.domain,s.status,s.pubdate,s.status_ "
                 "from fd_People p, fd_Status s where s.user_id = p.id and "
                 "s.id = %s", status_id)
+        if not status or status.status_ == 1:
+            raise tornado.web.HTTPError(404)
         template_values['status'] = status
         comments = self.db.query("select p.name,p.domain,c.comments, "
                 "c.pubdate from fd_People p, fd_Stacomm c where p.id"
