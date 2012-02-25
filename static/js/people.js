@@ -38,7 +38,7 @@ function submitdesc() {
             $(".descform").hide();
             $("#textdesc").css("display", "inline");
             $(".the-icons").show();
-            $("#textdesc").html(selfdesc.replace(/\n/gi, '<br>'));
+            $("#textdesc").html(data);
         }       
     });
     return false;

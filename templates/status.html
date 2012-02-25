@@ -101,7 +101,7 @@
                 <a href="/people/{{ template_values['status'].domain }}"><img src="{{ static_url('img/no_avatar.jpg') }}" width="50px" height="50px"></img></a>
             </div>
             <div class="status-text">
-                {{ handler.at(unicode(template_values['status'].status)) }}
+                {{ handler.br(handler.at(unicode(template_values['status'].status))) }}
             </div>
             <div class="status-info">
                 <a href="/people/{{ template_values['status'].domain }}" style="color:#999">{{ template_values['status'].name }}</a> 发布于 {{ str(template_values['status'].pubdate)[5:-3] if str(template_values['status'].pubdate)[5] != '0' else str(template_values['status'].pubdate)[6:-3] }}
@@ -125,7 +125,7 @@
                         </span>
                     </div>
                     <div class="comment-item-body">
-                        <p>{{ handler.at(comments.comments) }}</p>
+                        <p>{{ handler.at(handler.br(comments.comments)) }}</p>
                     </div>
                 </div>
             </div>

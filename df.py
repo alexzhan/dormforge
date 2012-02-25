@@ -99,6 +99,8 @@ class FilterHandler(BaseHandler):
                 if domain:
                     value = value.replace(m, '@<a href="/people/' + domain + '">' + username + '</a>')
         return value
+    def br(self, value):
+        return value.replace("\n", "<br>")
 
 class FollowBaseHandler(BaseHandler):
     def follow(self, domain, follow_type):
@@ -785,7 +787,7 @@ class PeopleHandler(FilterHandler):
             selfdesc = self.db.get("select selfdesc from fd_Selfdesc where user_id = %s", 
                     template_values['id'])
             if not selfdesc: raise tornado.web.HTTPError(405)
-            template_values['selfdesc'] = selfdesc.selfdesc
+            template_values['selfdesc'] = self.br(selfdesc.selfdesc).strip()
         uag = UserActivityGraph(self.rd)
         template_values['activities'] = uag.get_top_activities(template_values['id'], self.db) 
         template_values['activity_count'] = uag.count_activity(template_values['id']) 
@@ -941,12 +943,11 @@ class UnfollowHandler(BaseHandler):
         else:
             self.write('already')
 
-class SelfdescHandler(BaseHandler):
+class SelfdescHandler(FilterHandler):
     @tornado.web.authenticated
     def post(self):
         selfdesc = self.get_argument("selfdesc",None)
         if not selfdesc: raise tornado.web.HTTPError(405)
-        selfdesc = selfdesc.replace("\n", "<br>")
         if self.current_user.has_selfdesc:
             self.db.execute("update fd_Selfdesc set selfdesc = %s"
                     "where user_id = %s", selfdesc, self.current_user.id)
@@ -956,6 +957,7 @@ class SelfdescHandler(BaseHandler):
             if selfdesc_id:
                 self.db.execute("update fd_People set has_selfdesc"
                         " = 1 where id = %s", self.current_user.id)
+                self.write(self.br(selfdesc)).strip()
 
 class PubstatusHandler(FilterHandler):
     @tornado.web.authenticated
@@ -972,7 +974,7 @@ class PubstatusHandler(FilterHandler):
         actdict = {'time':redpubdate, 'status':status}
         addresult = add_activity(self.rd, user_id, status_id, 1, actdict)
         if status_id and addresult:
-            self.write(''.join([str(status_id), ',', self.at(unicode(status))]))
+            self.write(''.join([str(status_id), ',', self.at(self.br(unicode(status)))]))
         else:
             self.write("Something wrong...")
 
@@ -1019,7 +1021,7 @@ class StatusHandler(FilterHandler):
             else:
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(status_key, 'comm', comments_num)
-            self.write(self.at(comments))
+            self.write(self.at(self.br(comments)))
 
 class CdnzzVerifyHandler(tornado.web.RequestHandler):
     def get(self):
