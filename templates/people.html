@@ -221,7 +221,7 @@
                 <div class="status_preview_link">
                     <span class="cell">
                         <div class="status_preview">
-                            {{ handler.at(status[1]) }} 
+                            {{ handler.br(handler.at(unicode(status[1]))) }} 
                         </div>
                         <div class="timestamp">
                             <a href="/status/{{ status[2] }}" style="color:#999">{{ status[0] }}</a>

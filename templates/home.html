@@ -134,7 +134,7 @@
                                 <span class="feed-item-title desc">更新了状态:</span>
                             </div>
                             <div class="feed-item-body">
-                                <p>{{ handler.at(unicode(activity[1])) }}</p>
+                                <p>{{ handler.at(handler.br(unicode(activity[1]))) }}</p>
                             </div>
                             <div class="feed-item-footer">
                                 <div style="float:left"><span><a class="footerlink" href="/status/{{ activity[3] }}">{{ activity[0] }}</a></span>
