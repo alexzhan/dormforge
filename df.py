@@ -987,7 +987,7 @@ class PubstatusHandler(FilterHandler):
         actdict = {'time':redpubdate, 'status':status}
         addresult = add_activity(self.rd, user_id, status_id, 1, actdict)
         if status_id and addresult:
-            self.write(''.join([str(status_id), ',', self.at(self.br(unicode(status)))]))
+            self.write(''.join([encode(str(status_id)), ',', self.at(self.br(unicode(status)))]))
         else:
             self.write("Something wrong...")
 
@@ -997,6 +997,9 @@ class DeleteStatusHandler(BaseHandler):
         user = self.get_argument("user",None)
         actto = self.get_argument("actto",None)
         user_id = self.db.get("select id from fd_People where name = %s", user).id
+        if len(actto) < 8:
+            raise tornado.web.HTTPError(405)
+        actto = decode(actto)
         if user_id != self.current_user.id:
             raise tornado.web.HTTPError(405)
         # don't remove in db now because data is not got wholy in redis,just mark it
