@@ -1026,6 +1026,9 @@ class StatusHandler(FilterHandler):
         self.render("status.html", template_values=template_values)
     @tornado.web.authenticated
     def post(self, status_id):
+        if len(status_id) < 8:
+            raise tornado.web.HTTPError(404)
+        status_id = decode(status_id)
         comments = self.get_argument("commenttext",None)
         user_id = self.current_user.id
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
