@@ -141,7 +141,7 @@
                                 </div>
                                 <div style="float:right">
                                 {% if str(current_user.name) == activity[-4] %}
-                                <span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-4] }}', {{ activity[3] }});">删除</a></span>
+                                <span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-4] }}', '{{ handler.encode(activity[3]) }}');">删除</a></span>
                                 <span class="splitter">•</span>
                                 {% end %}
                                 <!--
