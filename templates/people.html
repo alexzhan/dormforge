@@ -206,7 +206,7 @@
                 {% if activity[-1] == 0 %}
                 <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[2] }}">{{ activity[1] }}</a>. <span class="timestamp">{{ activity[0] }}</span>
                 {% elif activity[-1] == 1 %}
-                <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/status/{{ activity[2] }}">更新了状态.</a> <span class="timestamp">{{ activity[0] }}</span>
+                <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/status/{{ handler.encode(activity[2]) }}">更新了状态.</a> <span class="timestamp">{{ activity[0] }}</span>
                 {% end %}         
                 {% end %}
                 </p>
@@ -224,7 +224,7 @@
                             {{ handler.br(handler.at(unicode(status[1]))) }} 
                         </div>
                         <div class="timestamp">
-                            <a href="/status/{{ status[2] }}" style="color:#999">{{ status[0] }}</a>
+                            <a href="/status/{{ handler.encode(status[2]) }}" style="color:#999">{{ status[0] }}</a>
                         </div>
                     </span>
                 </div>

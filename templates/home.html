@@ -137,7 +137,7 @@
                                 <p>{{ handler.at(handler.br(unicode(activity[1]))) }}</p>
                             </div>
                             <div class="feed-item-footer">
-                                <div style="float:left"><span><a class="footerlink" href="/status/{{ activity[3] }}">{{ activity[0] }}</a></span>
+                                <div style="float:left"><span><a class="footerlink" href="/status/{{ handler.encode(activity[3]) }}">{{ activity[0] }}</a></span>
                                 </div>
                                 <div style="float:right">
                                 {% if str(current_user.name) == activity[-4] %}
@@ -148,7 +148,7 @@
                                 <span><a class="footerlink" href="#"><i class="icon-retweet"></i>转发</a></span>
                                 <span class="splitter">•</span>
                                 -->
-                                <span><a class="footerlink" href="/status/{{ activity[3] }}">{% if not activity[2] or activity[2]=='0' %}评论{% else %}评论({{ activity[2] }}){% end %}</a></span>
+                                <span><a class="footerlink" href="/status/{{ handler.encode(activity[3]) }}">{% if not activity[2] or activity[2]=='0' %}评论{% else %}评论({{ activity[2] }}){% end %}</a></span>
                                 </div>
                             </div>
                         </div>
