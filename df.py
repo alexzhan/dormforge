@@ -1012,7 +1012,6 @@ class StatusHandler(FilterHandler):
         if len(status_id) < 8:
             raise tornado.web.HTTPError(404)
         status_id = decode(status_id)
-        logging.info(status_id)
         status = self.db.get("select p.name,p.domain,s.status,s.pubdate,s.status_ "
                 "from fd_People p, fd_Status s where s.user_id = p.id and "
                 "s.id = %s", status_id)
