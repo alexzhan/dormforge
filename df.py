@@ -18,6 +18,8 @@ import redis
 from tornado.options import define, options
 from util.encrypt import encrypt_password,validate_password
 from util.getby import get_domain_by_name
+from util.encode import encode,decode,key
+from base64 import b64encode,b64decode
 from db.redis.user_follow_graph import UserFollowGraph
 from db.redis.user_activity_graph import UserActivityGraph
 
@@ -54,7 +56,7 @@ class Application(tornado.web.Application):
                 (r"/selfdesc", SelfdescHandler),
                 (r"/pubstatus", PubstatusHandler),
                 (r"/deletestatus", DeleteStatusHandler),
-                (r"/status/([0-9]+)", StatusHandler),
+                (r"/status/([0-9a-z]+)", StatusHandler),
                 (r"/3e224bd553a3bfca3c7cb92c9806cd04\.html", CdnzzVerifyHandler),
                 ]
         settings = dict(
@@ -88,6 +90,17 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def set_default_headers(self): 
         self.set_header('Server', '18zhouServer/1.1')
+
+    def encode(self, unicodeString):  
+        strorg = unicodeString.encode('utf-8')  
+        strlength = len(strorg)  
+        baselength = len(key)  
+        hh = []  
+        for i in range(strlength):  
+            hh.append(chr((ord(strorg[i])+ord(key[i % baselength]))%256))  
+        return b64encode(''.join(hh)).encode("hex")
+
+
 
 class FilterHandler(BaseHandler):
     def at(self, value):
@@ -993,6 +1006,10 @@ class DeleteStatusHandler(BaseHandler):
 class StatusHandler(FilterHandler):
     def get(self, status_id):
         template_values = {}
+        if len(status_id) < 8:
+            raise tornado.web.HTTPError(404)
+        status_id = decode(status_id)
+        logging.info(status_id)
         status = self.db.get("select p.name,p.domain,s.status,s.pubdate,s.status_ "
                 "from fd_People p, fd_Status s where s.user_id = p.id and "
                 "s.id = %s", status_id)
