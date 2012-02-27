@@ -36,6 +36,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
                 (r"/", HomeHandler),
+                (r"/my", MyhomeHandler),
                 (r"/signup", SignupHandler),
                 (r"/login", LoginHandler),
                 (r"/logout", LogoutHandler),
@@ -165,6 +166,16 @@ class HomeHandler(FilterHandler):
             template_values['all_activities'] = uag.get_all_activities(self.db)
             #logging.info("%s--length", len(template_values['all_activities']))
             self.render("home.html", template_values=template_values)
+        else:
+            self.render("index.html")
+
+class MyhomeHandler(FilterHandler):
+    def get(self):
+        if self.current_user:
+            template_values = {}
+            uag = UserActivityGraph(self.rd)
+            template_values['all_activities'] = uag.get_my_activities(self.db, self.current_user.id)
+            self.render("myhome.html", template_values=template_values)
         else:
             self.render("index.html")
 
@@ -938,7 +949,7 @@ class FollowHandler(BaseHandler):
             acttime = time.strftime('%y-%m-%d %H:%M', time.localtime())
             redacttime = acttime[4:] if acttime[3] == '0' else acttime[3:]
             actto = self.db.get("select name from fd_People where id = %s", to_user).name
-            actdict = {'time':redacttime, 'to':actto}
+            actdict = {'time':redacttime}
             add_activity(self.rd, from_user, to_user, 0, actdict)
         else:
             self.write('already')
@@ -951,8 +962,8 @@ class UnfollowHandler(BaseHandler):
         if from_user == to_user or from_user == 0 or to_user == 0: raise tornado.web.HTTPError(405)
         ufg = UserFollowGraph(self.rd)
         if ufg.unfollow(from_user, to_user):
-            actto = self.db.get("select name from fd_People where id = %s", to_user).name
-            del_activity(self.rd, from_user, 0, actto)
+            #actto = self.db.get("select name from fd_People where id = %s", to_user).name
+            del_activity(self.rd, from_user, 0, to_user)
         else:
             self.write('already')
 
