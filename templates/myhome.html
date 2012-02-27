@@ -126,6 +126,11 @@
                     最新动态
                 </div>
                 <div class="feed-body">
+                    {% if len(template_values['all_activities']) == 0 %}
+                    <div style="margin:10px 0 0 60px;">
+                    暂时没有你关注的信息，去<a href="/">首页</a>看看吧^_^
+                    </div>
+                    {% end %}
                     {% for activity in template_values['all_activities'] %}
                     {% if activity[-2] == 'status' %}
                     <div id="feed-item{{ activity[-1] }}" class="feed-item">
@@ -165,8 +170,8 @@
         <div class="span3">
             <div class="navright">
                 <ul class="nav nav-pills nav-stacked">
-                    <li class="active"><a href="#">全部动态</a></li>
-                    <li><a href="/my">我关注的</a></li>
+                    <li ><a href="/">全部动态</a></li>
+                    <li class="active"><a href="#">我关注的</a></li>
                 </ul>
             </div>
         </div>

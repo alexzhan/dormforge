@@ -27,28 +27,16 @@ class UserActivityGraph(object):
         mark = 1
         if acttype == 0:# follow somepeople
             Follow_key = 'u:Follow:%s' %user
-            for follow_key in self.client.lrange(Follow_key, 0, -1):
-                if follow_key.split(":")[-1] == actto:
-                    #we must put a mark here because there may not exist the key we want to del,
-                    #but without a mark,we have to del the largest key as the loop goes
-                    self.client.delete(follow_key)
-                    mark = 0
-                    break
-            if mark:
-                return False
-            else:
+            follow_key = 'follow:%s:%s'%(user, actto)
+            if self.client.delete(follow_key):            
                 return self.client.lrem(Follow_key, 0, follow_key) and self.client.lrem(Activity_key, 0, follow_key)
+            else: return 0
         elif acttype == 1:# update status
             Status_key = 'u:Status:%s' % user
-            for status_key in self.client.lrange(Status_key, 0, -1):
-                if status_key.split(":")[-1] == actto:
-                    self.client.delete(status_key)
-                    mark = 0
-                    break
-            if mark:
-                return False
-            else:
+            status_key = 'status:%s:%s' % (user, actto)
+            if self.client.delete(status_key):
                 return self.client.lrem(Status_key, 0, status_key) and self.client.lrem(Activity_key, 0, status_key) and self.client.lrem("all", 0, status_key)
+            else: return 0
 
     #acttype:{follow:0;status:1}
     def add_sub_activity(self, user, actto, acttype, actdict):
@@ -107,10 +95,37 @@ class UserActivityGraph(object):
                 real_activity.append(act_username)
                 real_activity.append(act_domain)
                 real_activity.append(acttype)
-                real_activity.append(index)
+            real_activity.append(index)
             index = index + 1
             all_activities.append(real_activity)
         return all_activities
+
+    #whole-site activities
+    def get_my_activities(self, db, user):
+        my_activities = []
+        activities_list = self.client.lrange("my:%s"%user, 0, -1)
+        index = 1
+        for activity in activities_list:
+            acttype, act_userid, actto = activity.split(":")
+            act_username,act_domain = get_namedomain_by_id(db, self.client, act_userid)
+            if acttype == 'status':
+                real_activity = self.client.hmget(activity, ["time",'status','comm'])
+                real_activity.append(actto)
+                real_activity.append(act_username)
+                real_activity.append(act_domain)
+                real_activity.append(acttype)
+            if acttype == 'follow':
+                actto_username,actto_domain = get_namedomain_by_id(db, self.client, actto)
+                real_activity = self.client.hmget(activity, ["time",])
+                real_activity.append(act_username)
+                real_activity.append(act_domain)
+                real_activity.append(actto_username)
+                real_activity.append(actto_domain)
+                real_activity.append(acttype)
+            real_activity.append(index)
+            index = index + 1
+            my_activities.append(real_activity)
+        return my_activities
 
     def count_activity(self, user):
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
