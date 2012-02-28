@@ -20,7 +20,15 @@ class UserActivityGraph(object):
         addresult = self.client.lpush(Activity_key, activity_key)
         if acttype == 1:
             self.client.lpush("all", activity_key)
+        self.add_my_activity(user, activity_key)
         return addresult
+
+    def add_my_activity(self, user, activity_key):
+        followers = self.client.lrange("u:f:%s" % user, 0, -1)
+        followers.append(user)
+        for follower in followers:
+            key = "my:%s" % follower
+            self.client.lpush(key, activity_key)
 
     def del_activity(self, user, acttype, actto):
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
@@ -29,14 +37,37 @@ class UserActivityGraph(object):
             Follow_key = 'u:Follow:%s' %user
             follow_key = 'follow:%s:%s'%(user, actto)
             if self.client.delete(follow_key):            
-                return self.client.lrem(Follow_key, 0, follow_key) and self.client.lrem(Activity_key, 0, follow_key)
+                return self.client.lrem(Follow_key, 0, follow_key) and self.client.lrem(Activity_key, 0, follow_key) and self.del_my_activity(user, acttype, actto)
             else: return 0
         elif acttype == 1:# update status
             Status_key = 'u:Status:%s' % user
             status_key = 'status:%s:%s' % (user, actto)
             if self.client.delete(status_key):
-                return self.client.lrem(Status_key, 0, status_key) and self.client.lrem(Activity_key, 0, status_key) and self.client.lrem("all", 0, status_key)
+                return self.client.lrem(Status_key, 0, status_key) and self.client.lrem(Activity_key, 0, status_key) and self.client.lrem("all", 0, status_key) and self.del_my_activity(user, acttype, actto)
             else: return 0
+
+    def del_my_activity(self, user, acttype, actto):
+        if acttype == 0:
+            follow_specific_key = "follow:%s:%s" % (user, actto)
+            self.client.lrem("my:%s"%user, 0, follow_specific_key)
+            # self del
+            for activity_key in self.client.lrange("my:%s"%user, 0, -1):
+                act_type,act_user,act_to = activity_key.split(":")
+                if act_user == actto:
+                    self.client.lrem("my:%s"%user, 0, activity_key)
+            # follower del
+            followers = self.client.lrange("u:f:%s" % user, 0, -1)
+            for follower in followers:
+                key = "my:%s" % follower
+                self.client.lrem(key, 0, follow_specific_key)
+        if acttype == 1:
+            followers = self.client.lrange("u:f:%s" % user, 0, -1)
+            followers.append(user)
+            for follower in followers:
+                key = "my:%s" % follower
+                status_key = "status:%s:%s" % (user, actto)
+                self.client.lrem(key, 0, status_key)
+        return 1
 
     #acttype:{follow:0;status:1}
     def add_sub_activity(self, user, actto, acttype, actdict):

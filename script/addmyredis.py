@@ -18,7 +18,6 @@ ids = db.query("select id from fd_People order by id")
 for id in ids:
     print id.id
     followers = rd.lrange("u:f:%s"%id.id, 0, -1)
-    followers.append(id.id)
     activities = rd.lrange("u:A:%s"%id.id, 0, -1)
     for follower in followers:
         print 'follower:',follower
