@@ -219,6 +219,12 @@ function submitfunction(){
         $("#domainhelp").html("个性域名不能少于2个字符");
         mark = 0;
     }
+    if(!isDomain($("#domain").val())) {
+        $("#domaincontrol-group").removeClass();
+        $("#domaincontrol-group").addClass("control-group error");
+        $("#domainhelp").html("个性域名不符合规则，请使用a-zA-Z0-9_");
+        mark = 0;
+    }
     if(!mark) return false;
 }
 function usernameinfo(){
@@ -242,8 +248,8 @@ function usernameinfo(){
     }
     $.ajax({
         type:"POST",
-        url:"/isidexist",
-        data:{username:$("#username").val(),_xsrf:getCookie("_xsrf")},
+        url:"/isexist",
+        data:{property:$("#username").val(),propertype:"username",_xsrf:getCookie("_xsrf")},
         success:function(data){
             if(data == '已被占用'){ 
                 $("#idcontrol-group").removeClass();
@@ -284,8 +290,8 @@ function emailinfo(){
     }
     $.ajax({
         type:"POST",
-        url:"/isemailexist",
-        data:{email:$("#email").val(),_xsrf:getCookie("_xsrf")},
+        url:"/isexist",
+        data:{property:$("#email").val(),propertype:"email",_xsrf:getCookie("_xsrf")},
         success:function(data){
             if(data != '可以使用'){ 
                 $("#emailcontrol-group").removeClass();
@@ -324,10 +330,16 @@ function domaininfo(){
         $("#domainhelp").html("个性域名不能少于2个字符");
         return false;
     }
+    if(!isDomain($("#domain").val())) {
+        $("#domaincontrol-group").removeClass();
+        $("#domaincontrol-group").addClass("control-group error");
+        $("#domainhelp").html("个性域名不符合规则，请使用a-zA-Z0-9_");
+        return false;
+    }
     $.ajax({
         type:"POST",
-        url:"/isdomainexist",
-        data:{domain:$("#domain").val(),_xsrf:getCookie("_xsrf")},
+        url:"/isexist",
+        data:{property:$("#domain").val(),propertype:"domain",_xsrf:getCookie("_xsrf")},
         success:function(data){
             if(data != '可以使用'){ 
                 $("#domaincontrol-group").removeClass();
@@ -387,8 +399,8 @@ function collegeinfo(collegetype){
     }
     $.ajax({
         type:"POST",
-        url:"/iscollegeexist",
-        data:{college:$(collegeid).val(),_xsrf:getCookie("_xsrf")},
+        url:"/isexist",
+        data:{property:$(collegeid).val(),propertype:"college",_xsrf:getCookie("_xsrf")},
         success:function(data){
             if(data != '可以注册'){ 
                 $(collegeclass).removeClass();
