@@ -1007,8 +1007,8 @@ class DeleteStatusHandler(BaseHandler):
     def post(self):
         user = self.get_argument("user",None)
         actto = self.get_argument("actto",None)
-        user_id = get_id_by_name(user)
-        if len(actto) < 8 or not user_id or user_id != self.current_user.id:
+        user_id = get_id_by_name(self.db, self.rd, user)
+        if len(actto) < 8 or not user_id or int(user_id) != self.current_user.id:
             raise tornado.web.HTTPError(405)
         actto = decode(actto)
         # don't remove in db now because data is not got wholy in redis,just mark it
