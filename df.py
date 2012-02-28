@@ -688,11 +688,8 @@ class LoginHandler(BaseHandler):
             self.db.execute(
                     "UPDATE fd_People SET login_ip = %s, login_date = %s WHERE id = %s", login_ip, login_date, people['id'])
             self.set_secure_cookie("user", str(people['id']))
-            next_url = self.get_argument("next", "people/" + str(people['domain']))
-            if next_url == '/':
-                self.redirect("people/" + str(people['domain']))
-            else:
-                self.redirect(next_url)
+            next_url = self.get_argument("next", "/")
+            self.redirect(next_url)
 
 class ContactHandler(BaseHandler):
     def get(self):
