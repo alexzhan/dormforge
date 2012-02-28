@@ -905,7 +905,7 @@ class MajorHandler(BaseHandler):
 class UsernameExistHandler(BaseHandler):
     def post(self):
         username = self.get_argument("username",None)
-        user_id = self.db.get("select id from fd_People where name = %s", username)
+        user_id = get_id_by_name(self.db, self.rd, username)
         if user_id:
             self.write("已被占用")
         else: 
