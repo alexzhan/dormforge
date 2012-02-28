@@ -112,6 +112,9 @@
         color: #999;
         font-size:13px;
     }
+    .noinfo {
+        margin:10px 0 0 60px;
+    }
 </style>
 {% end %}
 {% block body %}
@@ -141,7 +144,7 @@
                 </div>
                 <div class="feed-body">
                     {% if len(template_values['all_activities']) == 0 %}
-                    <div style="margin:10px 0 0 60px;">
+                    <div class="noinfo">
                     暂时没有你关注的信息，去<a href="/">首页</a>看看吧^_^
                     </div>
                     {% end %}
