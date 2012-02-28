@@ -49,16 +49,14 @@ class Application(tornado.web.Application):
                 (r"/city/(.*)", CityHandler),
                 (r"/college/(.*)", CollegeHandler),
                 (r"/major/(.*)", MajorHandler),
-                (r"/isidexist", UsernameExistHandler),
-                (r"/isemailexist", EmailExistHandler),
-                (r"/isdomainexist", DomainExistHandler),
-                (r"/iscollegeexist", CollegeExistHandler),
+                (r"/isexist", ExistHandler),
                 (r"/follow", FollowHandler),
                 (r"/unfollow", UnfollowHandler),
                 (r"/selfdesc", SelfdescHandler),
                 (r"/pubstatus", PubstatusHandler),
                 (r"/deletestatus", DeleteStatusHandler),
                 (r"/status/([0-9a-z]+)", StatusHandler),
+                (r"/note/touch", PubnoteHandler),
                 ]
         settings = dict(
                 template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -255,7 +253,7 @@ class SignupHandler(BaseHandler):
                 email_error = 2
             else:
                 p = re.compile(r"(?:^|\s)[-a-z0-9_.+]+@(?:[-a-z0-9]+\.)+[a-z]{2,6}(?:\s|$)", re.IGNORECASE)
-                if (p.search(email)):
+                if p.search(email):
                     user_id = self.db.get("select id from fd_People where email = %s", email)
                     if user_id:
                         errors = errors + 1
@@ -518,6 +516,7 @@ class SignupHandler(BaseHandler):
                 u'请输入个性域名',
                 u'个性域名不能超过16个字符',
                 u'个性域名不能少于2个字符',
+                u'个性域名不符合规则，请使用a-zA-Z0-9_',
                 u'已被占用']
         domain = self.get_argument("domain").strip()
         if len(domain) == 0:
@@ -532,10 +531,15 @@ class SignupHandler(BaseHandler):
                     errors = errors + 1
                     domain_error = 3
                 else:
-                    domain_id = self.db.get("select id from fd_People where domain = %s", domain)
-                    if(domain_id):
+                    p = re.compile(r"([a-zA-Z0-9_])+", re.IGNORECASE)
+                    if not p.search(domain):
                         errors = errors + 1
-                        domain_error = 4 
+                        domain_error = 4
+                    else:
+                        domain_id = self.db.get("select id from fd_People where domain = %s", domain)
+                        if(domain_id):
+                            errors = errors + 1
+                            domain_error = 5 
         template_values['domain'] = domain
         template_values['domain_error'] = domain_error
         template_values['domain_error_message'] = domain_error_messages[domain_error]
@@ -902,41 +906,34 @@ class MajorHandler(BaseHandler):
         template_values['people'] = people 
         self.render("region.html", template_values=template_values)
 
-class UsernameExistHandler(BaseHandler):
+class ExistHandler(BaseHandler):
     def post(self):
-        username = self.get_argument("username",None)
-        user_id = get_id_by_name(self.db, self.rd, username)
-        if user_id:
-            self.write("已被占用")
-        else: 
-            self.write("可以使用")
-
-class EmailExistHandler(BaseHandler):
-    def post(self):
-        email = self.get_argument("email",None)
-        user_id = self.db.get("select id from fd_People where email = %s", email)
-        if user_id:
-            self.write("该邮箱已被人注册")
-        else: 
-            self.write("可以使用")
-
-class DomainExistHandler(BaseHandler):
-    def post(self):
-        domain = self.get_argument("domain",None)
-        user_id = self.db.get("select id from fd_People where domain = %s", domain)
-        if user_id:
-            self.write("已被占用")
-        else: 
-            self.write("可以使用")
-
-class CollegeExistHandler(BaseHandler):
-    def post(self):
-        college = self.get_argument("college",None)
-        college_id = self.db.get("select id from fd_College where name = %s", college)
-        if college_id:
-            self.write("可以注册")
-        else: 
-            self.write("学校不存在或不是全称")
+        prop = self.get_argument("property",None)
+        proptype = self.get_argument("propertype",None)
+        if proptype == "username":
+            user_id = get_id_by_name(self.db, self.rd, prop)
+            if user_id:
+                self.write("已被占用")
+            else: 
+                self.write("可以使用")
+        if proptype == "email":
+            user_id = self.db.get("select id from fd_People where email = %s", prop)
+            if user_id:
+                self.write("该邮箱已被人注册")
+            else: 
+                self.write("可以使用")
+        if proptype == "domain":
+            user_id = self.db.get("select id from fd_People where domain = %s", prop)
+            if user_id:
+                self.write("已被占用")
+            else: 
+                self.write("可以使用")
+        if proptype == "college":
+            college_id = self.db.get("select id from fd_College where name = %s", prop)
+            if college_id:
+                self.write("可以注册")
+            else: 
+                self.write("学校不存在或不是全称")
 
 class FollowHandler(BaseHandler):
     @tornado.web.authenticated
@@ -981,8 +978,7 @@ class SelfdescHandler(FilterHandler):
             if selfdesc_id:
                 self.db.execute("update fd_People set has_selfdesc"
                         " = 1 where id = %s", self.current_user.id)
-                self.write(self.br(selfdesc)).strip()
-
+        self.write(self.br(selfdesc).strip())
 class PubstatusHandler(FilterHandler):
     @tornado.web.authenticated
     def post(self):
@@ -1053,6 +1049,11 @@ class StatusHandler(FilterHandler):
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(status_key, 'comm', comments_num)
             self.write(self.at(self.br(comments)))
+
+class PubnoteHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.render("pubnote.html")
 
 def main():
     tornado.options.parse_command_line()

@@ -1,6 +1,6 @@
 def get_namedomain_by_id(db, client, userid):
     namedomain = client.hmget('u:' + userid, ['name', 'domain'])
-    if namedomain:
+    if namedomain[0] and namedomain[1]:
         return namedomain
     else:
         userinfo = db.get("select name,domain from fd_People where id = %s", userid)

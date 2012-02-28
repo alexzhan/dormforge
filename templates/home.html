@@ -148,10 +148,6 @@
                                 <span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-4] }}', '{{ handler.encode(activity[3]) }}');">删除</a></span>
                                 <span class="splitter">•</span>
                                 {% end %}
-                                <!--
-                                <span><a class="footerlink" href="#"><i class="icon-retweet"></i>转发</a></span>
-                                <span class="splitter">•</span>
-                                -->
                                 <span><a class="footerlink" href="/status/{{ handler.encode(activity[3]) }}">{% if not activity[2] or activity[2]=='0' %}评论{% else %}评论({{ activity[2] }}){% end %}</a></span>
                                 </div>
                             </div>
