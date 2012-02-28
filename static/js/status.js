@@ -16,6 +16,17 @@ function submitfunc(requesturl,name,domain,prevnum) {
     });
     return false;
 }
+function delstatus(user, status_id) {
+    $.ajax({
+    type:'POST',
+    url:'/deletestatus',
+    data:{user:user,actto:status_id,_xsrf:getCookie('_xsrf')},
+    success:function(data){
+        window.location.href="/";
+    }       
+    });
+    return false;
+}
 function replyOne(username) {
     replyContent = $("#comment-box");
     oldContent = replyContent.val();
