@@ -17,8 +17,9 @@ import redis
 
 from tornado.options import define, options
 from util.encrypt import encrypt_password,validate_password
-from util.getby import get_domain_by_name
+from util.getby import get_domain_by_name,get_id_by_name
 from util.encode import encode,decode,key
+from util.redis_activity import add_activity,del_activity
 from base64 import b64encode,b64decode
 from db.redis.user_follow_graph import UserFollowGraph
 from db.redis.user_activity_graph import UserActivityGraph
@@ -58,7 +59,6 @@ class Application(tornado.web.Application):
                 (r"/pubstatus", PubstatusHandler),
                 (r"/deletestatus", DeleteStatusHandler),
                 (r"/status/([0-9a-z]+)", StatusHandler),
-                (r"/3e224bd553a3bfca3c7cb92c9806cd04\.html", CdnzzVerifyHandler),
                 ]
         settings = dict(
                 template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -1007,12 +1007,10 @@ class DeleteStatusHandler(BaseHandler):
     def post(self):
         user = self.get_argument("user",None)
         actto = self.get_argument("actto",None)
-        user_id = self.db.get("select id from fd_People where name = %s", user).id
-        if len(actto) < 8:
+        user_id = get_id_by_name(self.db, self.rd, user)
+        if len(actto) < 8 or not user_id or int(user_id) != self.current_user.id:
             raise tornado.web.HTTPError(405)
         actto = decode(actto)
-        if user_id != self.current_user.id:
-            raise tornado.web.HTTPError(405)
         # don't remove in db now because data is not got wholy in redis,just mark it
         self.db.execute("update fd_Status set status_ = 1 where id = %s", actto)
         del_activity(self.rd, user_id, 1, actto)
@@ -1055,18 +1053,6 @@ class StatusHandler(FilterHandler):
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(status_key, 'comm', comments_num)
             self.write(self.at(self.br(comments)))
-
-class CdnzzVerifyHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.write('e1faafa0c2f808702da5c1b7fda8e919')
-
-def add_activity(client, actuser, actto, acttype, actdict):
-    uag = UserActivityGraph(client)
-    return uag.add_activity(actuser, actto, acttype, actdict)
-
-def del_activity(client, actuser ,acttype, actto):
-    uag = UserActivityGraph(client)
-    return uag.del_activity(actuser, acttype, actto)
 
 def main():
     tornado.options.parse_command_line()

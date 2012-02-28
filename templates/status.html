@@ -30,6 +30,9 @@
         font-size: small;
         margin-bottom: 5px;
     }
+    .status-info a {
+        color: #999;
+    }
     .status-comment {
         margin-left: 60px;
         width: 600px;
@@ -104,7 +107,11 @@
                 {{ handler.br(handler.at(unicode(template_values['status'].status))) }}
             </div>
             <div class="status-info">
-                <a href="/people/{{ template_values['status'].domain }}" style="color:#999">{{ template_values['status'].name }}</a> 发布于 {{ str(template_values['status'].pubdate)[5:-3] if str(template_values['status'].pubdate)[5] != '0' else str(template_values['status'].pubdate)[6:-3] }}
+                <a href="/people/{{ template_values['status'].domain }}">{{ template_values['status'].name }}</a> 发布于 {{ str(template_values['status'].pubdate)[5:-3] if str(template_values['status'].pubdate)[5] != '0' else str(template_values['status'].pubdate)[6:-3] }}
+                {% if current_user.name == template_values['status'].name %}
+                <span class="splitter"> • </span>
+                <span><a href="#" onclick="return delstatus('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}');">删除</a></span>
+                {% end %}
             </div>
         </div>
         <div class="status-comment">
