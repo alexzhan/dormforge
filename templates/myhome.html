@@ -152,7 +152,7 @@
                     {% if activity[-2] == 'status' %}
                     <div id="feed-item{{ activity[-1] }}" class="feed-item">
                         <div class="avatar">
-                            <a href="#"><img width="50px" height="50px" src="{{ static_url("img/no_avatar.jpg") }}"></a>
+                            <a href="/people/{{ activity[-3] }}"><img width="50px" height="50px" src="{{ static_url("img/no_avatar.jpg") }}"></a>
                         </div>
                         <div class="feed-item-content">
                             <div class="feed-item-title">
