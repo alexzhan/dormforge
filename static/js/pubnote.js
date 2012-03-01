@@ -18,8 +18,13 @@ function pubnote(notetype) {
     $.ajax({
         type:'POST',
         url:'/note/touch',
-        data:{notetype:notetype,notetitle:notetitle,notecontent:notecontent,_xsrf:getCookie('_xsrf')},
+        data:{notetype:notetype,
+            notetitle:notetitle,
+            notecontent:notecontent,
+            _xsrf:getCookie('_xsrf')},
         success:function(data){
+            if(data == "right")
+              window.location.href="/";
         }
     });
     return false;

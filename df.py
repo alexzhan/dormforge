@@ -119,7 +119,7 @@ class FollowBaseHandler(BaseHandler):
         people = self.db.get("SELECT id,name,domain FROM fd_People WHERE domain = %s", domain) 
         if not people: raise tornado.web.HTTPError(404)
         template_values = {}
-        if not self.get_secure_cookie("user") or self.get_secure_cookie("user") and int(self.get_secure_cookie("user")) != int(people.id):
+        if not self.current_user or self.current_user and self.current_user.id != people.id:
             template_values['is_self'] = False
         else:
             template_values['is_self'] = True
@@ -130,7 +130,7 @@ class FollowBaseHandler(BaseHandler):
         ufg = UserFollowGraph(self.rd)
         template_values['follow_count'] = ufg.follow_count(people.id)
         template_values['follower_count'] = ufg.follower_count(people.id)
-        template_values['is_follow'] = ufg.is_follow(self.get_secure_cookie("user"), people.id)
+        template_values['is_follow'] = ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
         if follow_type == 'following':
             follows = ufg.get_follows(template_values['id'])
         elif follow_type == 'follower':
@@ -146,9 +146,9 @@ class FollowBaseHandler(BaseHandler):
                 orderstr = str(follows)[1:-1].replace(" ","")
                 follow_people = self.db.query("SELECT id,name,domain from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
             for i in range(len(follow_people)):
-                follow_people[i].is_follow = ufg.is_follow(self.get_secure_cookie("user"), follow_people[i].id)
+                follow_people[i].is_follow = ufg.is_follow(self.current_user.id, follow_people[i].id) if self.current_user else False
                 follow_people[i].image = self.static_url("img/no_avatar.jpg")
-                if not self.get_secure_cookie("user") or self.get_secure_cookie("user") and int(self.get_secure_cookie("user")) != int(follow_people[i].id):
+                if not self.current_user or self.current_user and self.current_user.id != follow_people[i].id:
                     follow_people[i].is_self = False 
                 else:
                     follow_people[i].is_self = True
@@ -733,7 +733,7 @@ class PeopleHandler(FilterHandler):
         people = self.db.get("SELECT * FROM fd_People WHERE domain = %s", domain) 
         if not people: raise tornado.web.HTTPError(404)
         template_values = {}
-        if not self.get_secure_cookie("user") or self.get_secure_cookie("user") and int(self.get_secure_cookie("user")) != int(people.id):
+        if not self.current_user or self.current_user and self.current_user.id != people.id:
             template_values['is_self'] = False
         else:
             template_values['is_self'] = True
@@ -805,7 +805,7 @@ class PeopleHandler(FilterHandler):
         ufg = UserFollowGraph(self.rd)
         template_values['follow_count'] = ufg.follow_count(people.id)
         template_values['follower_count'] = ufg.follower_count(people.id)
-        template_values['is_follow'] = ufg.is_follow(self.get_secure_cookie("user"), people.id)
+        template_values['is_follow'] = ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
         template_values['image'] = self.static_url("img/no_avatar.jpg")
         template_values['selfdesc'] = ""
         if template_values['has_selfdesc']:
@@ -814,10 +814,13 @@ class PeopleHandler(FilterHandler):
             if not selfdesc: raise tornado.web.HTTPError(405)
             template_values['selfdesc'] = self.br(selfdesc.selfdesc).strip()
         uag = UserActivityGraph(self.rd)
-        template_values['activities'] = uag.get_top_activities(template_values['id'], self.db) 
+        isself = template_values['id'] == self.current_user.id if self.current_user else False
+        template_values['activities'] = uag.get_top_activities(template_values['id'], self.db, isself) 
         template_values['activity_count'] = uag.count_activity(template_values['id']) 
-        template_values['statuses'] = uag.get_top_sub_activities(template_values['id'], 1) 
+        template_values['statuses'] = uag.get_top_sub_activities(template_values['id'], 1, isself) 
         template_values['status_count'] = uag.count_sub_activity(template_values['id'], 1) 
+        template_values['notes'] = uag.get_top_sub_activities(template_values['id'], 2, isself) 
+        template_values['note_count'] = uag.count_sub_activity(template_values['id'], 2) 
         self.render("people.html", template_values=template_values)
 
 class FollowingHandler(FollowBaseHandler):
@@ -844,9 +847,9 @@ class CityHandler(BaseHandler):
         template_values['image'] = self.static_url("img/no_photo.gif")
         ufg = UserFollowGraph(self.rd)
         for i in range(len(people)):
-            people[i].is_follow = ufg.is_follow(self.get_secure_cookie("user"), people[i].id)
+            people[i].is_follow = ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
             people[i].image = self.static_url("img/no_avatar.jpg")
-            if not self.get_secure_cookie("user") or self.get_secure_cookie("user") and int(self.get_secure_cookie("user")) != int(people[i].id):
+            if not self.current_user or self.current_user and self.current_user.id != people[i].id:
                 people[i].is_self = False 
             else:
                 people[i].is_self = True
@@ -871,9 +874,9 @@ class CollegeHandler(BaseHandler):
             template_values['image'] = self.static_url("img/no_photo.gif")
         ufg = UserFollowGraph(self.rd)
         for i in range(len(people)):
-            people[i].is_follow = ufg.is_follow(self.get_secure_cookie("user"), people[i].id)
+            people[i].is_follow = ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
             people[i].image = self.static_url("img/no_avatar.jpg")
-            if not self.get_secure_cookie("user") or self.get_secure_cookie("user") and int(self.get_secure_cookie("user")) != int(people[i].id):
+            if not self.current_user or self.current_user and self.current_user.id != people[i].id:
                 people[i].is_self = False 
             else:
                 people[i].is_self = True
@@ -894,9 +897,9 @@ class MajorHandler(BaseHandler):
         template_values['image'] = self.static_url("img/no_photo.gif")
         ufg = UserFollowGraph(self.rd)
         for i in range(len(people)):
-            people[i].is_follow = ufg.is_follow(self.get_secure_cookie("user"), people[i].id)
+            people[i].is_follow = ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
             people[i].image = self.static_url("img/no_avatar.jpg")
-            if not self.get_secure_cookie("user") or self.get_secure_cookie("user") and int(self.get_secure_cookie("user")) != int(people[i].id):
+            if not self.current_user or self.current_user and self.current_user.id != people[i].id:
                 people[i].is_self = False 
             else:
                 people[i].is_self = True
@@ -988,12 +991,13 @@ class PubstatusHandler(FilterHandler):
                     " status, pubdate) values (%s,%s,%s)", user_id, 
                     status, pubdate)
         #redis
-        actdict = {'time':redpubdate, 'status':status}
-        addresult = add_activity(self.rd, user_id, status_id, 1, actdict)
-        if status_id and addresult:
-            self.write(''.join([encode(str(status_id)), ',', self.at(self.br(unicode(status)))]))
-        else:
-            self.write("Something wrong...")
+        if status_id:
+            actdict = {'time':redpubdate, 'status':status}
+            addresult = add_activity(self.rd, user_id, status_id, 1, actdict)
+            if addresult:
+                self.write(''.join([encode(str(status_id)), ',', self.at(self.br(unicode(status)))]))
+            else:
+                self.write("Something wrong...")
 
 class DeleteStatusHandler(BaseHandler):
     @tornado.web.authenticated
@@ -1056,10 +1060,23 @@ class PubnoteHandler(BaseHandler):
         notetype = self.get_argument("notetype",None)
         notetitle = self.get_argument("notetitle",None)
         notecontent = self.get_argument("notecontent",None)
-        logging.info(notetype)
-        logging.info(type(notetype))
-        logging.info(notetitle)
-        logging.info(notecontent)
+        #status_:{0:public,1:private,2:delted
+        status_ = int(notetype)
+        user_id = self.current_user.id
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+        redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
+        note_id = self.db.execute("insert into fd_Note (user_id, title, "
+                "note, pubdate, status_) values (%s,%s,%s,%s,%s)", user_id,
+                notetitle, notecontent, pubdate, status_)
+        if note_id:
+            actdict = {'time':redpubdate, 'title':notetitle, 
+                    'content':notecontent, 'status':status_}
+            addresult = add_activity(self.rd, user_id, note_id, 2, actdict)
+            if addresult:
+                #self.write(encode(str(status_id)))
+                self.write("right")
+            else:
+                self.write("wrong")
 
 def main():
     tornado.options.parse_command_line()
