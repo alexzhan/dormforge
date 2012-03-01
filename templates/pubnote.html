@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>发布日志</title>
+<style type="text/css">
+    .pubform {
+        float: right;
+        margin-right: 130px;
+    }
+    form .content {
+        margin-top: 10px;
+    }
+    form .title .input-xlarge {
+        text-align: center;
+        width: 700px;
+        height: 20px;
+        padding: 7px;
+        font-size: 16px;
+    }
+    form .content .input-xlarge {
+        width: 700px;
+        height: 350px;
+        font-size: 14px;
+        padding: 7px;
+    }
+    .sub-button {
+        text-align: right;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="row">
+    <div class="pubform">
+        <form  id='pubnote' method='POST' action="{{ request.path }}">
+            <fieldset>
+                <div class="title">
+                    <input id="title" name="title" type="text" class="input-xlarge">
+                </div>
+                <div class="content">
+                    <textarea id="content" name="content"  class="input-xlarge"></textarea>
+                </div>
+            </fieldset>
+            <div class="sub-button">
+                <button type="submit" class="btn">私密发布</button>
+                <button type="submit" class="btn btn-primary">公开发布</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url('js/pubnote.js') }}"></script>
+{% end %}

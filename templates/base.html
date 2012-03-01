@@ -21,6 +21,10 @@
             .footer span{
                 padding: 0 4px;
             }
+            .footer p {
+                margin-top: 10px;
+                text-align: center;
+            }
         </style>
         {% block head %}{% end %}
     </head>
@@ -47,13 +51,13 @@
             <div class="content">
                 {% block body %}{% end %}
             </div>
-            <footer class="footer">
+            <div class="footer">
             <p class="pull-right">
             <a href="/about">关于</a>
             <span>&bull;</span>
             <a href="/contact">反馈</a>
             </p>
-            </footer>
+            </div>
         </div>
         <!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>-->
         <script type="text/javascript" src="{{ static_url("js/jquery.min.js") }}"></script>
@@ -68,6 +72,6 @@
              ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
              var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
              })();
-</script>
+         </script>
   </body>
 </html>
