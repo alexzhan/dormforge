@@ -223,27 +223,6 @@
         </div>
         <div class="span4">
             <div class="col_header">
-                <a href="#" class="tabtitle">状态 {{ template_values['status_count'] }}</a>
-            </div>
-            {% for status in template_values['statuses'] %}
-            <div class="row">
-                <div class="status_preview_link">
-                    <span class="cell">
-                        <div class="status_preview">
-                            {{ handler.br(handler.at(unicode(status[1]))) }} 
-                        </div>
-                        <div class="timestamp">
-                            <a href="/status/{{ handler.encode(status[2]) }}">{{ status[0] }}</a>
-                        </div>
-                    </span>
-                </div>
-            </div>
-            {% end %}
-        </div>
-    </div>
-    <div class="row">
-        <div class="span4">
-            <div class="col_header">
                 <a href="#" class="tabtitle">日志 {{ template_values['note_count'] }}</a>
             </div>
             {% for note in template_values['notes'] %}
@@ -258,6 +237,25 @@
                             {{ note[0] }}
                         </div>
                         </a>
+                    </span>
+                </div>
+            </div>
+            {% end %}
+        </div>
+        <div class="span4">
+            <div class="col_header">
+                <a href="#" class="tabtitle">状态 {{ template_values['status_count'] }}</a>
+            </div>
+            {% for status in template_values['statuses'] %}
+            <div class="row">
+                <div class="status_preview_link">
+                    <span class="cell">
+                        <div class="status_preview">
+                            {{ handler.br(handler.at(unicode(status[1]))) }} 
+                        </div>
+                        <div class="timestamp">
+                            <a href="/status/{{ handler.encode(status[2]) }}">{{ status[0] }}</a>
+                        </div>
                     </span>
                 </div>
             </div>
