@@ -138,9 +138,6 @@
             </div>
             {% end %}
         </div>
-        {% if handler.xsrf_token %}
-        <div style="display:none">xsrf generated if logged in ready for publish</div>                   
-        {% end %}
         <div class="add-comment">
             <form id="comment-form" method="POST" action="{{ request.path }}" >
                 <textarea id="comment-box" name="comment" style="width:590px;height: 60px;margin-top:5px"></textarea>

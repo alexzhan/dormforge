@@ -5,8 +5,8 @@ class UserActivityGraph(object):
     def __init__(self, client):
         self.client = client
         self.Activity_KEY = 'A'
-        self.Sub_Activity_KEYS = ['Follow','Status']
-        self.sub_activity_KEYS = ['follow','status']
+        self.Sub_Activity_KEYS = ['Follow','Status','Note']
+        self.sub_activity_KEYS = ['follow','status','note']
 
     #Activity_key's format:'u:A:1' ('u:A:user_id')
     
@@ -18,7 +18,7 @@ class UserActivityGraph(object):
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
         activity_key = self.add_sub_activity(user, actto, acttype, actdict)
         addresult = self.client.lpush(Activity_key, activity_key)
-        if acttype == 1:
+        if acttype in [1,2]:
             self.client.lpush("all", activity_key)
         self.add_my_activity(user, activity_key)
         return addresult
@@ -31,20 +31,18 @@ class UserActivityGraph(object):
             self.client.lpush(key, activity_key)
 
     def del_activity(self, user, acttype, actto):
-        Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
-        mark = 1
+        Activity_KEY = 'u:%s:%s' % (self.Activity_KEY, user)
+        Activity_key = "u:%s:%s" % (self.Sub_Activity_KEYS[acttype], user)
+        activity_key = "%s:%s:%s" % (self.sub_activity_KEYS[acttype], user, actto)
         if acttype == 0:# follow somepeople
-            Follow_key = 'u:Follow:%s' %user
-            follow_key = 'follow:%s:%s'%(user, actto)
-            if self.client.delete(follow_key):            
-                return self.client.lrem(Follow_key, 0, follow_key) and self.client.lrem(Activity_key, 0, follow_key) and self.del_my_activity(user, acttype, actto)
+            if self.client.delete(activity_key):            
+                return self.client.lrem(Activity_key, 0, activity_key) and self.client.lrem(Activity_KEY, 0, activity_key) and self.del_my_activity(user, acttype, actto)
             else: return 0
-        elif acttype == 1:# update status
-            Status_key = 'u:Status:%s' % user
-            status_key = 'status:%s:%s' % (user, actto)
-            if self.client.delete(status_key):
-                return self.client.lrem(Status_key, 0, status_key) and self.client.lrem(Activity_key, 0, status_key) and self.client.lrem("all", 0, status_key) and self.del_my_activity(user, acttype, actto)
+        elif acttype == 1:# delete status
+            if self.client.delete(activity_key):
+                return self.client.lrem(Activity_key, 0, activity_key) and self.client.lrem(Activity_KEY, 0, activity_key) and self.client.lrem("all", 0, activity_key) and self.del_my_activity(user, acttype, actto)
             else: return 0
+        #elif acttype == 2:# delete note
 
     def del_my_activity(self, user, acttype, actto):
         if acttype == 0:
@@ -67,9 +65,10 @@ class UserActivityGraph(object):
                 key = "my:%s" % follower
                 status_key = "status:%s:%s" % (user, actto)
                 self.client.lrem(key, 0, status_key)
+        #if acttype == 2:
         return 1
 
-    #acttype:{follow:0;status:1}
+    #acttype:{follow:0;status:1;note:2}
     def add_sub_activity(self, user, actto, acttype, actdict):
         Sub_Activity_key = 'u:%s:%s' % (self.Sub_Activity_KEYS[acttype], user)
         sub_activity_key = '%s:%s:%s' % (self.sub_activity_KEYS[acttype], user, actto)
@@ -78,38 +77,54 @@ class UserActivityGraph(object):
         return sub_activity_key
 
     #get top 5 activities
-    def get_top_activities(self, user, db):
+    def get_top_activities(self, user, db, isself):
         Activity_list = []
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
-        for i in range(5):
-            sub_activity_key = self.client.lindex(Activity_key, i)
-            if sub_activity_key:
-                actto = sub_activity_key.split(":")[-1]
-                if sub_activity_key.split(":")[0] == 'follow':
-                    sub_activity = self.client.hmget(sub_activity_key, ["time",])
-                    username,domain = get_namedomain_by_id(db, self.client, actto)
-                    sub_activity.append(username)#follow who
-                    sub_activity.append(domain)#domain
-                    sub_activity.append(0)#type:0
-                elif sub_activity_key.split(":")[0] == 'status':
-                    sub_activity = self.client.hmget(sub_activity_key, ["time",'status'])
-                    sub_activity.append(actto)#actto
-                    sub_activity.append(1)#type:1
-                Activity_list.append(sub_activity)                    
+        All_Activity_list = self.client.lrange(Activity_key, 0, -1)
+        index = 0
+        for sub_activity_key in All_Activity_list:
+            acttype,actuser,actto = sub_activity_key.split(":")
+            if acttype == 'follow':
+                sub_activity = self.client.hmget(sub_activity_key, ["time",])
+                username,domain = get_namedomain_by_id(db, self.client, actto)
+                sub_activity.append(username)#follow who
+                sub_activity.append(domain)#domain
+                sub_activity.append(0)#type:0
+            elif acttype == 'status':
+                sub_activity = self.client.hmget(sub_activity_key, ["time","status"])
+                sub_activity.append(actto)#actto
+                sub_activity.append(1)#type:1
+            elif acttype == 'note':
+                sub_activity = self.client.hmget(sub_activity_key, ["time","title","content","status"])
+                if not isself and sub_activity[3] != '0':
+                    continue
+                sub_activity.append(actto)#actto
+                sub_activity.append(2)#type:2
+            Activity_list.append(sub_activity)                    
+            index = index + 1
+            if index == 5:
+                break
         return Activity_list
 
     #get top 3 sub_activities
-    def get_top_sub_activities(self, user, acttype):
+    def get_top_sub_activities(self, user, acttype, isself):
         Sub_Activity_list = []
         Sub_Activity_key = "u:%s:%s" % (self.Sub_Activity_KEYS[acttype], user)
-        for i in range(3):
-            sub_activity_key = self.client.lindex(Sub_Activity_key, i)
-            if sub_activity_key:
-                actto = sub_activity_key.split(":")[-1]
-                if acttype == 1:
-                    sub_activity = self.client.hmget(sub_activity_key, ["time",'status'])
-                    sub_activity.append(actto)
-                Sub_Activity_list.append(sub_activity)
+        index = 0
+        for sub_activity_key in self.client.lrange(Sub_Activity_key, 0, -1):
+            actto = sub_activity_key.split(":")[-1]
+            if acttype == 1:
+                sub_activity = self.client.hmget(sub_activity_key, ["time",'status'])
+                sub_activity.append(actto)
+            if acttype == 2:
+                sub_activity = self.client.hmget(sub_activity_key, ["time","title","content","status"])
+                if not isself and sub_activity[3] != '0':
+                    continue
+                sub_activity.append(actto)
+            Sub_Activity_list.append(sub_activity)
+            index = index + 1
+            if index == 3:
+                break
         return Sub_Activity_list
 
     #whole-site activities
@@ -122,10 +137,12 @@ class UserActivityGraph(object):
             act_username,act_domain = get_namedomain_by_id(db, self.client, act_userid)
             if acttype == 'status':
                 real_activity = self.client.hmget(activity, ["time",'status','comm'])
-                real_activity.append(actto)
-                real_activity.append(act_username)
-                real_activity.append(act_domain)
-                real_activity.append(acttype)
+            elif acttype == 'note':
+                real_activity = self.client.hmget(activity, ["time","title","content","status",'comm'])
+            real_activity.append(actto)
+            real_activity.append(act_username)
+            real_activity.append(act_domain)
+            real_activity.append(acttype)
             real_activity.append(index)
             index = index + 1
             all_activities.append(real_activity)
@@ -142,17 +159,17 @@ class UserActivityGraph(object):
             if acttype == 'status':
                 real_activity = self.client.hmget(activity, ["time",'status','comm'])
                 real_activity.append(actto)
-                real_activity.append(act_username)
-                real_activity.append(act_domain)
-                real_activity.append(acttype)
+            if acttype == 'note':
+                real_activity = self.client.hmget(activity, ["time","title","content","status",'comm'])
+                real_activity.append(actto)
             if acttype == 'follow':
                 actto_username,actto_domain = get_namedomain_by_id(db, self.client, actto)
                 real_activity = self.client.hmget(activity, ["time",])
-                real_activity.append(act_username)
-                real_activity.append(act_domain)
                 real_activity.append(actto_username)
                 real_activity.append(actto_domain)
-                real_activity.append(acttype)
+            real_activity.append(act_username)
+            real_activity.append(act_domain)
+            real_activity.append(acttype)
             real_activity.append(index)
             index = index + 1
             my_activities.append(real_activity)

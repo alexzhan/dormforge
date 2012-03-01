@@ -121,11 +121,6 @@
                             </div>
                         </div>
                         <div class="mfollow">
-                            {% if current_user %}
-                            {% if handler.xsrf_token %}
-                            <div style="display:none">xsrf generated if logged in ready for follow/unfollow</div>
-                            {% end %}
-                            {% end %}
                             {% if not follow.is_self %}
                             {% if follow.is_follow %}
                             <a id="following-btn{{ follow.id }}" class="btn btn-small btn-primary" style="display:none" onclick="{% if current_user %}follow('following-btn{{ follow.id }}', {{ current_user['id'] }}, {{ follow.id }}){% end %}">关注</a>
