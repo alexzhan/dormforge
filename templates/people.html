@@ -221,6 +221,7 @@
                 {% end %}         
             </div>
         </div>
+        {% if template_values['note_count'] != 0 %}
         <div class="span4">
             <div class="col_header">
                 <a href="#" class="tabtitle">日志 {{ template_values['note_count'] }}</a>
@@ -230,19 +231,21 @@
                 <div class="status_preview_link">
                     <span class="cell">
                         <a href="/note/{{ handler.encode(note[4]) }}">
-                        <div class="status_preview">
-                            {{ note[1] }} 
-                        </div>
-                        <div class="timestamp">
-                            {{ note[0] }}
-                        </div>
+                            <div class="status_preview">
+                                {{ note[1] }} 
+                            </div>
+                            <div class="timestamp">
+                                {{ note[0] }}
+                            </div>
                         </a>
                     </span>
                 </div>
             </div>
             {% end %}
         </div>
-        <div class="span4">
+        {% end %}
+        {% if template_values['status_count'] != 0 %}
+        <div class="span4" style="{% if template_values['note_count'] != 0 %}clear:both;{% end %}">
             <div class="col_header">
                 <a href="#" class="tabtitle">状态 {{ template_values['status_count'] }}</a>
             </div>
@@ -261,6 +264,7 @@
             </div>
             {% end %}
         </div>
+        {% end %}
     </div>
 </div>
 {% end %}
