@@ -7,9 +7,6 @@
         float: right;
         margin-right: 130px;
     }
-    form .content {
-        margin-top: 10px;
-    }
     form .title .input-xlarge {
         text-align: center;
         width: 700px;
@@ -41,8 +38,8 @@
                 </div>
             </fieldset>
             <div class="sub-button">
-                <button type="submit" class="btn">私密发布</button>
-                <button type="submit" class="btn btn-primary">公开发布</button>
+                <button type="submit" class="btn" onclick="return pubnote(0);">私密发布</button>
+                <button type="submit" class="btn btn-primary" onclick="return pubnote(1);">公开发布</button>
             </div>
         </form>
     </div>
