@@ -38,6 +38,9 @@
                             {% if current_user %}
                             <li><a href="/people/{{ _(current_user['domain']) }}">{{ _(current_user['name']) }}</a></li>
                             <li><a href="/logout?next={{ url_escape(request.uri) }}">{{ _("退出") }}</a></li>
+                            {% if handler.xsrf_token %}
+                            <div style="display:none">xsrfgend</div>
+                            {% end %}
                             {% else %}
                             <li>{{ _('<a href="%(url)s">登录</a>') % {"url": "/login?next=" + url_escape(request.uri)} }}</li>
                             <li><a href="/signup">注册</a></li>

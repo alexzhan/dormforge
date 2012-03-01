@@ -133,11 +133,6 @@
             <img width="150px" height="150px" src="{{ template_values['image'] }}">
         </div>
         <div class="profile">
-            {% if current_user %}
-            {% if handler.xsrf_token %}
-            <div style="display:none">xsrf generated if logged in ready for follow/unfollow</div>
-            {% end %}
-            {% end %}
             {% if current_user and current_user.id == template_values['id'] and not template_values['has_selfdesc']%}
             <p class="profile-text"><a href="#" id="activatedesc" onclick="return activatedesc();">描述下你自己</a></p>
             <p class="profile-text" id="textdesc" style="display:none"></p>

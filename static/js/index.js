@@ -1,5 +1,7 @@
 function submitfunction(){
     var mark = 1;
+    $("#idcontrol-group").removeClass("error");
+    $("#passwordcontrol-group").removeClass("error");
     if($("#username").val().length == 0){
         $("#idcontrol-group").removeClass();
         $("#idcontrol-group").addClass("control-group error");

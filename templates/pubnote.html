@@ -7,14 +7,17 @@
         float: right;
         margin-right: 130px;
     }
-    form .title .input-xlarge {
+    .control-group {
+        margin-bottom: 0;
+    }
+    form #notetitle .input-xlarge {
         text-align: center;
         width: 700px;
         height: 20px;
         padding: 7px;
         font-size: 16px;
     }
-    form .content .input-xlarge {
+    form #notecontent .input-xlarge {
         width: 700px;
         height: 350px;
         font-size: 14px;
@@ -30,10 +33,10 @@
     <div class="pubform">
         <form  id='pubnote' method='POST' action="{{ request.path }}">
             <fieldset>
-                <div class="title">
+                <div class="control-group" id="notetitle">
                     <input id="title" name="title" type="text" class="input-xlarge">
                 </div>
-                <div class="content">
+                <div class="control-group" id="notecontent">
                     <textarea id="content" name="content"  class="input-xlarge"></textarea>
                 </div>
             </fieldset>

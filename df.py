@@ -1051,6 +1051,15 @@ class PubnoteHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         self.render("pubnote.html")
+    @tornado.web.authenticated
+    def post(self):
+        notetype = self.get_argument("notetype",None)
+        notetitle = self.get_argument("notetitle",None)
+        notecontent = self.get_argument("notecontent",None)
+        logging.info(notetype)
+        logging.info(type(notetype))
+        logging.info(notetitle)
+        logging.info(notecontent)
 
 def main():
     tornado.options.parse_command_line()
