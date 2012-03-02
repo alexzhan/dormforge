@@ -52,9 +52,19 @@
         clear: both;
         width: 100%;
     }
+    .row .col1{
+        float: left;
+        margin: 10px 0 0 40px;
+        width: 415px;
+    }
+    .row .col2 {
+        float:left;
+        margin: 10px 0 0 40px;
+        width: 415px;
+    }
     .span4 {
         width: 415px;
-        margin: 10px 0 0 40px;
+        margin-left: 0;
     }
     .col_header {
         border-bottom: 1px solid #EAEAEA;
@@ -203,68 +213,72 @@
     </div>
 
     <div class="row">
-        <div class="span4">
-            <div class="col_header">
-                <a href="#" class="tabtitle">活动 {{ template_values['activity_count'] }}</a>
+        <div class="col1">
+            <div class="span4">
+                <div class="col_header">
+                    <a href="#" class="tabtitle">活动 {{ template_values['activity_count'] }}</a>
+                </div>
+                <div class="latest_activity">
+                    {% for activity in template_values['activities']%}
+                    <p class="light_gray">
+                    {% if activity[-1] == 0 %}
+                    <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[2] }}">{{ activity[1] }}</a>. <span class="timestamp">{{ activity[0] }}</span>
+                    {% elif activity[-1] == 1 %}
+                    <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/status/{{ handler.encode(activity[2]) }}">更新了状态.</a> <span class="timestamp">{{ activity[0] }}</span>
+                    {% elif activity[-1] == 2 %}
+                    <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/note/{{ handler.encode(activity[4]) }}">发布了日志.</a> <span class="timestamp">{{ activity[0] }}</span>
+                    {% end %}
+                    </p>
+                    {% end %}         
+                </div>
             </div>
-            <div class="latest_activity">
-                {% for activity in template_values['activities']%}
-                <p class="light_gray">
-                {% if activity[-1] == 0 %}
-                <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[2] }}">{{ activity[1] }}</a>. <span class="timestamp">{{ activity[0] }}</span>
-                {% elif activity[-1] == 1 %}
-                <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/status/{{ handler.encode(activity[2]) }}">更新了状态.</a> <span class="timestamp">{{ activity[0] }}</span>
-                {% elif activity[-1] == 2 %}
-                <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/note/{{ handler.encode(activity[4]) }}">发布了日志.</a> <span class="timestamp">{{ activity[0] }}</span>
+            {% if template_values['note_count'] != 0 %}
+            <div class="span4">
+                <div class="col_header">
+                    <a href="#" class="tabtitle">日志 {{ template_values['note_count'] }}</a>
+                </div>
+                {% for note in template_values['notes'] %}
+                <div class="row">
+                    <div class="status_preview_link">
+                        <span class="cell">
+                            <a href="/note/{{ handler.encode(note[4]) }}">
+                                <div class="status_preview">
+                                    {{ note[1] }} 
+                                </div>
+                                <div class="timestamp">
+                                    {{ note[0] }}
+                                </div>
+                            </a>
+                        </span>
+                    </div>
+                </div>
                 {% end %}
-                </p>
-                {% end %}         
             </div>
+            {% end %}
         </div>
-        {% if template_values['note_count'] != 0 %}
-        <div class="span4">
-            <div class="col_header">
-                <a href="#" class="tabtitle">日志 {{ template_values['note_count'] }}</a>
-            </div>
-            {% for note in template_values['notes'] %}
-            <div class="row">
-                <div class="status_preview_link">
-                    <span class="cell">
-                        <a href="/note/{{ handler.encode(note[4]) }}">
+        <div class="col2">
+            {% if template_values['status_count'] != 0 %}
+            <div class="span4">
+                <div class="col_header">
+                    <a href="#" class="tabtitle">状态 {{ template_values['status_count'] }}</a>
+                </div>
+                {% for status in template_values['statuses'] %}
+                <div class="row">
+                    <div class="status_preview_link">
+                        <span class="cell">
                             <div class="status_preview">
-                                {{ note[1] }} 
+                                {{ handler.br(handler.at(unicode(status[1]))) }} 
                             </div>
                             <div class="timestamp">
-                                {{ note[0] }}
+                                <a href="/status/{{ handler.encode(status[2]) }}">{{ status[0] }}</a>
                             </div>
-                        </a>
-                    </span>
+                        </span>
+                    </div>
                 </div>
+                {% end %}
             </div>
             {% end %}
         </div>
-        {% end %}
-        {% if template_values['status_count'] != 0 %}
-        <div class="span4" style="{% if template_values['note_count'] != 0 %}clear:both;{% end %}">
-            <div class="col_header">
-                <a href="#" class="tabtitle">状态 {{ template_values['status_count'] }}</a>
-            </div>
-            {% for status in template_values['statuses'] %}
-            <div class="row">
-                <div class="status_preview_link">
-                    <span class="cell">
-                        <div class="status_preview">
-                            {{ handler.br(handler.at(unicode(status[1]))) }} 
-                        </div>
-                        <div class="timestamp">
-                            <a href="/status/{{ handler.encode(status[2]) }}">{{ status[0] }}</a>
-                        </div>
-                    </span>
-                </div>
-            </div>
-            {% end %}
-        </div>
-        {% end %}
     </div>
 </div>
 {% end %}
