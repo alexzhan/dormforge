@@ -182,7 +182,7 @@ class MyhomeHandler(FilterHandler):
 class SignupHandler(BaseHandler):
     def get(self):
         if self.current_user:
-            return self.redirect("people/" + self.current_user.domain)
+            return self.redirect("/")
         self.render("signup.html", template_values={})
 
     def post(self):
@@ -659,7 +659,7 @@ class SignupHandler(BaseHandler):
 class LoginHandler(BaseHandler):
     def get(self):
         if self.current_user:
-            return self.redirect("people/" + self.current_user.domain)
+            return self.redirect("/")
         template_values = {}
         template_values['next'] = self.get_argument("next", '/')
         self.render("login.html", template_values=template_values)
