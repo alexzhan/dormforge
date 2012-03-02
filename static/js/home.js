@@ -81,6 +81,7 @@ function viewnote(note_id, note_index) {
 function togglenote(note_index){
     $("#allnote"+note_index).hide();
     $("#note"+note_index).show();
+    return false;
 }
 
 function getCookie(name) {
