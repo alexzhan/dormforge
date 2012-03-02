@@ -1085,7 +1085,6 @@ class ViewnoteHandler(FilterHandler):
     @tornado.web.authenticated
     def post(self):
         noteid = self.get_argument("note_id",None)
-        logging.info(noteid)
         if not noteid or len(noteid) < 8:
             raise tornado.web.HTTPError(404)
         noteid = decode(noteid)
