@@ -54,7 +54,7 @@ class Application(tornado.web.Application):
                 (r"/unfollow", UnfollowHandler),
                 (r"/selfdesc", SelfdescHandler),
                 (r"/pubstatus", PubstatusHandler),
-                (r"/deletestatus", DeleteStatusHandler),
+                (r"/deleteactivity", DeleteActivityHandler),
                 (r"/status/([0-9a-z]+)", StatusHandler),
                 (r"/note/touch", PubnoteHandler),
                 #(r"/note/([0-9a-z]+)", NoteHandler),
@@ -1001,18 +1001,23 @@ class PubstatusHandler(FilterHandler):
             else:
                 self.write("Something wrong...")
 
-class DeleteStatusHandler(BaseHandler):
+class DeleteActivityHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self):
         user = self.get_argument("user",None)
         actto = self.get_argument("actto",None)
+        acttype = self.get_argument("acttype",None)
         user_id = get_id_by_name(self.db, self.rd, user)
         if len(actto) < 8 or not user_id or int(user_id) != self.current_user.id:
             raise tornado.web.HTTPError(405)
+        acttype = int(acttype)
         actto = decode(actto)
         # don't remove in db now because data is not got wholy in redis,just mark it
-        self.db.execute("update fd_Status set status_ = 1 where id = %s", actto)
-        del_activity(self.rd, user_id, 1, actto)
+        if acttype == 1:
+            self.db.execute("update fd_Status set status_ = 1 where id = %s", actto)
+        elif acttype == 2:
+            self.db.execute("update fd_Note set status_ = 2 where id = %s", actto)
+        del_activity(self.rd, user_id, acttype, actto)
 
 class StatusHandler(FilterHandler):
     def get(self, status_id):

@@ -38,11 +38,10 @@ class UserActivityGraph(object):
             if self.client.delete(activity_key):            
                 return self.client.lrem(Activity_key, 0, activity_key) and self.client.lrem(Activity_KEY, 0, activity_key) and self.del_my_activity(user, acttype, actto)
             else: return 0
-        elif acttype == 1:# delete status
+        elif acttype in [1,2]:# delete status or note             
             if self.client.delete(activity_key):
                 return self.client.lrem(Activity_key, 0, activity_key) and self.client.lrem(Activity_KEY, 0, activity_key) and self.client.lrem("all", 0, activity_key) and self.del_my_activity(user, acttype, actto)
             else: return 0
-        #elif acttype == 2:# delete note
 
     def del_my_activity(self, user, acttype, actto):
         if acttype == 0:
@@ -58,14 +57,13 @@ class UserActivityGraph(object):
             for follower in followers:
                 key = "my:%s" % follower
                 self.client.lrem(key, 0, follow_specific_key)
-        if acttype == 1:
+        if acttype in [1,2]:
             followers = self.client.lrange("u:f:%s" % user, 0, -1)
             followers.append(user)
             for follower in followers:
                 key = "my:%s" % follower
-                status_key = "status:%s:%s" % (user, actto)
+                status_key = "%s:%s:%s" % (self.sub_activity_KEYS[acttype], user, actto)
                 self.client.lrem(key, 0, status_key)
-        #if acttype == 2:
         return 1
 
     #acttype:{follow:0;status:1;note:2}

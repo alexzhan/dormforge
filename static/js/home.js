@@ -47,11 +47,11 @@ function submit(name, domain) {
     });
 }
 
-function deletestatus(item_id, user, status_id){
+function deleteactivity(item_id, user, actid, acttype){
     $.ajax({
     type:'POST',
-    url:'/deletestatus',
-    data:{user:user,actto:status_id,_xsrf:getCookie('_xsrf')},
+    url:'/deleteactivity',
+    data:{user:user,actto:actid,acttype:acttype,_xsrf:getCookie('_xsrf')},
     success:function(data){
         $("#feed-item" + item_id).hide('slow');
     }       
@@ -70,7 +70,7 @@ function viewnote(note_id, note_index) {
     data:{note_id:note_id,_xsrf:getCookie('_xsrf')},
     success:function(data){
         if(data != "wrong"){
-            data = data + "<a href='#' onclick='return togglenote(" + note_index + ")'>« 隐藏</a>";
+            data = data + "<a href='#' onclick='return togglenote(" + note_index + ")'>« 收起</a>";
             $("#note"+note_index).hide();
             $("#allnote"+note_index).html(data);
         }
