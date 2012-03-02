@@ -21,6 +21,7 @@ function pubnote(notetype) {
         data:{notetype:notetype,
             notetitle:notetitle,
             notecontent:notecontent,
+            id:$("#noteid").val(),
             _xsrf:getCookie('_xsrf')},
         success:function(data){
             if(data == "right")
