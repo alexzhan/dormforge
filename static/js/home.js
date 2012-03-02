@@ -70,7 +70,7 @@ function viewnote(note_id, note_index) {
     data:{note_id:note_id,_xsrf:getCookie('_xsrf')},
     success:function(data){
         if(data != "wrong"){
-            data = data + "<a href='#' onclick='return togglenote(" + note_index + ")'>« 隐藏</a>";
+            data = data + "<a href='#' onclick='return togglenote(" + note_index + ")'>« 收起</a>";
             $("#note"+note_index).hide();
             $("#allnote"+note_index).html(data);
         }
