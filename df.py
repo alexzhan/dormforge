@@ -57,6 +57,7 @@ class Application(tornado.web.Application):
                 (r"/deletestatus", DeleteStatusHandler),
                 (r"/status/([0-9a-z]+)", StatusHandler),
                 (r"/note/touch", PubnoteHandler),
+                (r"/viewnote", ViewnoteHandler),
                 ]
         settings = dict(
                 template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -1061,6 +1062,8 @@ class PubnoteHandler(BaseHandler):
         notetitle = self.get_argument("notetitle",None)
         notecontent = self.get_argument("notecontent",None)
         #status_:{0:public,1:private,2:delted
+        if len(notecontent) > 150:
+            rednotecontent = notecontent[:100] + " ..."
         status_ = int(notetype)
         user_id = self.current_user.id
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
@@ -1070,13 +1073,28 @@ class PubnoteHandler(BaseHandler):
                 notetitle, notecontent, pubdate, status_)
         if note_id:
             actdict = {'time':redpubdate, 'title':notetitle, 
-                    'content':notecontent, 'status':status_}
+                    'content':rednotecontent, 'status':status_}
             addresult = add_activity(self.rd, user_id, note_id, 2, actdict)
             if addresult:
                 #self.write(encode(str(status_id)))
                 self.write("right")
             else:
                 self.write("wrong")
+
+class ViewnoteHandler(FilterHandler):
+    @tornado.web.authenticated
+    def post(self):
+        noteid = self.get_argument("note_id",None)
+        logging.info(noteid)
+        if not noteid or len(noteid) < 8:
+            raise tornado.web.HTTPError(404)
+        noteid = decode(noteid)
+        note = self.db.get("select note from fd_Note where "
+                "id = %s", noteid)
+        if note:
+            self.write(self.at(self.br(note.note)))
+        else:
+            self.write("wrong")
 
 def main():
     tornado.options.parse_command_line()

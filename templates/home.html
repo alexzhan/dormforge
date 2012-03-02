@@ -162,7 +162,7 @@
                                 <span><a href="/note/{{ handler.encode(activity[5]) }}">{{ activity[1] }}</a></span>
                             </div>
                             <div class="feed-item-body">
-                                <p>{{ handler.at(handler.br(unicode(activity[2]))) }}</p>
+                                <p id="note{{ activity[-1] }}">{{ "".join([handler.at(unicode(activity[2])), "<a href='#' onclick=\"return viewnote('" + handler.encode(activity[5]) +"', '" + str(activity[-1]) + "');\"> 显示全部 »</a>"]) if len(unicode(activity[2])) < 110 and unicode(activity[2])[-4:]==" ..." else handler.at(handler.br(unicode(activity[2]))) }}</p>
                             </div>
                             <div class="feed-item-footer">
                                 <div style="float:left"><span><a class="footerlink" href="/note/{{ handler.encode(activity[5]) }}">{{ activity[0] }}</a></span>

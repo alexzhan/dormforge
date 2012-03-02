@@ -58,6 +58,19 @@ function deletestatus(item_id, user, status_id){
     });
     return false;
 }
+function viewnote(note_id, note_index) {
+    $.ajax({
+    type:'POST',
+    url:'/viewnote',
+    data:{note_id:note_id,_xsrf:getCookie('_xsrf')},
+    success:function(data){
+        if(data != "wrong"){
+            $("#note"+note_index).html(data);
+        }
+    }       
+    });
+    return false;
+}
 
 function getCookie(name) {
     var r = document.cookie.match('\\b' + name + '=([^;]*)\\b');
