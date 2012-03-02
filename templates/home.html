@@ -162,15 +162,18 @@
                                 <span><a href="/note/{{ handler.encode(activity[5]) }}">{{ activity[1] }}</a></span>
                             </div>
                             <div class="feed-item-body">
-                                <p>{{ handler.at(handler.br(unicode(activity[2]))) }}</p>
+                                <p id="note{{ activity[-1] }}">{{ "".join([handler.at(unicode(activity[2])), "<a href='#' onclick=\"return viewnote('" + handler.encode(activity[5]) +"', '" + str(activity[-1]) + "');\">更多 »</a>"]) if len(unicode(activity[2])) < 150 and unicode(activity[2])[-4:]==" ..." else handler.at(handler.br(unicode(activity[2]))) }}</p>
+                                <p id="allnote{{ activity[-1] }}"></p>
                             </div>
                             <div class="feed-item-footer">
                                 <div style="float:left"><span><a class="footerlink" href="/note/{{ handler.encode(activity[5]) }}">{{ activity[0] }}</a></span>
                                 </div>
                                 <div style="float:right">
                                 {% if str(current_user.name) == activity[-4] %}
-                                <!--<span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-4] }}', '{{ handler.encode(activity[3]) }}');">删除</a></span>
-                                <span class="splitter">•</span>-->
+                                <span><a class="footerlink" href="#" onclick="return deletestatus({{ activity[-1] }},'{{ activity[-4] }}', '{{ handler.encode(activity[3]) }}');">删除</a></span>
+                                <span class="splitter">•</span>
+                                <span><a class="footerlink" href="/note/touch?id={{ handler.encode(activity[5]) }}">编辑</a></span>
+                                <span class="splitter">•</span>
                                 {% end %}
                                 <span><a class="footerlink" href="/note/{{ handler.encode(activity[5]) }}">{% if not activity[4] or activity[4]=='0' %}评论{% else %}评论({{ activity[4] }}){% end %}</a></span>
                                 </div>

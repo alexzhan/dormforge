@@ -34,16 +34,17 @@
         <form  id='pubnote' method='POST' action="{{ request.path }}">
             <fieldset>
                 <div class="control-group" id="notetitle">
-                    <input id="title" name="title" type="text" class="input-xlarge">
+                    <input id="title" name="title" type="text" class="input-xlarge" value="{{ template_values['note'].title if template_values else '' }}">
                 </div>
                 <div class="control-group" id="notecontent">
-                    <textarea id="content" name="content"  class="input-xlarge"></textarea>
+                    <textarea id="content" name="content"  class="input-xlarge">{{ template_values['note'].note if template_values else '' }}</textarea>
                 </div>
             </fieldset>
             <div class="sub-button">
                 <button type="submit" class="btn" onclick="return pubnote(1);">私密发布</button>
                 <button type="submit" class="btn btn-primary" onclick="return pubnote(0);">公开发布</button>
             </div>
+            <input id="noteid" type="hidden" name="id" value="{{ template_values['note'].id if template_values else '' }}">
         </form>
     </div>
 </div>

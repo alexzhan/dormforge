@@ -57,6 +57,8 @@ class Application(tornado.web.Application):
                 (r"/deletestatus", DeleteStatusHandler),
                 (r"/status/([0-9a-z]+)", StatusHandler),
                 (r"/note/touch", PubnoteHandler),
+                #(r"/note/([0-9a-z]+)", NoteHandler),
+                (r"/viewnote", ViewnoteHandler),
                 ]
         settings = dict(
                 template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -1054,29 +1056,70 @@ class StatusHandler(FilterHandler):
 class PubnoteHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        self.render("pubnote.html")
+        template_values = {}
+        noteid = self.get_argument("id",None)
+        if noteid:
+            if len(noteid) < 8:
+                raise tornado.web.HTTPError(404)
+            note_id = decode(noteid)
+            note = self.db.get("select id,title,note from fd_Note "
+                    "where id = %s", note_id)
+            note.id = noteid
+            template_values['note'] = note
+        self.render("pubnote.html", template_values=template_values)
     @tornado.web.authenticated
     def post(self):
+        noteid = self.get_argument("id",None)
         notetype = self.get_argument("notetype",None)
         notetitle = self.get_argument("notetitle",None)
         notecontent = self.get_argument("notecontent",None)
         #status_:{0:public,1:private,2:delted
+        if len(notecontent) > 150:
+            rednotecontent = notecontent[:140] + " ..."
         status_ = int(notetype)
         user_id = self.current_user.id
-        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
-        redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
-        note_id = self.db.execute("insert into fd_Note (user_id, title, "
-                "note, pubdate, status_) values (%s,%s,%s,%s,%s)", user_id,
-                notetitle, notecontent, pubdate, status_)
-        if note_id:
-            actdict = {'time':redpubdate, 'title':notetitle, 
-                    'content':notecontent, 'status':status_}
-            addresult = add_activity(self.rd, user_id, note_id, 2, actdict)
-            if addresult:
-                #self.write(encode(str(status_id)))
+        if noteid:
+            noteid = decode(noteid)
+            note_user = self.db.get("select user_id from fd_Note where id = %s", noteid)
+            if not note_user or note_user and note_user.user_id != user_id:
+                raise tornado.web.HTTPError(404)
+            self.db.execute("update fd_Note set title = %s, note = %s,"
+                    "status_ = %s where id = %s", notetitle, notecontent, status_, noteid)
+            note_key = "note:%s:%s" % (user_id, noteid)
+            actdict = {'title':notetitle, 'content':rednotecontent, 'status':status_}
+            if self.rd.hmset(note_key, actdict):
                 self.write("right")
             else:
                 self.write("wrong")
+        else:
+            pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+            redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
+            note_id = self.db.execute("insert into fd_Note (user_id, title, "
+                    "note, pubdate, status_) values (%s,%s,%s,%s,%s)", user_id,
+                    notetitle, notecontent, pubdate, status_)
+            if note_id:
+                actdict = {'time':redpubdate, 'title':notetitle, 
+                        'content':rednotecontent, 'status':status_}
+                addresult = add_activity(self.rd, user_id, note_id, 2, actdict)
+                if addresult:
+                    #self.write(encode(str(status_id)))
+                    self.write("right")
+                else:
+                    self.write("wrong")
+
+class ViewnoteHandler(FilterHandler):
+    @tornado.web.authenticated
+    def post(self):
+        noteid = self.get_argument("note_id",None)
+        if not noteid or len(noteid) < 8:
+            raise tornado.web.HTTPError(404)
+        noteid = decode(noteid)
+        note = self.db.get("select note from fd_Note where "
+                "id = %s", noteid)
+        if note:
+            self.write(self.at(self.br(note.note)))
+        else:
+            self.write("wrong")
 
 def main():
     tornado.options.parse_command_line()

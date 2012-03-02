@@ -58,6 +58,30 @@ function deletestatus(item_id, user, status_id){
     });
     return false;
 }
+function viewnote(note_id, note_index) {
+    if($("#allnote"+note_index).text() != ""){
+        $("#note"+note_index).hide();
+        $("#allnote"+note_index).show();
+        return false;
+    }
+    $.ajax({
+    type:'POST',
+    url:'/viewnote',
+    data:{note_id:note_id,_xsrf:getCookie('_xsrf')},
+    success:function(data){
+        if(data != "wrong"){
+            data = data + "<a href='#' onclick='return togglenote(" + note_index + ")'>« 隐藏</a>";
+            $("#note"+note_index).hide();
+            $("#allnote"+note_index).html(data);
+        }
+    }       
+    });
+    return false;
+}
+function togglenote(note_index){
+    $("#allnote"+note_index).hide();
+    $("#note"+note_index).show();
+}
 
 function getCookie(name) {
     var r = document.cookie.match('\\b' + name + '=([^;]*)\\b');
