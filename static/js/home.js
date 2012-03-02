@@ -47,11 +47,11 @@ function submit(name, domain) {
     });
 }
 
-function deletestatus(item_id, user, status_id){
+function deleteactivity(item_id, user, actid, acttype){
     $.ajax({
     type:'POST',
-    url:'/deletestatus',
-    data:{user:user,actto:status_id,_xsrf:getCookie('_xsrf')},
+    url:'/deleteactivity',
+    data:{user:user,actto:actid,acttype:acttype,_xsrf:getCookie('_xsrf')},
     success:function(data){
         $("#feed-item" + item_id).hide('slow');
     }       
