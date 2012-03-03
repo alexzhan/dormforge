@@ -1069,8 +1069,8 @@ class PubnoteHandler(BaseHandler):
             if len(noteid) < 8:
                 raise tornado.web.HTTPError(404)
             note_id = decode(noteid)
-            note = self.db.get("select id,title,note,user_id from fd_Note "
-                    "where id = %s", note_id)
+            note = self.db.get("select id,title,note,user_id,status_ "
+                    "from fd_Note where id = %s", note_id)
             if not note or note.user_id != self.current_user.id:
                 raise tornado.web.HTTPError(404)
             note.id = noteid

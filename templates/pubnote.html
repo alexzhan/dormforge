@@ -26,6 +26,14 @@
     .sub-button .sub{
         float: right;
     }
+    .sub-button .secretbox{
+        float: right;
+        margin-right: 20px;
+        padding-top: 4px;
+    }
+    label {
+        display: inline-block;
+    }
     .sub-button .cancel{
         float: left;
     }
@@ -45,9 +53,19 @@
             </fieldset>
             <div class="sub-button">
                 <span class="sub">
-                    <button type="submit" class="btn" onclick="return pubnote(1);">私密发布</button>
-                    <button type="submit" class="btn btn-primary" onclick="return pubnote(0);">公开发布</button>
+                    {% if not template_values %}
+                    <button type="submit" class="btn" onclick="return pubnote(1,0);">私密发布</button>
+                    <button type="submit" class="btn btn-primary" onclick="return pubnote(0,0);">公开发布</button>
+                    {% else %}
+                    <button type="submit" class="btn btn-primary" onclick="return pubnote({{ template_values['note'].status_ }},1);">完成修改</button>
+                    {% end %}
                 </span>
+                {% if template_values %}
+                <span class="secretbox">
+                    <input type="checkbox" name="secret" id="secret">
+                    <label for="secret" id="secret-label">{{ "改为私密" if template_values['note'].status_ == 0 else "改为公开" }}</label>
+                </span>
+                {% end %}
                 <span class="cancel">
                     {% if template_values %}
                     <a type="submit" class="btn" href="/note/{{ template_values['note'].id }}">取消</a>

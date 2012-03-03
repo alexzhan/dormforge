@@ -1,4 +1,10 @@
-function pubnote(notetype) {
+function pubnote(notetype,pubtype) {
+    if (pubtype == 1) {
+        if ($("#secret").attr("checked")=="checked"){
+            if (notetype == 0) notetype = 1;        
+            else if (notetype == 1) notetype = 0;        
+        }
+    }
     var notetitle = $("#title").val();
     var notecontent = $("#content").val();
     var mark = 1;
