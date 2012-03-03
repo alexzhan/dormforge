@@ -11,7 +11,7 @@ function submitfunc(requesturl,name,domain,prevnum) {
             $('#comment-box').val("");
             var replystr = "replyOne('" + name + "')";
             var new_comment_item = "<div class='comment-item'><div class='commavatar'><a href='/people/"+domain+"'><img width='50px' height='50px' src='/static/img/no_avatar.jpg?v=ebaa4'></a></div><div class='comment-item-content'><div class='comment-item-title'><a class='name' href='/people/"+domain+"'>"+name+"</a><span class='time'>刚刚   <img src='/static/img/reply.png' align='absmiddle' border='0' alt='回复 "+name+"' onclick="+replystr+" class='clickable'></span></div><div class='comment-item-body'><p>"+data+"</p></div></div></div>";
-            $(".status-comment").append(new_comment_item);
+            $(".note-comment").append(new_comment_item);
         }       
     });
     return false;
