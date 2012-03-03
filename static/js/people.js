@@ -1,3 +1,9 @@
+$("#useravatar").mouseover(function() {
+    $("#editavatar").show();
+});
+$("#useravatar").mouseout(function() {
+    $("#editavatar").hide();
+});
 function activatedesc() {
     $("#activatedesc").hide();
     $(".descform").show();

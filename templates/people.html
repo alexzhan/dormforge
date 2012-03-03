@@ -6,6 +6,20 @@
     .hero-unit .avatar {
         float: left;
         width:150px;
+        position: relative;
+    }
+    .hero-unit .avatar .edit_avatar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #888;
+        display: none;
+    }
+    .hero-unit .avatar .edit_avatar a{
+        color: white;
+        display: block;
+        padding: 5px 0 5px 25px;
     }
     .hero-unit .profile {
         float: left;
@@ -151,8 +165,13 @@
             {% end  %}
             {% end  %}
         </div>
-        <div class="avatar">
-            <img width="150px" height="150px" src="{{ template_values['image'] }}">
+        <div class="avatar" id="useravatar">
+            <!--<a href="#" title="点击更改头像">-->
+                <img width="150px" height="150px" src="{{ template_values['image'] }}" alt=""{{ template_values['username'] }}>
+                <div class="edit_avatar" id="editavatar">
+                    <a href="#"><i class="icon-upload icon-white"></i>上传新头像</a>
+                </div>
+            <!--</a>-->
         </div>
         <div class="profile">
             {% if current_user and current_user.id == template_values['id'] and not template_values['has_selfdesc']%}
