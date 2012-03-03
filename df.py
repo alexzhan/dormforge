@@ -1067,8 +1067,10 @@ class PubnoteHandler(BaseHandler):
             if len(noteid) < 8:
                 raise tornado.web.HTTPError(404)
             note_id = decode(noteid)
-            note = self.db.get("select id,title,note from fd_Note "
+            note = self.db.get("select id,title,note,user_id from fd_Note "
                     "where id = %s", note_id)
+            if not note or note.user_id != self.current_user.id:
+                raise tornado.web.HTTPError(404)
             note.id = noteid
             template_values['note'] = note
         self.render("pubnote.html", template_values=template_values)
@@ -1079,6 +1081,7 @@ class PubnoteHandler(BaseHandler):
         notetitle = self.get_argument("notetitle",None)
         notecontent = self.get_argument("notecontent",None)
         #status_:{0:public,1:private,2:delted
+        rednotecontent = notecontent
         if len(notecontent) > 150:
             rednotecontent = notecontent[:140] + " ..."
         status_ = int(notetype)
@@ -1086,7 +1089,7 @@ class PubnoteHandler(BaseHandler):
         if noteid:
             noteid = decode(noteid)
             note_user = self.db.get("select user_id from fd_Note where id = %s", noteid)
-            if not note_user or note_user and note_user.user_id != user_id:
+            if not note_user or note_user.user_id != user_id:
                 raise tornado.web.HTTPError(404)
             self.db.execute("update fd_Note set title = %s, note = %s,"
                     "status_ = %s where id = %s", notetitle, notecontent, status_, noteid)
