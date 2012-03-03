@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>发布日志</title>
+<title>{{ "编辑日志" if template_values else "发布日志" }}</title>
 <style type="text/css">
     .pubform {
         float: right;
@@ -12,19 +12,22 @@
     }
     form #notetitle .input-xlarge {
         text-align: center;
-        width: 700px;
+        width: 720px;
         height: 20px;
         padding: 7px;
         font-size: 16px;
     }
     form #notecontent .input-xlarge {
-        width: 700px;
+        width: 720px;
         height: 350px;
         font-size: 14px;
         padding: 7px;
     }
-    .sub-button {
-        text-align: right;
+    .sub-button .sub{
+        float: right;
+    }
+    .sub-button .cancel{
+        float: left;
     }
 </style>
 {% end %}
@@ -41,8 +44,17 @@
                 </div>
             </fieldset>
             <div class="sub-button">
-                <button type="submit" class="btn" onclick="return pubnote(1);">私密发布</button>
-                <button type="submit" class="btn btn-primary" onclick="return pubnote(0);">公开发布</button>
+                <span class="sub">
+                    <button type="submit" class="btn" onclick="return pubnote(1);">私密发布</button>
+                    <button type="submit" class="btn btn-primary" onclick="return pubnote(0);">公开发布</button>
+                </span>
+                <span class="cancel">
+                    {% if template_values %}
+                    <a type="submit" class="btn" href="/note/{{ template_values['note'].id }}">取消</a>
+                    {% else %}
+                    <a type="submit" class="btn" href="/">取消</a>
+                    {% end %}
+                </span>
             </div>
             <input id="noteid" type="hidden" name="id" value="{{ template_values['note'].id if template_values else '' }}">
         </form>
