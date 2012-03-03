@@ -166,12 +166,10 @@
             {% end  %}
         </div>
         <div class="avatar" id="useravatar">
-            <!--<a href="#" title="点击更改头像">-->
-                <img width="150px" height="150px" src="{{ template_values['image'] }}" alt=""{{ template_values['username'] }}>
-                <div class="edit_avatar" id="editavatar">
-                    <a href="#"><i class="icon-upload icon-white"></i>上传新头像</a>
-                </div>
-            <!--</a>-->
+            <img width="150px" height="150px" src="{{ template_values['image'] }}" alt=""{{ template_values['username'] }}>
+            <div class="edit_avatar" id="editavatar">
+                <a href="#"><i class="icon-upload icon-white"></i>上传新头像</a>
+            </div>
         </div>
         <div class="profile">
             {% if current_user and current_user.id == template_values['id'] and not template_values['has_selfdesc']%}
