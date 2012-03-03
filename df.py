@@ -59,6 +59,7 @@ class Application(tornado.web.Application):
                 (r"/note/touch", PubnoteHandler),
                 #(r"/note/([0-9a-z]+)", NoteHandler),
                 (r"/viewnote", ViewnoteHandler),
+                (r"/note/([0-9a-z]+)", NoteHandler),
                 ]
         settings = dict(
                 template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -1020,6 +1021,7 @@ class DeleteActivityHandler(BaseHandler):
         del_activity(self.rd, user_id, acttype, actto)
 
 class StatusHandler(FilterHandler):
+    @tornado.web.authenticated
     def get(self, status_id):
         template_values = {}
         if len(status_id) < 8:
@@ -1028,7 +1030,7 @@ class StatusHandler(FilterHandler):
         status = self.db.get("select p.name,p.domain,s.status,s.pubdate,s.status_ "
                 "from fd_People p, fd_Status s where s.user_id = p.id and "
                 "s.id = %s", status_id)
-        if not status or status.status_ == 1:
+        if not self.current_user or not status or status.status_ == 1:
             raise tornado.web.HTTPError(404)
         template_values['status'] = status
         comments = self.db.query("select p.name,p.domain,c.comments, "
@@ -1128,6 +1130,49 @@ class ViewnoteHandler(FilterHandler):
             self.write(self.at(self.br(note.note)))
         else:
             self.write("wrong")
+
+class NoteHandler(FilterHandler):
+    @tornado.web.authenticated
+    def get(self, note_id):
+        template_values = {}
+        if len(note_id) < 8:
+            raise tornado.web.HTTPError(404)
+        note_id = decode(note_id)
+        note = self.db.get("select p.name,p.domain,n.title,n.note,n.status_ "
+                ",n.pubdate from fd_People p, fd_Note n where n.user_id = p.id and "
+                "n.id = %s", note_id)
+        if not self.current_user or not note or note.status_ == 2 or \
+        note.status_ == 1 and note.name != self.current_user.name:
+            raise tornado.web.HTTPError(404)
+        template_values['note'] = note
+        #comments = self.db.query("select p.name,p.domain,c.comments, "
+        #        "c.pubdate from fd_People p, fd_Stacomm c where p.id"
+        #        "=c.user_id and note_id = %s", note_id)
+        #template_values['comments_length'] = len(comments)
+        #template_values['comments'] = comments
+        template_values['comments_length'] = 0
+        template_values['comments'] = {}
+        self.render("note.html", template_values=template_values)
+    @tornado.web.authenticated
+    def post(self, note_id):
+        if len(note_id) < 8:
+            raise tornado.web.HTTPError(404)
+        note_id = decode(note_id)
+        comments = self.get_argument("commenttext",None)
+        user_id = self.current_user.id
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+        comment_id = self.db.execute("insert into fd_Stacomm (user_id, "
+                    " note_id, comments, pubdate) values (%s,%s,%s,%s)", 
+                    user_id, note_id, comments, pubdate)
+        if comment_id:
+            status_key = self.rd.keys('status*%s' % note_id)[0]
+            prev_comments_num = self.rd.hget(status_key, 'comm')
+            if not prev_comments_num:
+                comments_num = 1
+            else:
+                comments_num = int(prev_comments_num) + 1
+            self.rd.hset(status_key, 'comm', comments_num)
+            self.write(self.at(self.br(comments)))
 
 def main():
     tornado.options.parse_command_line()

@@ -16,11 +16,11 @@ function submitfunc(requesturl,name,domain,prevnum) {
     });
     return false;
 }
-function delstatus(user, status_id) {
+function delactivity(user, activity_id, acttype) {
     $.ajax({
     type:'POST',
-    url:'/deletestatus',
-    data:{user:user,actto:status_id,_xsrf:getCookie('_xsrf')},
+    url:'/deleteactivity',
+    data:{user:user,actto:activity_id,acttype:acttype,_xsrf:getCookie('_xsrf')},
     success:function(data){
         window.location.href="/";
     }       
