@@ -1145,13 +1145,11 @@ class NoteHandler(FilterHandler):
         note.status_ == 1 and note.name != self.current_user.name:
             raise tornado.web.HTTPError(404)
         template_values['note'] = note
-        #comments = self.db.query("select p.name,p.domain,c.comments, "
-        #        "c.pubdate from fd_People p, fd_Stacomm c where p.id"
-        #        "=c.user_id and note_id = %s", note_id)
-        #template_values['comments_length'] = len(comments)
-        #template_values['comments'] = comments
-        template_values['comments_length'] = 0
-        template_values['comments'] = {}
+        comments = self.db.query("select p.name,p.domain,c.comments, "
+                "c.pubdate from fd_People p, fd_Notecomm c where p.id"
+                "=c.user_id and note_id = %s", note_id)
+        template_values['comments_length'] = len(comments)
+        template_values['comments'] = comments
         self.render("note.html", template_values=template_values)
     @tornado.web.authenticated
     def post(self, note_id):
@@ -1161,17 +1159,17 @@ class NoteHandler(FilterHandler):
         comments = self.get_argument("commenttext",None)
         user_id = self.current_user.id
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
-        comment_id = self.db.execute("insert into fd_Stacomm (user_id, "
+        comment_id = self.db.execute("insert into fd_Notecomm (user_id, "
                     " note_id, comments, pubdate) values (%s,%s,%s,%s)", 
                     user_id, note_id, comments, pubdate)
         if comment_id:
-            status_key = self.rd.keys('status*%s' % note_id)[0]
-            prev_comments_num = self.rd.hget(status_key, 'comm')
+            note_key = self.rd.keys('note*%s' % note_id)[0]
+            prev_comments_num = self.rd.hget(note_key, 'comm')
             if not prev_comments_num:
                 comments_num = 1
             else:
                 comments_num = int(prev_comments_num) + 1
-            self.rd.hset(status_key, 'comm', comments_num)
+            self.rd.hset(note_key, 'comm', comments_num)
             self.write(self.at(self.br(comments)))
 
 def main():
