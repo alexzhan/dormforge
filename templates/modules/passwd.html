@@ -1,0 +1,37 @@
+<div class="tab-pane active" id="passwd">
+    <div id="change-password">
+        <div class="alert alert-success" style="{{ 'display:none' if 'success' not in template_values else '' }}">
+            <a class="close" data-dismiss="alert" href="#">×</a>
+            密码修改成功
+        </div>
+        <h2>修改密码</h2>
+        <form class="well" id='password' method='POST' action="{{ request.path }}">
+            <fieldset>
+                <div id='oldcontrol' class="control-group {{ _('error') if template_values['errors'] != 0 and template_values['password_error'] in [1,6] else '' }}">
+                    <label class="control-label" for="password">当前密码</label>
+                    <div class="controls">
+                        <input  id="old" name="old" class="input-xlarge" size="30" type="password" value="{{ escape(template_values['old']) if template_values['errors'] != 0 else '' }}">
+                        <span id="oldhelp" class="help-inline">{{ escape(template_values['password_error_message']) if template_values['errors']!=0 and template_values['password_error'] in [1,6] else '' }}</span>
+                    </div>
+                </div>
+                <div id='newcontrol' class="control-group {{ _('error') if template_values['errors'] != 0 and template_values['password_error'] in [2,4] else '' }}">
+                    <label class="control-label" for="password">新密码</label>
+                    <div class="controls">
+                        <input  id="new" name="new" class="input-xlarge" size="30" type="password" value="{{ escape(template_values['new']) if template_values['errors'] != 0 else '' }}">
+                        <span id="newhelp" class="help-inline">{{ escape(template_values['password_error_message']) if template_values['errors']!=0 and template_values['password_error'] in [2,4] else '' }}</span>
+                    </div>
+                </div>
+                <div id='confirmcontrol' class="control-group {{ _('error') if template_values['errors'] != 0 and template_values['password_error'] in [3,5] else '' }}">
+                    <label class="control-label" for="password">新密码确认</label>
+                    <div class="controls">
+                        <input  id="confirm" name="confirm" class="input-xlarge" ize="30" type="password" value="{{ escape(template_values['confirm']) if template_values['errors'] != 0 else '' }}">
+                        <span id="confirmhelp" class="help-inline">{{ escape(template_values['password_error_message']) if template_values['errors']!=0 and template_values['password_error'] in [3,5] else '' }}</span>
+                    </div>
+                </div>
+            </fieldset>
+            <button type="submit" class="btn" onclick="return subch();">提交</button>
+        </div>
+        {{ xsrf_form_html() }}
+    </form>
+</div>
+</div>

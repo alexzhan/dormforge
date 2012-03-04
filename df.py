@@ -57,13 +57,14 @@ class Application(tornado.web.Application):
                 (r"/deleteactivity", DeleteActivityHandler),
                 (r"/status/([0-9a-z]+)", StatusHandler),
                 (r"/note/touch", PubnoteHandler),
-                #(r"/note/([0-9a-z]+)", NoteHandler),
                 (r"/viewnote", ViewnoteHandler),
                 (r"/note/([0-9a-z]+)", NoteHandler),
+                (r"/settings/(account|avatar|passwd)", SettingsHandler),
                 ]
         settings = dict(
                 template_path=os.path.join(os.path.dirname(__file__), "templates"),
                 static_path=os.path.join(os.path.dirname(__file__), "static"),
+                ui_modules={"Setting": SettingModule},
                 xsrf_cookies=True,
                 cookie_secret="18oETzKXQAGaYdkL5gEmGEJJFuYh7ENnpTXdTP1o/Vo=",
                 login_url="/login",
@@ -102,15 +103,13 @@ class BaseHandler(tornado.web.RequestHandler):
             hh.append(chr((ord(strorg[i])+ord(key[i % baselength]))%256))  
         return b64encode(''.join(hh)).encode("hex")
 
-
-
 class FilterHandler(BaseHandler):
     def at(self, value):
         ms = re.findall(u'(@[\u4e00-\u9fa5A-Za-z0-9_-]{2,16})', value)
         if (len(ms) > 0):
             for m in ms:
                 username = m[1:]
-                domain = get_domain_by_name(self.db, self.rd, username)
+                domain = get_domain_by_name(self.db, self.rd, username.lower())
                 if domain:
                     value = value.replace(m, '@<a href="/people/' + domain + '">' + username + '</a>')
         return value
@@ -1171,6 +1170,94 @@ class NoteHandler(FilterHandler):
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(note_key, 'comm', comments_num)
             self.write(self.at(self.br(comments)))
+
+class SettingsHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self, setting):
+        template_values = {}
+        template_values['setting'] = setting
+        if setting == 'account':
+            page_title = '账户设置'
+        elif setting == 'avatar':
+            page_title = '头像设置'
+        elif setting == 'passwd':
+            page_title = '修改密码'
+        else: 
+            page_title = '18周'
+        template_values['page_title'] = page_title
+        template_values['errors'] = 0
+        self.render("settings.html", template_values=template_values)
+
+    @tornado.web.authenticated
+    def post(self, setting):
+        template_values = {}
+        errors = 0
+        template_values['setting'] = setting
+        if setting == 'account':
+            page_title = '账户设置'
+        elif setting == 'avatar':
+            page_title = '头像设置'
+        elif setting == 'passwd':
+            page_title = '修改密码'
+            #password verify
+            password_error = 0
+            password_error_messages = ['',
+                u'请输入当前密码',
+                u'请输入新密码',
+                u'请输入新密码确认',
+                u'密码长度不能超过 32 个字符',
+                u'两次输入的密码不一致',
+                u'当前密码不正确',
+                ]
+            old = self.get_argument("old", None)
+            new = self.get_argument("new", None)
+            confirm = self.get_argument("confirm", None)
+            if not old or len(old) == 0:
+                errors = errors + 1
+                password_error = 1
+            else:
+                if not new or len(new) == 0:
+                    errors = errors + 1
+                    password_error = 2
+                else:
+                    if not confirm or len(confirm) == 0:
+                        errors = errors + 1
+                        password_error = 3
+                    else:
+                        old = old.strip()
+                        new = new.strip()
+                        confirm = confirm.strip()
+                        if len(confirm) > 32:
+                            errors = errors + 1
+                            password_error = 4
+                        else:
+                            if confirm != new:
+                                errors = errors + 1
+                                password_error = 5
+                            else:
+                                if not validate_password(self.current_user.password.decode('hex'), old):
+                                    errors = errors + 1
+                                    password_error = 6
+            if errors != 0:
+                template_values['old'] = old
+                template_values['new'] = new
+                template_values['confirm'] = confirm
+                template_values['errors'] = errors
+                template_values['password_error'] = password_error
+                template_values['password_error_message'] = password_error_messages[password_error]
+                template_values['page_title'] = page_title
+                return self.render("settings.html", template_values=template_values)
+            if new != old:
+                hashed = encrypt_password(new).encode('hex')
+                self.db.execute("update fd_People set password = %s where id = %s", hashed, self.current_user.id)
+            template_values['errors'] = errors
+            template_values['success'] = 1
+            template_values['page_title'] = page_title
+            return self.render("settings.html", template_values=template_values)
+
+class SettingModule(tornado.web.UIModule):
+    def render(self, template_values):
+        return self.render_string("modules/%s.html" % template_values['setting'], template_values=template_values)
 
 def main():
     tornado.options.parse_command_line()

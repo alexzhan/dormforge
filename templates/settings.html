@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block head %}
+<title>{{ template_values['page_title'] }}</title>
+<style type="text/css">
+    .row .tabbable {
+        margin-left:30px;
+    }
+    .tabs-left .nav-tabs{
+        margin-right: 40px;
+    }
+    .tab-pane h2 {
+        font-size: 20px;
+        line-height: 24px;
+        color: #666;
+        font-weight: inherit;
+    }
+    .tab-content {
+        margin-left: 80px;
+    }
+    #change-password {
+        margin-left: 40px;
+    }
+    .well {
+        background-color: white;
+        border: none;
+    }
+</style>
+{% end %}
+
+{% block body %}
+<div class="row">
+    <div class="tabbable tabs-left">
+        <ul class="nav nav-tabs">
+            <li class="{{ 'active' if template_values['setting'] == 'account' else "" }}"><a href="/settings/account" data-toggle="tab">账户设置</a></li>
+            <li class= {{ 'active' if template_values['setting'] == 'avatar' else "" }}><a href="/settings/avatar" data-toggle="tab">头像设置</a></li>
+            <li class="{{ 'active' if template_values['setting'] == 'passwd' else "" }}"><a href="/settings/passwd" data-toggle="tab">修改密码</a></li>
+        </ul>
+        <div class="tab-content">
+        {{ modules.Setting(template_values) }}
+        </div>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url('js/settings.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('js/alert.js') }}"></script>
+{% end %}
