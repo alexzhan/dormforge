@@ -37,7 +37,7 @@
                         <ul class="nav pull-right">
                             {% if current_user %}
                             <li><a href="/people/{{ _(current_user['domain']) }}">{{ _(current_user['name']) }}</a></li>
-                            <li><a href="/settings">{{ _("设置") }}</a></li>
+                            <li><a href="/settings/account">{{ _("设置") }}</a></li>
                             <li><a href="/logout?next={{ url_escape(request.uri) }}">{{ _("退出") }}</a></li>
                             {% if handler.xsrf_token %}
                             <div style="display:none">xsrfgend</div>
