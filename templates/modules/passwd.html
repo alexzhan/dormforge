@@ -1,9 +1,11 @@
 <div class="tab-pane active" id="passwd">
     <div id="change-password">
-        <div class="alert alert-success" style="{{ 'display:none' if 'success' not in template_values else '' }}">
+        {% if 'success' in template_values %}
+        <div class="alert alert-success">
             <a class="close" data-dismiss="alert" href="#">×</a>
             密码修改成功
         </div>
+        {% end %}
         <h2>修改密码</h2>
         <form class="well" id='password' method='POST' action="{{ request.path }}">
             <fieldset>
@@ -33,5 +35,4 @@
         </div>
         {{ xsrf_form_html() }}
     </form>
-</div>
 </div>

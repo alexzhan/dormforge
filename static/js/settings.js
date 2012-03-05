@@ -31,27 +31,4 @@ function subch(){
         mark = 0;
     }
     if(!mark) return false;
-    /*
-    $.ajax({
-        type:'POST',
-        url:requesturl,
-        data:{oldp:$("#old").val(),
-            newp:$("#new").val(),
-            confirmp:$("#confirm").val(),
-            _xsrf:getCookie('_xsrf')},
-        success:function(data){
-            if(data == 'right') {
-                $(".alert-success").show();
-                $("#old").val("");
-                $("#new").val("");
-                $("#confirm").val("");
-            }
-        }
-    });
-    return false;
-    */
-}
-function getCookie(name) {
-    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
-    return r ? r[1] : undefined;
 }
