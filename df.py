@@ -60,6 +60,7 @@ class Application(tornado.web.Application):
                 (r"/viewnote", ViewnoteHandler),
                 (r"/note/([0-9a-z]+)", NoteHandler),
                 (r"/settings/(account|avatar|passwd)", SettingsHandler),
+                (r"/404", PNFHandler),
                 ]
         settings = dict(
                 template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -93,6 +94,15 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def set_default_headers(self): 
         self.set_header('Server', '18zhouServer/1.1')
+
+    def write_error(self, status_code, **kwargs):
+        if status_code == 404:
+            self.render("404.html")
+
+    def get_error_html(self, status_code, **kwargs):
+        logging.info("1")
+        if status_code == 404:
+            self.render("404.html")
 
     def encode(self, unicodeString):  
         strorg = unicodeString.encode('utf-8')  
@@ -716,9 +726,7 @@ class ContactHandler(BaseHandler):
             if not contact_id:
                 raise tornado.web.HTTPError(404)
             else:
-                template_values = {}
-                template_values['message'] = '您的反馈我们已收到，谢谢！'
-                self.render("success.html", template_values=template_values)
+                self.write("right")
 
 class AboutHandler(BaseHandler):
     def get(self):
@@ -1258,6 +1266,10 @@ class SettingsHandler(BaseHandler):
 class SettingModule(tornado.web.UIModule):
     def render(self, template_values):
         return self.render_string("modules/%s.html" % template_values['setting'], template_values=template_values)
+
+class PNFHandler(BaseHandler):
+    def get(self):
+        self.render("404.html")
 
 def main():
     tornado.options.parse_command_line()

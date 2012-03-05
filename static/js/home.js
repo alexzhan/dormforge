@@ -83,8 +83,3 @@ function togglenote(note_index){
     $("#note"+note_index).show();
     return false;
 }
-
-function getCookie(name) {
-    var r = document.cookie.match('\\b' + name + '=([^;]*)\\b');
-    return r ? r[1] : undefined;
-}

@@ -23,6 +23,10 @@
     .topbar .btn {
         border: 0;
     }
+    .alert-success {
+        margin-right: -20px;
+        margin-left: -20px;
+    }
 </style>
 {% end %}
 {% block body %}
@@ -65,11 +69,11 @@
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary" onclick="return submitfunction();">提交</button>
             </div>
-            {{ xsrf_form_html() }}
         </form>
     </div>
 </div>
 {% end %}
 {% block bottom %}
 <script type="text/javascript" src="{{ static_url("js/contact.js") }}"></script>
+<script type="text/javascript" src="{{ static_url('js/alert.js') }}"></script>
 {% end %}

@@ -85,8 +85,3 @@ function unfollow(button_id, from_user, to_user){
     }       
     });
 }
-
-function getCookie(name) {
-    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
-    return r ? r[1] : undefined;
-}

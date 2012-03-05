@@ -37,9 +37,22 @@ function submitfunction(){
         mark = 0;
     }
     if(!mark) return false;
-}
-function isMail(mail) {
-    var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})$/;
-    if (filter.test(mail)) return true;
-    else return false;
+    var username = $("#username").val();
+    var email = $("#email").val();
+    var subject = $("#subject").val();
+    var comment = $("#comment").val();
+    var alertstr = "<div class='alert alert-success'><a class='close' data-dismiss='alert' href='#'>×</a>您的反馈我们已收到，谢谢！</div>";
+    $.ajax({
+        type:'POST',
+        url:'/contact',
+        data:{username:username,email:email,subject:subject,comment:comment,_xsrf:getCookie('_xsrf')},
+        success:function(data){
+            if(data == "right"){
+                $(alertstr).insertBefore(".container .content");
+                $("#subject").val("");
+                $("#comment").val("");
+            }
+        }       
+    });
+    return false;
 }

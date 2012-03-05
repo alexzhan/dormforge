@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>18周 › 提示信息</title>
+<style type="text/css">
+    .marketing {
+        margin: 80px 0 200px;
+    }
+    .marketing h1 {
+        font-size: 70px;
+        font-weight: 300;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .marketing .desc {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .marketing .links {
+        text-align: center;
+        font-size: 16px;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="marketing">
+    <h1>404</h1>
+    <div class="desc">这里可能没有你要找的页面，有的只是--可爱的洪水猛兽。</div>
+    <div class="links">
+        <a href="/" style="margin-right: 15px">首页</a>
+        {% if current_user %}
+        <a href="{{ ''.join(['/people/',current_user.domain]) if current_user else ''}}">我的个人页面</a>
+        {% else %}
+        <a href="/login">登录</a>
+        {% end %}
+    </div>
+</div>
+{% end %}
