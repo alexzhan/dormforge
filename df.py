@@ -95,6 +95,11 @@ class BaseHandler(tornado.web.RequestHandler):
     def set_default_headers(self): 
         self.set_header('Server', '18zhouServer/1.1')
 
+    def write_error(self, status_code, **kwargs):
+        if status_code == 404:
+            self.render("404.html")
+            self.finish()
+
     def encode(self, unicodeString):  
         strorg = unicodeString.encode('utf-8')  
         strlength = len(strorg)  
