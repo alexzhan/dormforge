@@ -60,7 +60,7 @@ class Application(tornado.web.Application):
                 (r"/viewnote", ViewnoteHandler),
                 (r"/note/([0-9a-z]+)", NoteHandler),
                 (r"/settings/(account|avatar|passwd)", SettingsHandler),
-                (r"/404", PNFHandler),
+                (r".*", PNFHandler),
                 ]
         settings = dict(
                 template_path=os.path.join(os.path.dirname(__file__), "templates"),
@@ -94,15 +94,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def set_default_headers(self): 
         self.set_header('Server', '18zhouServer/1.1')
-
-    def write_error(self, status_code, **kwargs):
-        if status_code == 404:
-            self.render("404.html")
-
-    def get_error_html(self, status_code, **kwargs):
-        logging.info("1")
-        if status_code == 404:
-            self.render("404.html")
 
     def encode(self, unicodeString):  
         strorg = unicodeString.encode('utf-8')  
@@ -1269,6 +1260,7 @@ class SettingModule(tornado.web.UIModule):
 
 class PNFHandler(BaseHandler):
     def get(self):
+        self.set_status(404)
         self.render("404.html")
 
 def main():
