@@ -26,7 +26,7 @@ from db.redis.user_activity_graph import UserActivityGraph
 from base64 import b64encode,b64decode
 from PIL import Image
 
-define("port", default=80, help="run on the given port", type=int)
+define("port", default=8080, help="run on the given port", type=int)
 define("mysql_host", default="127.0.0.1:3306", help="blog database host")
 define("mysql_database", default="df", help="blog database name")
 define("mysql_user", default="df", help="blog database user")
@@ -1237,7 +1237,7 @@ class SettingsHandler(BaseHandler):
                             img = Image.open(tf.name)
                             imgsize = picsizedict[ps]
                             img.thumbnail((imgsize,imgsize),resample=1)
-                            imgpath = "./data/static/usrimg/%s" % shard
+                            imgpath = "/data/static/usrimg/%s" % shard
                             img = img.convert("RGB")
                             try:
                                 img.save("%s/%s_%s" % (imgpath, ps, dstname))
