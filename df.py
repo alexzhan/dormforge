@@ -1237,7 +1237,7 @@ class SettingsHandler(BaseHandler):
                             img = Image.open(tf.name)
                             imgsize = picsizedict[ps]
                             img.thumbnail((imgsize,imgsize),resample=1)
-                            imgpath = "/data/static/usrimg/%s" % shard
+                            imgpath = "/work/Dormforge/static/usrimg/%s" % shard
                             img = img.convert("RGB")
                             try:
                                 img.save("%s/%s_%s" % (imgpath, ps, dstname))
