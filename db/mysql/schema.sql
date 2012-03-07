@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.1.54, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.1.41, for debian-linux-gnu (i486)
 --
 -- Host: localhost    Database: df
 -- ------------------------------------------------------
--- Server version	5.1.54-1ubuntu4
+-- Server version	5.1.41-3ubuntu12.10
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -120,7 +120,7 @@ CREATE TABLE `fd_Feedback` (
   `date` datetime NOT NULL,
   `is_login` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -129,6 +129,7 @@ CREATE TABLE `fd_Feedback` (
 
 LOCK TABLES `fd_Feedback` WRITE;
 /*!40000 ALTER TABLE `fd_Feedback` DISABLE KEYS */;
+INSERT INTO `fd_Feedback` VALUES (1,'alex','alex@163.com','test','test','112.193.169.174','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.77 Safari/535.7','2012-02-10 13:28:37',0),(2,'julie','juliec@gmail.com','test','test','112.193.169.174','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.77 Safari/535.7','2012-02-10 22:03:32',0),(3,'alex','alexzhan12@gmail.com','test','test','112.193.169.174','Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.77 Safari/535.7','2012-02-11 00:26:07',1),(4,'liuyu','liuynope@163.com','加油','！！！','61.135.152.211','Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.46 Safari/535.11','2012-02-13 19:54:40',1),(5,'alex','alexzhan12@163.com','kindle ua','content to read','8.18.145.128','Mozilla/5.0 (Linux; U; zh-cn) AppleWebKit/528.5+ (KHTML, like Gecko, Safari/528.5+) Version/4.0 Kindle/3.0 (screen 600x800; rotate)','2012-02-24 14:16:00',1);
 /*!40000 ALTER TABLE `fd_Feedback` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -143,7 +144,7 @@ CREATE TABLE `fd_Major` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -152,7 +153,63 @@ CREATE TABLE `fd_Major` (
 
 LOCK TABLES `fd_Major` WRITE;
 /*!40000 ALTER TABLE `fd_Major` DISABLE KEYS */;
+INSERT INTO `fd_Major` VALUES (1,'自动化'),(2,'信安'),(3,'计算机'),(4,'生物工程'),(5,'数学'),(6,'交通工程'),(7,'人工智能'),(8,'云计算'),(9,'软件工程'),(10,'土木工程'),(11,'交控'),(12,'计算机科学与技术'),(13,'信息管理与信息系统'),(14,'电子信息科学与技术'),(15,'通信与信息系统'),(16,'通信工程'),(17,'广告徐'),(18,'网络工程'),(19,'运筹学与控制论'),(20,'信息与计算科学');
 /*!40000 ALTER TABLE `fd_Major` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `fd_Note`
+--
+
+DROP TABLE IF EXISTS `fd_Note`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fd_Note` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `title` varchar(512) NOT NULL,
+  `note` mediumtext NOT NULL,
+  `pubdate` datetime NOT NULL,
+  `status_` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `fd_Note`
+--
+
+LOCK TABLES `fd_Note` WRITE;
+/*!40000 ALTER TABLE `fd_Note` DISABLE KEYS */;
+INSERT INTO `fd_Note` VALUES (1,1,'18周上的第一篇日志','现在可以写日志了。\n       日志模块主要参考了gist的UI，虽然跟42qu的写日志UI很像，但是我最初确实也是想要这种样式。\n       公开发布很好理解，任何地方都可以出现。而私密发布不会出现在首页，即使是你本人在登录也不能出现在首页。但是私密日志会出现在个人页面，而且只有本人访问时才会出现，你可以试一下：写一篇公开日志和一篇私密日志，在看私密日志能不能被别人看到的时候，在你的个人主页点退出，然后你的个人主页就不会出现私密日志了。\n       删除日志白天再写吧，很困了，白天还要去练车。\n       这一次提交做了很多方面的改动。不过都是小的地方的优化。','2012-03-02 02:55:00',0),(2,1,'可以修改密码了','暂时还是只能这么访问：\nhttp://18zhou.openpk.org/settings/passwd\n从晚上六点多做到现在，主要是界面做了太久，后来做功能，提示的逻辑太多了，用的时间就长了。本来想用ajax来做，但是发现一些因素不太适合用ajax做，所以就没用ajax。但是以后可能还是要换成ajax，有时间再做吧。\n今天，实际上是昨天了，早上8：50起来的，九点去驾校，本来不想去的，主要是周末的原因，但是下周四就考桩了，所以还是过去了。这还是我第一次上午去练车。上午练了三把，中午在驾校附近吃了饭，下午练了两把，3点多点就回来了。认识了王勇胜。','2012-03-05 03:09:00',0),(3,1,'可爱的洪水猛兽','今天一天又是练车，不过基本上没问题了。\n还差一个选修课，选了影视欣赏，今天去上课，在八教，看了一部goodfellas,电影是不错，但是看的很沉重，以后还是尽量少看这种电影，可能把心情搞得很不好，还是喜剧比较好。\n回来都十点半了吧，做了一些小的改动，js合并了一些到common.js，反馈页面改成ajax做了，修改密码页面底部修正，做了一个404页面，只是我重写write_error不知道为什么不能处理。白天看吧，白天不一定去练车了，感觉很熟了。有可能下午最后去练一把去熟下手。\n得去申请两个学分，用srtp来申请。就可以少上一个选修。','2012-03-06 02:33:00',0);
+/*!40000 ALTER TABLE `fd_Note` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `fd_Notecomm`
+--
+
+DROP TABLE IF EXISTS `fd_Notecomm`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fd_Notecomm` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `note_id` int(11) NOT NULL,
+  `comments` mediumtext NOT NULL,
+  `pubdate` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `fd_Notecomm`
+--
+
+LOCK TABLES `fd_Notecomm` WRITE;
+/*!40000 ALTER TABLE `fd_Notecomm` DISABLE KEYS */;
+INSERT INTO `fd_Notecomm` VALUES (1,1,1,'18周上的第一篇日志的评论','2012-03-03 15:47:00'),(2,1,2,'所谓界面做的很久是因为，我又研究了下tornado的源码，理解了下UIModule，把几个设置界面用Module来做。\n下面要把/和/my 的界面也这样做。','2012-03-05 03:16:00');
+/*!40000 ALTER TABLE `fd_Notecomm` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -192,7 +249,7 @@ CREATE TABLE `fd_People` (
   `has_selfdesc` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -201,6 +258,7 @@ CREATE TABLE `fd_People` (
 
 LOCK TABLES `fd_People` WRITE;
 /*!40000 ALTER TABLE `fd_People` DISABLE KEYS */;
+INSERT INTO `fd_People` VALUES (1,'d4d0d6ec5c3f165d224bbeb419ce4dd492487c6e167635f035162529b52d5fdeecfdbaae0998c9d2','alex','alexzhan12@163.com',NULL,261,464,11,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'alex',0,'112.193.169.174','202.115.73.222','2012-02-11 04:18:47','2012-03-03 15:08:00','c0e6081431d742cb9dd3387513ca96fc',0,1),(2,'1ada715e69425d18c5c5676220adc7d79430e861ce49aa7c51660327303d8307f1bfaf67e6694d5f','julie','juliec@163.com',NULL,261,464,11,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'julie',0,'112.193.169.174','202.115.73.222','2012-02-11 04:25:44','2012-03-03 15:08:00','9c6be07495264498b473113dcb3d6763',0,1),(3,'c5f2340ddfc447bdc41832cf09f427dfb3fbafad033b05980042ecd17ffd9c469e1afc42e9e2eb19','guo','guo@gmail.com',NULL,121,325,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'guo',0,'1.192.130.30','1.192.130.30','2012-02-11 19:04:23','2012-02-11 19:04:23','89611e08d6644b459e26191277708787',0,0),(4,'cee95f16fcd670901d71227f1973e4b7eb00322e29f93a18892e1c02f26ca38fff8c44fd92d5fe18','zyy_max','zyy1990@yeah.net',NULL,261,464,12,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'zyy_max',0,'114.99.167.99','222.18.59.166','2012-02-12 17:19:27','2012-02-29 12:25:00','7ccd414ad22a4d32a57a6bca540df809',0,1),(5,'11330d46f08cd8a20a7d528c315c0a0c3547a54b01e1d655d59ac07fe7ec32ae84ed5d99190ba922','yongPassion','yong098007@gmail.com',NULL,40,171,12,103,5,12,NULL,NULL,NULL,NULL,NULL,NULL,2,'yongPassion',0,'114.255.122.16','114.255.122.16','2012-02-12 22:41:02','2012-02-12 22:41:02','cbdb3435877a4d1b9f01bdf2b4c73735',0,1),(6,'ff473c2f2be4e06e3db0f1d92adf50f59833b7a8a7aade6c1f9ac2f473651be924dfadae94a2067d','alexzhan','alexzhan12@gmail.com',NULL,261,464,1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'alexzhan',0,'112.193.171.253','112.193.171.253','2012-02-13 16:22:42','2012-02-13 16:22:42','3889f2c971f04d0b9180217a43dface5',0,0),(7,'17117311e3aeb9fc5783817bb8933c60fc8ff855948469d9c2539ada5e1a1108c434ad3d129657fe','liuyu','liuynope@163.com',NULL,48,396,13,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'liuyu',0,'61.135.152.211','61.135.152.211','2012-02-13 19:53:59','2012-02-13 19:53:59','8d74ffec61464932b0d2286677e65538',0,1),(8,'1721da4dab0ca98dc94cafeba784a10bbe4d2580366aa00b66971264a4d851621a305bd448f058e2','Test','test@test.com',NULL,103,1,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'Test',0,'207.46.92.17','207.46.92.19','2012-02-14 11:08:45','2012-02-17 14:33:08','ce6fc420e3f349efa453cbaf7687caaf',0,1),(10,'8ac1ffbe863707cecd4e2f475a2150cb7cc2704cf52c59a2ffb695b1e21e25f157147f7dcd8e3077','Jessie','zq_jessie_swjtu@163.com',NULL,261,464,11,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'qi',0,'222.18.58.35','222.18.58.35','2012-02-21 17:05:00','2012-02-21 17:11:00','4a2779733e5f440bbc38151f3a2b3f87',0,1),(11,'d417b3b2ff891768d783d84f7bf19bfe42d357263c69717bd667b2187d3370edf475e93d64b4bdd4','lsanotes','lsanotes@qq.com',NULL,299,468,14,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'lsanotes',0,'113.251.168.152','113.251.218.142','2012-02-23 13:03:00','2012-02-24 21:58:00','4c4e8aa4241a4bdda4c9e1f7e461f9aa',0,1),(12,'7da1a5ec74d81fd4207b4f9476eb864b47c425c9c0e3116265f7e1f4bafbe0a5a1a225179f6cb281','wangwei','632315147@qq.com',NULL,61,324,16,61,324,15,NULL,NULL,NULL,NULL,NULL,NULL,2,'wangwei',0,'211.87.221.192','211.87.221.192','2012-02-24 22:38:00','2012-02-24 22:38:00','92a73111cafb48e1a1e4ccbc8dd35963',0,1),(13,'8bd7d8a1e57745d3487364dd97c954134be877fe659229658dd7f2a1e24afe557f695549bf20cbe0','SErHo','serho@qq.com',NULL,261,464,9,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'serho',0,'119.6.71.6','124.161.72.207','2012-02-25 20:49:00','2012-03-04 20:25:00','3082a93372e54658b9a5a79f7965750e',0,1),(14,'bcba87d6ddbca018f87f0b6dccaaf5c69a921193e39af6903461da7f09a5c71f2fcb9e3b15afcc69','Eric','zfzhang100@gmail.com',NULL,261,464,12,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'eric',0,'222.18.59.193','110.45.196.161','2012-02-27 18:49:00','2012-02-27 19:03:00','989c1f9176fc4b54b4f61443d21b6569',0,0),(15,'ba260979b6f6d54858f977ae9a5bc71d0fffa8896a85e69729f8472ee6ad27a5f566b9d03eacc419','xiong','xiongcb2008@163.com',NULL,261,464,11,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'xiong',0,'222.18.48.208','113.142.17.124','2012-02-29 17:55:00','2012-03-01 10:23:00','0fdfa9fccad34f31bc1676c56fb255ff',0,0),(16,'470296246f8872e1534817eccc64d28da6df3dad60af3c8bea66292fc45e8431e204d63377330492','pqlmessi','971730907@qq.com',NULL,261,464,11,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'pqlmessi',0,'112.193.171.111','112.193.171.111','2012-02-29 18:00:00','2012-02-29 18:00:00','f5862b0d657249ea925ec8cce37e010b',0,1),(17,'fcba4c2efb45416b574282e93684d3c81b265206ed5c0c50880b90a7b594d53a9c457912e12d2f27','ssblove558','596509779@qq.com',NULL,261,464,11,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'558',0,'112.193.171.111','112.193.171.111','2012-02-29 18:04:00','2012-02-29 18:04:00','af5e057da608434599014aed63b470a6',0,0),(18,'02f6a940c403e8652803286942182d77fff3e822ad0f2ad7d155659f810bcc45c0aa9cebbc38d698','celia','jjxxs@163.com',NULL,48,387,17,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'celia',0,'27.17.154.179','27.17.154.179','2012-02-29 21:24:00','2012-02-29 21:26:00','82a1eead979e4afab554fb276a492787',0,1),(19,'181f85c24f6c916482034aa2f77d8b4f4f7a7d7dab6f9a24296d9e453b0ba0aec2f323464f84d65c','samdrew','samdrew2@yahoo.cn',NULL,281,1622,3,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'samdrew',0,'110.80.55.237','110.80.55.237','2012-02-29 22:58:00','2012-02-29 22:58:00','63af7658a6e4487793b4e98dd3ae17cc',0,1),(20,'5acf57af232faec08dfd56604e2edaa0de6a8acf1a43474f85d1d81411447e7946e169d578ba175e','LostTong','570897918@qq.com',NULL,261,464,18,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'LostTong',0,'115.193.166.54','115.193.166.54','2012-02-29 23:25:00','2012-02-29 23:25:00','2aa0f4abcec845fa8d2ac433f8332ced',0,0),(21,'45e534e6b682258e9212016199475b31f2f4188b460bd433ab11050272591db13dbd084437b33e46','lixiao','elixiao@gmail.com',NULL,261,464,20,101,253,19,NULL,NULL,NULL,NULL,NULL,NULL,2,'lixiao',0,'60.191.99.12','60.191.99.12','2012-02-29 23:32:00','2012-02-29 23:32:00','fd83f85592694e128ae808c2b7a376e9',0,0),(22,'9e45c5d8fd393ce9d39cf1ea9bb66b8922cc4f461b11cc98d287a9872b92845f570764f7edd6602f','huzheteng','dreamslinkcn@sina.cn',NULL,262,92,18,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,1,'huzheteng',0,'60.222.247.78','60.222.247.78','2012-03-05 20:37:00','2012-03-05 20:37:00','953428ef91f444c794a3a932ff4839ee',0,1);
 /*!40000 ALTER TABLE `fd_People` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -241,7 +299,7 @@ CREATE TABLE `fd_Selfdesc` (
   `user_id` int(11) DEFAULT NULL,
   `selfdesc` mediumtext,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -250,7 +308,62 @@ CREATE TABLE `fd_Selfdesc` (
 
 LOCK TABLES `fd_Selfdesc` WRITE;
 /*!40000 ALTER TABLE `fd_Selfdesc` DISABLE KEYS */;
+INSERT INTO `fd_Selfdesc` VALUES (1,1,'Live Free\n笑忘歌\n尽量让每一天都过得充实而有意义\n坚持下去'),(2,2,'Happy'),(3,5,'yongPassion'),(4,7,'啧啧啧'),(5,4,'伪技术狂人，伪攻城师~~~'),(6,8,'测试账号'),(7,10,'岁月静好'),(8,11,'好奇心太强……'),(9,12,'顶顶兄弟网站，来条信息~~'),(10,16,'宅男'),(11,18,'看清这世界的伤疤，却依然爱它。'),(12,19,'名字改不了的吗T T'),(13,22,'前端爱好者 Linux爱好者'),(14,13,'serholiu.com');
 /*!40000 ALTER TABLE `fd_Selfdesc` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `fd_Stacomm`
+--
+
+DROP TABLE IF EXISTS `fd_Stacomm`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fd_Stacomm` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `status_id` int(11) NOT NULL,
+  `comments` mediumtext NOT NULL,
+  `pubdate` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `fd_Stacomm`
+--
+
+LOCK TABLES `fd_Stacomm` WRITE;
+/*!40000 ALTER TABLE `fd_Stacomm` DISABLE KEYS */;
+INSERT INTO `fd_Stacomm` VALUES (1,1,5,'这是在线环境上的第一条评论','2012-02-22 22:37:00'),(2,1,5,'这是在线环境上的第一条来自ie的评论','2012-02-23 01:30:00'),(3,1,6,'谢谢支持，功能还很不完善，还在做。','2012-02-23 18:26:00'),(4,1,10,'测试下数字','2012-02-23 21:31:00'),(5,1,14,'测试 @测试 @alex @isanotes @Isanotes @Alex @ALEX @Julie @julie @jessie @JESSIE','2012-02-24 22:14:00'),(6,1,14,'test @lsanotes','2012-02-24 22:15:00'),(7,1,17,'可以分行了。\n@alex@Julie@Jessie@guo@zyy_max@yongPassion@liuyu@lsanotes@wangwei','2012-02-25 20:09:00'),(8,1,21,'test reply\n@test','2012-02-26 19:46:00'),(9,1,21,'just test','2012-02-27 08:03:00'),(10,14,22,'@alex','2012-02-27 18:52:00'),(11,1,30,'恩 关注你了','2012-02-29 23:35:00'),(12,1,32,'@samdrew\n现在功能都还没开发完，所以我还没有公开代码。\n你想看代码吗？我可以把你加入开发组。','2012-03-01 10:41:00');
+/*!40000 ALTER TABLE `fd_Stacomm` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `fd_Status`
+--
+
+DROP TABLE IF EXISTS `fd_Status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fd_Status` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `status` mediumtext NOT NULL,
+  `pubdate` datetime NOT NULL,
+  `status_` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `fd_Status`
+--
+
+LOCK TABLES `fd_Status` WRITE;
+/*!40000 ALTER TABLE `fd_Status` DISABLE KEYS */;
+INSERT INTO `fd_Status` VALUES (1,1,'改了redis的数据结构，所以又flushall了一次，以后应该不会flushall了，应该会比较稳定了。可惜之前的发的状态都丢了。','2012-02-20 22:04:00',0),(2,10,'川哥很强大~~','2012-02-21 18:37:00',0),(3,2,'Live Happy','2012-02-21 18:37:00',0),(4,1,'做好了状态页面，马上添加功能。','2012-02-22 16:47:00',0),(5,1,'状态页面功能基本完成了。现在点击状态下方的时间，就能进入状态评论页面。','2012-02-22 22:36:00',0),(6,11,'这个平台不错啊。','2012-02-23 13:05:00',0),(7,1,'调了很久为什么ie下不能载入js中的函数，最终发现是函数名的问题，在出问题的那个页面中所用的js函数叫submit，改成了submitfunc或者其他的ie下都能通过，而直接用submit，chrome下都不会有问题。真奇怪。估计是ie缓存了另一个js下的submit函数，可是我清了缓存还是不行。','2012-02-23 18:35:00',0),(8,1,'现在 status页面界面还是有点小问题，comment-item设置了min-height之后，不管多高，都是这个min-height了。','2012-02-23 18:35:00',0),(9,1,'现在得写一个脚本从mysql中读出一些数据写入到redis中对应的部分。最初，redis的结构还是没有设计得很好。','2012-02-23 18:46:00',0),(10,1,'今天在K3上看了两本书的各一半，一个是@agentzh 的nginx教程的后一半，另一个是《怪诞行为学》的前一半，能找到自己喜欢读，读了对自己有益的书的感觉真不错。','2012-02-23 18:47:00',0),(11,1,'Post from my kindle.','2012-02-24 14:14:00',0),(12,1,'k3浏览器的user-agent：Mozilla/5.0 (Linux; U; zh-cn) AppleWebKit/528.5+ (KHTML, like Gecko, Safari/528.5+) Version/4.0 Kindle/3.0 (screen 600x800; rotate)','2012-02-24 18:59:00',0),(13,1,'今天看完了《怪诞行为学》，其实，里面的故事一点都不怪诞，很正常，作者所做的事就是描述清楚了为什么人会有那些举动，我现在记得最清楚的一件事就是作者做实验的时候采集了很多样本，所以分析都是可信的，值得一读。','2012-02-24 19:30:00',0),(14,1,'python正则匹配中文的时候一定要注意中文必须是utf8编码而且正则也必须是utf8编码，否则匹配不到，比如写这个微博at关系的正则：re.findall(u\'(@[\\u4e00-\\u9fa5A-Za-z0-9_-]{4,30})\', u\'@测试 @test\')','2012-02-24 20:12:00',0),(15,1,'增加一功能：正则匹配到@username 的情况，就自动增加链接。','2012-02-24 22:17:00',0),(16,1,'修了一处bug：当用户名是有中文时，之前自己发的状态不会显示删除链接，现在能显示了。编码的问题。','2012-02-25 00:09:00',0),(17,1,'可以@了，只是还不能提醒。@alex@Julie@Jessie@guo@zyy_max@yongPassion@liuyu@lsanotes@wangwei','2012-02-25 01:04:00',0),(18,1,'可以分行了。\n@alex@Julie@Jessie@guo@zyy_max@yongPassion@liuyu@lsanotes@wangwei','2012-02-25 20:09:00',0),(19,1,'刚刚添加一个文件，用来encode url中出现的id，显得正式一点。','2012-02-26 19:11:00',0),(20,1,'刚修正了两处bug：因为添加encode，刚发布时js中也要encode，删除时也要encode。','2012-02-26 19:27:00',0),(21,1,'又修正一处回复时的bug。','2012-02-26 19:45:00',0),(22,1,'固定了topbar，以后还可能取消固定；\n增加了我关注的链接（功能还没做好）；\n修正了删除状态和取消关注的bug。','2012-02-27 11:44:00',0),(23,1,'test','2012-02-27 11:44:00',1),(24,1,'做好了 我关注的模块 ，说起来比较简单，做起来还真不简单。\n主要是删除和对某人取消关注，牵一发而动全身，里面的逻辑真不容易想通，慢慢地调好的。\n这个功能用今天一上午做好的，在图书馆做的。今天不去练车。','2012-02-28 11:41:00',0),(25,1,'对于“我关注的”信息，只是你在做了“关注”这个动作之后，这个人的信息以后才会出现在“我关注的”信息里面，这个也是考虑了quora的实现。不然实现起来太麻烦了。\n现在用push的方式，以后用pull吧，只是我还没想清除pull应该怎么实现。\n在取消关注某人或者你关注的人删除了信息的情况下，“我关注的”信息里对应也会删除。','2012-02-28 13:15:00',0),(26,1,'这一次提交改动了下面几处：\n1、把注册时的4个ExistHandler合并成了一个；\n2、注册时在js中以及py中都增加对domain的验证，避免一些麻烦的情况；\n3、修正Selfdesc一处bug。','2012-02-29 00:07:00',0),(27,1,'把登录改成了默认导向到首页，而不是个人首页了。','2012-02-29 00:14:00',0),(28,1,'要停止几天18zhou.com的域名解析，还是老实备案吧。\n不选国外的服务器主要是考虑到我的银行卡暂时没有开通境外支付还有访问速度的考虑。\n我希望18周的程序能一直运行下去，暂时可以通过：18zhou.openpk.org访问。http://18zhou.openpk.org','2012-02-29 14:13:00',0),(29,1,'我以后得多拉几个同学上来。哈哈。\n@alex@Julie@Jessie@guo@zyy_max@yongPassion@liuyu@lsanotes@wangwei@eric@SErHo@xiong@pqlmessi@ssblove558','2012-02-29 18:40:00',0),(30,19,'注册了呵呵~~~','2012-02-29 22:59:00',0),(31,1,'再更新下18zhouer\n@alex@Julie@Jessie@guo@zyy_max@yongPassion@liuyu@lsanotes@wangwei@eric@SErHo@xiong@pqlmessi@ssblove558@celia@LostTong@samdrew@lixiao','2012-02-29 23:38:00',0),(32,19,'请教这开源的东西怎么玩呢？','2012-03-01 09:18:00',0),(33,1,'@samdrew 名字可以改，只是暂时还没做这块功能。\n功能落下的太多了。。。','2012-03-01 10:45:00',0),(34,1,'可以编辑日志了','2012-03-02 20:40:00',0),(35,1,'如果发布日志之后想改变日志的状态，即从私密改成公开或者从公开改成私密，就可以进入编辑日志页面，直接选择私密发布或者公开发布就行了。','2012-03-02 20:56:00',0),(36,1,'现在日志也可以删除了，但是我不建议删除日志。如果不想被别人看到，完全可以把日志设成私密。\n把删除日志的逻辑合并进了删除状态的逻辑，我发现他们两个是完全差不多的，所以代码没有改动多少就完成了删除日志的逻辑。','2012-03-02 22:32:00',0),(37,1,'做好了日志页面，现在还不能评论日志。马上开做。','2012-03-03 15:07:00',0),(38,1,'很小的改动了下，就做好了评论日志的逻辑。也是跟评论状态差不多。','2012-03-03 15:48:00',0),(39,1,'现在开始做上传头像和修改个人信息的功能','2012-03-03 15:49:00',0),(40,1,'修改了修改日志的UI','2012-03-03 16:55:00',0),(41,1,'解决了404的问题，可能是晚上太困了，没有考虑到，我在Baseandler里重写RequestHandler的write_error，但是Application里的hanlers字典并没有添加一个没有找到的页面的匹配，所以根本不会走BaseHandler，知道了这个，问题就好解决了。我去掉了write_error的重写，直接添加了一个PNFHanldler(page not found).以后要自定义其他页面，比如500，再重写下write_error就行了。','2012-03-06 10:07:00',0),(42,1,'现在可以访问一个很随意的页面看到404页了。\n今天下午4点再去练车，能练一把就行。\n开始做上传头像模块。','2012-03-06 10:12:00',0),(43,1,'发现不能不重写write_error，因为如果只是PNFHanldler，只能是没出现在规则里的url才能导向到404页，但是出现在规则里的也就是raise tornado.web.HTTPError(404)的就不行了，比如/people/xxxxx，刚才想到了这一点，已经重写了write_error，任何找不到的页面都会导向到404页。','2012-03-06 14:17:00',0);
+/*!40000 ALTER TABLE `fd_Status` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -262,4 +375,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2012-02-13 18:21:41
+-- Dump completed on 2012-03-07 20:13:42
