@@ -14,17 +14,19 @@ import tornado.web
 import unicodedata
 import logging
 import redis
+import tempfile
 
 from tornado.options import define, options
 from util.encrypt import encrypt_password,validate_password
 from util.getby import get_domain_by_name,get_id_by_name
 from util.encode import encode,decode,key
 from util.redis_activity import add_activity,del_activity
-from base64 import b64encode,b64decode
 from db.redis.user_follow_graph import UserFollowGraph
 from db.redis.user_activity_graph import UserActivityGraph
+from base64 import b64encode,b64decode
+from PIL import Image
 
-define("port", default=80, help="run on the given port", type=int)
+define("port", default=8080, help="run on the given port", type=int)
 define("mysql_host", default="127.0.0.1:3306", help="blog database host")
 define("mysql_database", default="df", help="blog database name")
 define("mysql_user", default="df", help="blog database user")
@@ -98,7 +100,8 @@ class BaseHandler(tornado.web.RequestHandler):
     def write_error(self, status_code, **kwargs):
         if status_code == 404:
             self.render("404.html")
-            self.finish()
+        elif status_code == 500:
+            self.render("500.html")
 
     def encode(self, unicodeString):  
         strorg = unicodeString.encode('utf-8')  
@@ -1201,6 +1204,53 @@ class SettingsHandler(BaseHandler):
             page_title = '账户设置'
         elif setting == 'avatar':
             page_title = '头像设置'
+            avatar_error = 0
+            avatar_error_messages = ['',
+                    u'请选择图片',
+                    u'图片格式不正确',
+                    u'图片不能大于2MB',
+                    ]
+            if not self.request.files:
+                errors = errors + 1
+                avatar_error = 1
+            else:
+                f = self.request.files['avatar'][0]
+                if f['filename'].split(".").pop().lower() not in ["jpg", "png", "gif", "jpeg"]:
+                    errors = errors + 1
+                    avatar_error = 2
+                else:
+                    if len(f['body']) > 1024*1024*2:
+                        errors = errors + 1
+                        avatar_error = 3
+                    else:
+                        picsize = ["s", "m", "l", "xl"]
+                        picsizedict = {"xl":150,"l":100,"m":50,"s":25}
+                        rawname = f['filename']
+                        tempdstname = ''.join([str(int(time.time())), '.', rawname.split('.').pop()])
+                        dstname = ''.join([self.current_user.uuid_, '.jpg'])
+                        shard = str(self.current_user.id % 40)
+                        thbname = "thumb_" + tempdstname
+                        tf = tempfile.NamedTemporaryFile()
+                        tf.write(f['body'])
+                        tf.seek(0)
+                        for ps in picsize:
+                            img = Image.open(tf.name)
+                            imgsize = picsizedict[ps]
+                            img.thumbnail((imgsize,imgsize),resample=1)
+                            imgpath = "./data/static/usrimg/%s" % shard
+                            img = img.convert("RGB")
+                            try:
+                                img.save("%s/%s_%s" % (imgpath, ps, dstname))
+                            except IOError:
+                                os.makedirs(imgpath)
+                                img.save("%s/%s_%s" % (imgpath, ps, dstname))
+                        tf.close()
+            if errors != 0:
+                template_values['errors'] = errors
+                template_values['avatar_error'] = avatar_error
+                template_values['avatar_error_message'] = avatar_error_messages[avatar_error]
+                template_values['page_title'] = page_title
+                return self.render("settings.html", template_values=template_values)
         elif setting == 'passwd':
             page_title = '修改密码'
             #password verify
@@ -1254,10 +1304,10 @@ class SettingsHandler(BaseHandler):
             if new != old:
                 hashed = encrypt_password(new).encode('hex')
                 self.db.execute("update fd_People set password = %s where id = %s", hashed, self.current_user.id)
-            template_values['errors'] = errors
-            template_values['success'] = 1
-            template_values['page_title'] = page_title
-            return self.render("settings.html", template_values=template_values)
+        template_values['errors'] = errors
+        template_values['success'] = 1
+        template_values['page_title'] = page_title
+        return self.render("settings.html", template_values=template_values)
 
 class SettingModule(tornado.web.UIModule):
     def render(self, template_values):
