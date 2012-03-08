@@ -1320,6 +1320,8 @@ class SettingsHandler(BaseHandler):
         template_values['errors'] = errors
         template_values['success'] = 1
         template_values['page_title'] = page_title
+        template_values['id'] = self.current_user.id
+        template_values['uuid'] = self.current_user.uuid_
         return self.render("settings.html", template_values=template_values)
 
 class SettingModule(tornado.web.UIModule):
