@@ -1,4 +1,4 @@
-function submitfunc(requesturl,name,domain,prevnum) {
+function submitfunc(requesturl,name,domain,prevnum,commentype) {
     var commenttext = $('#comment-box').val();
     if (commenttext == '')
         return false;
@@ -7,11 +7,18 @@ function submitfunc(requesturl,name,domain,prevnum) {
         url:requesturl,
         data:{commenttext:commenttext,_xsrf:getCookie('_xsrf')},
         success:function(data){
+            avapath = data.split(",", 1)[0];
+            comments = data.substr(avapath.length + 1);
             $("#number").text("评论("+(parseInt(prevnum)+1)+")");
             $('#comment-box').val("");
             var replystr = "replyOne('" + name + "')";
-            var new_comment_item = "<div class='comment-item'><div class='commavatar'><a href='/people/"+domain+"'><img width='50px' height='50px' src='/static/img/no_avatar.jpg?v=ebaa4'></a></div><div class='comment-item-content'><div class='comment-item-title'><a class='name' href='/people/"+domain+"'>"+name+"</a><span class='time'>刚刚   <img src='/static/img/reply.png' align='absmiddle' border='0' alt='回复 "+name+"' onclick="+replystr+" class='clickable'></span></div><div class='comment-item-body'><p>"+data+"</p></div></div></div>";
-            $(".note-comment").append(new_comment_item);
+            var new_comment_item = "<div class='comment-item'><div class='commavatar'><a href='/people/"+domain+"'><img width='50px' height='50px' src=" + avapath + "></a></div><div class='comment-item-content'><div class='comment-item-title'><a class='name' href='/people/"+domain+"'>"+name+"</a><span class='time'>刚刚   <img src='/static/img/reply.png' align='absmiddle' border='0' alt='回复 "+name+"' onclick="+replystr+" class='clickable'></span></div><div class='comment-item-body'><p>"+comments+"</p></div></div></div>";
+            if(commentype == 1){
+                $(".note-comment").append(new_comment_item);
+            }
+            else {
+                $(".status-comment").append(new_comment_item);
+            }
         }       
     });
     return false;

@@ -166,10 +166,12 @@
             {% end  %}
         </div>
         <div class="avatar" id="useravatar">
-            <img width="150px" height="150px" src="{{ template_values['image'] }}" alt=""{{ template_values['username'] }}>
+            <img width="150px" height="150px" src="{{ handler.avatar('xl', template_values['id'], template_values['uuid']) }}" alt=""{{ template_values['username'] }}>
+            {% if current_user and current_user.id == template_values['id'] %}
             <div class="edit_avatar" id="editavatar">
                 <a href="/settings/avatar"><i class="icon-upload icon-white"></i>上传新头像</a>
             </div>
+            {% end %}
         </div>
         <div class="profile">
             {% if current_user and current_user.id == template_values['id'] and not template_values['has_selfdesc']%}

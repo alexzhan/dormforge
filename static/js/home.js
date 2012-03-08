@@ -36,7 +36,11 @@ function submit(name, domain) {
     url:'/pubstatus',
     data:{statustext:statustext,_xsrf:getCookie('_xsrf')},
     success:function(data){
-        $('.feed-body').prepend("<div class='feed-item'><div class='avatar'><a href='/people/"+domain+"'><img width='50px' height='50px' src='../static/img/no_avatar.jpg'></a></div><div class='feed-item-content'><div class='feed-item-title'><a class='feed-item-title name' href='/people/"+domain+"'>"+name+"</a> <span class='feed-item-title desc'>更新了状态:</span></div><div class='feed-item-body'><p>"+data.split(",")[1]+"</p></div><div class='feed-item-footer'><div style='float:left'><span><a class='footerlink' href='/status/"+data.split(",")[0]+"'>刚刚</a></span></div><div style='float:right'><span><a class='footerlink' href='#'>评论</a></span></div></div></div></div>");
+        statusavatar = data.split(",", 2);
+        pstatusid = statusavatar[0];
+        pavatar = statusavatar[1];
+        pstatus = data.substr(pstatusid.length + pavatar.length + 2);
+        $('.feed-body').prepend("<div class='feed-item'><div class='avatar'><a href='/people/"+domain+"'><img width='50px' height='50px' src="+pavatar+"></a></div><div class='feed-item-content'><div class='feed-item-title'><a class='feed-item-title name' href='/people/"+domain+"'>"+name+"</a> <span class='feed-item-title desc'>更新了状态:</span></div><div class='feed-item-body'><p>"+pstatus+"</p></div><div class='feed-item-footer'><div style='float:left'><span><a class='footerlink' href='/status/"+pstatusid+"'>刚刚</a></span></div><div style='float:right'><span><a class='footerlink' href='/status/"+pstatusid+"'>评论</a></span></div></div></div></div>");
         if ($(".noinfo").length>0) {
             $(".noinfo").hide();
         }

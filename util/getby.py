@@ -1,11 +1,11 @@
-def get_namedomain_by_id(db, client, userid):
-    namedomain = client.hmget('u:' + userid, ['name', 'domain'])
-    if namedomain[0] and namedomain[1]:
+def get_namedomainuuid_by_id(db, client, userid):
+    namedomain = client.hmget('u:' + userid, ['name', 'domain', 'uuid'])
+    if namedomain[0] and namedomain[1] and namedomain[2]:
         return namedomain
     else:
-        userinfo = db.get("select name,domain from fd_People where id = %s", userid)
-        client.hmset('u:' + userid, {"name":userinfo.name, "domain":userinfo.domain})
-        return [userinfo.name, userinfo.domain]
+        userinfo = db.get("select name,domain,uuid_ from fd_People where id = %s", userid)
+        client.hmset('u:' + userid, {"name":userinfo.name, "domain":userinfo.domain, "uuid":userinfo.uuid_})
+        return [userinfo.name, userinfo.domain, userinfo.uuid_]
 
 def get_domain_by_name(db, client, username):
     domain = client.hmget("u:name:%s" % username, ["domain",])

@@ -89,6 +89,15 @@ class BaseHandler(tornado.web.RequestHandler):
     def rd(self):
         return redis.StrictRedis(host='localhost', port=6379, db=0)
 
+    def avatar(self, avasize, user_id, uuid):
+        shard = str(user_id % 40)
+        avapath = "".join(["usrimg/", shard, "/", avasize, "_", uuid, ".jpg"])
+        if os.path.exists("/work/Dormforge/static/" + avapath):
+            avatarpath = avapath
+        else:
+            avatarpath = "".join(["img/", avasize, "_noavatar.jpg"])
+        return self.static_url(avatarpath)
+
     def get_current_user(self):
         user_id = self.get_secure_cookie("user")
         if not user_id: return None
@@ -127,7 +136,7 @@ class FilterHandler(BaseHandler):
 
 class FollowBaseHandler(BaseHandler):
     def follow(self, domain, follow_type):
-        people = self.db.get("SELECT id,name,domain FROM fd_People WHERE domain = %s", domain) 
+        people = self.db.get("SELECT id,name,domain,uuid_ FROM fd_People WHERE domain = %s", domain) 
         if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         if not self.current_user or self.current_user and self.current_user.id != people.id:
@@ -135,9 +144,10 @@ class FollowBaseHandler(BaseHandler):
         else:
             template_values['is_self'] = True
         template_values['id'] = people.id
+        template_values['uuid'] = people.uuid_
         template_values['username'] = people.name
         template_values['domain'] = people.domain
-        template_values['image'] = self.static_url("img/no_avatar.jpg")
+        template_values['image'] = self.avatar("xl", self.current_user.id, self.current_user.uuid_)
         ufg = UserFollowGraph(self.rd)
         template_values['follow_count'] = ufg.follow_count(people.id)
         template_values['follower_count'] = ufg.follower_count(people.id)
@@ -152,13 +162,13 @@ class FollowBaseHandler(BaseHandler):
             for i in range(len(follows)):
                 follows[i] = int(follows[i])
             if len(follows) == 1:
-                follow_people = self.db.query("SELECT id,name,domain from fd_People where id = %s", follows[0]) 
+                follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id = %s", follows[0]) 
             else:
                 orderstr = str(follows)[1:-1].replace(" ","")
-                follow_people = self.db.query("SELECT id,name,domain from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
+                follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
             for i in range(len(follow_people)):
                 follow_people[i].is_follow = ufg.is_follow(self.current_user.id, follow_people[i].id) if self.current_user else False
-                follow_people[i].image = self.static_url("img/no_avatar.jpg")
+                follow_people[i].image = self.avatar("m", follow_people[i].id, follow_people[i].uuid_)
                 if not self.current_user or self.current_user and self.current_user.id != follow_people[i].id:
                     follow_people[i].is_self = False 
                 else:
@@ -749,6 +759,7 @@ class PeopleHandler(FilterHandler):
         template_values['id'] = people.id
         template_values['username'] = people.name
         template_values['domain'] = people.domain
+        template_values['uuid'] = people.uuid_
         template_values['has_selfdesc'] = people.has_selfdesc
         college_type = people.college_type
         template_values['college_type'] = college_type
@@ -847,7 +858,7 @@ class CityHandler(BaseHandler):
         city_id = self.db.get("SELECT id FROM fd_City where name = %s", city)
         if not city_id: raise tornado.web.HTTPError(404)
         city_id = city_id.id
-        people = self.db.query("SELECT id,name,domain FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3)", city_id, city_id, city_id) 
+        people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3)", city_id, city_id, city_id) 
         #if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         template_values['region_id'] = city_id
@@ -857,7 +868,7 @@ class CityHandler(BaseHandler):
         ufg = UserFollowGraph(self.rd)
         for i in range(len(people)):
             people[i].is_follow = ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
-            people[i].image = self.static_url("img/no_avatar.jpg")
+            people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
             if not self.current_user or self.current_user and self.current_user.id != people[i].id:
                 people[i].is_self = False 
             else:
@@ -871,7 +882,7 @@ class CollegeHandler(BaseHandler):
         if not college_id: raise tornado.web.HTTPError(404)
         image_path = college_id.image_path
         college_id = college_id.id
-        people = self.db.query("SELECT id,name,domain FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3)", college_id, college_id, college_id) 
+        people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3)", college_id, college_id, college_id) 
         #if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         template_values['region_id'] = college_id
@@ -884,7 +895,7 @@ class CollegeHandler(BaseHandler):
         ufg = UserFollowGraph(self.rd)
         for i in range(len(people)):
             people[i].is_follow = ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
-            people[i].image = self.static_url("img/no_avatar.jpg")
+            people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
             if not self.current_user or self.current_user and self.current_user.id != people[i].id:
                 people[i].is_self = False 
             else:
@@ -897,7 +908,7 @@ class MajorHandler(BaseHandler):
         major_id = self.db.get("SELECT id FROM fd_Major where name = %s", major)
         if not major_id: raise tornado.web.HTTPError(404)
         major_id = major_id.id
-        people = self.db.query("SELECT id,name,domain FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3)", major_id, major_id, major_id) 
+        people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3)", major_id, major_id, major_id) 
         #if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         template_values['region_id'] = major_id
@@ -907,7 +918,7 @@ class MajorHandler(BaseHandler):
         ufg = UserFollowGraph(self.rd)
         for i in range(len(people)):
             people[i].is_follow = ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
-            people[i].image = self.static_url("img/no_avatar.jpg")
+            people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
             if not self.current_user or self.current_user and self.current_user.id != people[i].id:
                 people[i].is_self = False 
             else:
@@ -1004,7 +1015,7 @@ class PubstatusHandler(FilterHandler):
             actdict = {'time':redpubdate, 'status':status}
             addresult = add_activity(self.rd, user_id, status_id, 1, actdict)
             if addresult:
-                self.write(''.join([encode(str(status_id)), ',', self.at(self.br(unicode(status)))]))
+                self.write(''.join([encode(str(status_id)), ',', self.avatar('m',self.current_user.id,self.current_user.uuid_),',', self.at(self.br(unicode(status)))]))
             else:
                 self.write("Something wrong...")
 
@@ -1033,13 +1044,13 @@ class StatusHandler(FilterHandler):
         if len(status_id) < 8:
             raise tornado.web.HTTPError(404)
         status_id = decode(status_id)
-        status = self.db.get("select p.name,p.domain,s.status,s.pubdate,s.status_ "
+        status = self.db.get("select p.name,p.domain,p.uuid_,p.id,s.status,s.pubdate,s.status_ "
                 "from fd_People p, fd_Status s where s.user_id = p.id and "
                 "s.id = %s", status_id)
         if not self.current_user or not status or status.status_ == 1:
             raise tornado.web.HTTPError(404)
         template_values['status'] = status
-        comments = self.db.query("select p.name,p.domain,c.comments, "
+        comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
                 "c.pubdate from fd_People p, fd_Stacomm c where p.id"
                 "=c.user_id and status_id = %s", status_id)
         template_values['comments_length'] = len(comments)
@@ -1064,7 +1075,7 @@ class StatusHandler(FilterHandler):
             else:
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(status_key, 'comm', comments_num)
-            self.write(self.at(self.br(comments)))
+            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.at(self.br(comments))]))
 
 class PubnoteHandler(BaseHandler):
     @tornado.web.authenticated
@@ -1151,7 +1162,7 @@ class NoteHandler(FilterHandler):
         note.status_ == 1 and note.name != self.current_user.name:
             raise tornado.web.HTTPError(404)
         template_values['note'] = note
-        comments = self.db.query("select p.name,p.domain,c.comments, "
+        comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
                 "c.pubdate from fd_People p, fd_Notecomm c where p.id"
                 "=c.user_id and note_id = %s", note_id)
         template_values['comments_length'] = len(comments)
@@ -1176,7 +1187,7 @@ class NoteHandler(FilterHandler):
             else:
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(note_key, 'comm', comments_num)
-            self.write(self.at(self.br(comments)))
+            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.at(self.br(comments))]))
 
 class SettingsHandler(BaseHandler):
     @tornado.web.authenticated
@@ -1187,6 +1198,8 @@ class SettingsHandler(BaseHandler):
             page_title = '账户设置'
         elif setting == 'avatar':
             page_title = '头像设置'
+            template_values['id'] = self.current_user.id
+            template_values['uuid'] = self.current_user.uuid_
         elif setting == 'passwd':
             page_title = '修改密码'
         else: 
