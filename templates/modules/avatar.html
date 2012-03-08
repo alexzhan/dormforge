@@ -9,7 +9,7 @@
         <h2>上传新头像</h2>
         <div class="oldavatar">
             <span>当前头像</span>
-            <span style="margin-left: 10px"><img style="vertical-align:middle;" width="100px" height="100px" src="{{ static_url("img/no_avatar.jpg") }}"></span>
+            <span style="margin-left: 10px"><img style="vertical-align:middle;" width="100px" height="100px" src="{{ handler.avatar('l', template_values['id'], template_values['uuid']) }}"></span>
         </div>
         <div class="newavatar">
             <div class="avadesc">请使用不超过2MB的 jpg/png/gif 图片，建议尺寸大于100×100。</div>

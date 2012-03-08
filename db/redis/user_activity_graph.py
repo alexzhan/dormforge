@@ -1,4 +1,4 @@
-from util.getby import get_namedomain_by_id
+from util.getby import get_namedomainuuid_by_id
 
 class UserActivityGraph(object):
 
@@ -84,7 +84,7 @@ class UserActivityGraph(object):
             acttype,actuser,actto = sub_activity_key.split(":")
             if acttype == 'follow':
                 sub_activity = self.client.hmget(sub_activity_key, ["time",])
-                username,domain = get_namedomain_by_id(db, self.client, actto)
+                username,domain,uuid = get_namedomainuuid_by_id(db, self.client, actto)
                 sub_activity.append(username)#follow who
                 sub_activity.append(domain)#domain
                 sub_activity.append(0)#type:0
@@ -132,14 +132,16 @@ class UserActivityGraph(object):
         index = 1
         for activity in activities_list:
             acttype, act_userid, actto = activity.split(":")
-            act_username,act_domain = get_namedomain_by_id(db, self.client, act_userid)
+            act_username,act_domain,act_uuid = get_namedomainuuid_by_id(db, self.client, act_userid)
             if acttype == 'status':
                 real_activity = self.client.hmget(activity, ["time",'status','comm'])
             elif acttype == 'note':
                 real_activity = self.client.hmget(activity, ["time","title","content","status",'comm'])
             real_activity.append(actto)
+            real_activity.append(act_userid)
             real_activity.append(act_username)
             real_activity.append(act_domain)
+            real_activity.append(act_uuid)
             real_activity.append(acttype)
             real_activity.append(index)
             index = index + 1
@@ -153,7 +155,7 @@ class UserActivityGraph(object):
         index = 1
         for activity in activities_list:
             acttype, act_userid, actto = activity.split(":")
-            act_username,act_domain = get_namedomain_by_id(db, self.client, act_userid)
+            act_username,act_domain,act_uuid = get_namedomainuuid_by_id(db, self.client, act_userid)
             if acttype == 'status':
                 real_activity = self.client.hmget(activity, ["time",'status','comm'])
                 real_activity.append(actto)
@@ -161,12 +163,16 @@ class UserActivityGraph(object):
                 real_activity = self.client.hmget(activity, ["time","title","content","status",'comm'])
                 real_activity.append(actto)
             if acttype == 'follow':
-                actto_username,actto_domain = get_namedomain_by_id(db, self.client, actto)
+                actto_username,actto_domain,actto_uuid = get_namedomainuuid_by_id(db, self.client, actto)
                 real_activity = self.client.hmget(activity, ["time",])
+                real_activity.append(actto)
                 real_activity.append(actto_username)
                 real_activity.append(actto_domain)
+                real_activity.append(actto_uuid)
+            real_activity.append(act_userid)
             real_activity.append(act_username)
             real_activity.append(act_domain)
+            real_activity.append(act_uuid)
             real_activity.append(acttype)
             real_activity.append(index)
             index = index + 1
