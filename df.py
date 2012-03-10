@@ -127,7 +127,7 @@ class FilterHandler(BaseHandler):
         if (len(ms) > 0):
             for m in ms:
                 username = m[1:]
-                domain = get_domain_by_name(self.db, self.rd, username.lower())
+                domain = get_domain_by_name(self.db, self.rd, username)
                 if domain:
                     value = value.replace(m, '@<a href="/people/' + domain + '">' + username + '</a>')
         return value
@@ -558,7 +558,7 @@ class SignupHandler(BaseHandler):
                         domain_error = 4
                     else:
                         domain_id = self.db.get("select id from fd_People where domain = %s", domain)
-                        if(domain_id):
+                        if domain_id:
                             errors = errors + 1
                             domain_error = 5 
         template_values['domain'] = domain
@@ -1196,6 +1196,10 @@ class SettingsHandler(BaseHandler):
         template_values['setting'] = setting
         if setting == 'account':
             page_title = '账户设置'
+            template_values['username'] = self.current_user.name
+            template_values['domain'] = self.current_user.domain
+            template_values['username_error'] = 0
+            template_values['domain_error'] = 0
         elif setting == 'avatar':
             page_title = '头像设置'
             template_values['id'] = self.current_user.id
@@ -1212,9 +1216,111 @@ class SettingsHandler(BaseHandler):
     def post(self, setting):
         template_values = {}
         errors = 0
+        username_error = 0
+        domain_error = 0
         template_values['setting'] = setting
         if setting == 'account':
             page_title = '账户设置'
+            username_error = 0
+            username_error_messages = ['',
+                    u'一个月之内只能修改一次用户名',
+                    u'请输入用户名',
+                    u'用户名不能超过16个字符',
+                    u'用户名不能少于2个字符',
+                    u'该用户名已被占用',
+                    ]
+            username = self.get_argument("name", None)
+            lastuc = self.db.get("select chtimedelta from fd_Change where user_id = %s and chtype = 1", self.current_user.id)
+            if lastuc:
+                lastdelta = lastuc.chtimedelta
+                timedelta = lastdelta - int(time.time())
+                if username != self.current_user.name and timedelta < 2592000: #24*60*60*30
+                    errors = errors + 1
+                    username_error = 1
+            if username_error != 1:
+                if len(username) == 0:
+                    errors = errors + 1
+                    username_error = 2
+                elif len(username) > 16:
+                    errors = errors + 1
+                    username_error = 3
+                elif len(username) < 2:
+                    errors = errors + 1
+                    username_error = 4
+                else:
+                    if username != self.current_user.name:
+                        user_id = get_id_by_name(self.db, self.rd, username)
+                        if user_id:
+                            errors = errors + 1
+                            username_error = 5
+                        else:
+                            self.rd.delete("u:name:%s" % self.current_user.name)
+                            self.rd.delete("u:%s" % self.current_user.id)
+                            self.db.execute("update fd_People set name = %s where id = %s", username, self.current_user.id)
+                            pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+                            pubdelta = int(time.time())
+                            if lastuc:
+                                self.db.execute("update fd_Change set chtime = %s,chtimedelta = %s where user_id = %s and chtype = %s", pubdate, pubdelta, self.current_user.id, 1)
+                            else:
+                                self.db.execute("insert into fd_Change set chtime = %s, chtimedelta = %s, user_id = %s, chtype = %s", pubdate, pubdelta, self.current_user.id, 1)
+                            self.current_user.name = username
+            domain_error_messages = ['',
+                    u'一个月之内只能修改一次个性域名',
+                    u'请输入个性域名',
+                    u'个性域名不能超过16个字符',
+                    u'个性域名不能少于2个字符',
+                    u'个性域名不符合规则，请使用a-zA-Z0-9_',
+                    u'该个性域名已被占用']
+            domain = self.get_argument("domain", None)
+            lastdc = self.db.get("select chtimedelta from fd_Change where user_id = %s and chtype = 2", self.current_user.id)
+            if lastdc:
+                lastdelta = lastdc.chtimedelta
+                timedelta = lastdelta - int(time.time())
+                if domain != self.current_user.domain and timedelta < 2592000: #24*60*60*30
+                    errors = errors + 1
+                    domain_error = 1
+            if domain_error != 1:
+                if len(domain) == 0:
+                    errors = errors + 1
+                    domain_error = 2
+                elif len(domain) > 16:
+                    errors = errors + 1
+                    domain_error = 3
+                elif len(domain) < 2:
+                    errors = errors + 1
+                    domain_error = 4
+                else:
+                    if domain != self.current_user.domain:
+                        p = re.compile(r"([a-zA-Z0-9_])+", re.IGNORECASE)
+                        if not p.search(domain):
+                            errors = errors + 1
+                            domain_error = 5
+                        else:
+                            domain_id = self.db.get("select id from fd_People where domain = %s", domain)
+                            if domain_id:
+                                errors = errors + 1
+                                domain_error = 6
+                            else:
+                                self.db.execute("update fd_People set domain = %s where id = %s", domain, self.current_user.id)
+                                pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+                                pubdelta = int(time.time())
+                                if lastdc:
+                                    self.db.execute("update fd_Change set chtime = %s,chtimedelta = %s where user_id = %s and chtype = %s", pubdate, pubdelta, self.current_user.id, 2)
+                                else:
+                                    self.db.execute("insert into fd_Change set chtime = %s, chtimedelta = %s, user_id = %s, chtype = %s", pubdate, pubdelta, self.current_user.id, 2)
+                                self.current_user.domain = domain
+            template_values['username'] = self.current_user.name
+            template_values['domain'] = self.current_user.domain
+            template_values['username_error'] = username_error
+            template_values['domain_error'] = domain_error
+            if username_error:
+                template_values['newname'] = username
+                template_values['username_error_message'] = username_error_messages[username_error]
+            if domain_error:
+                template_values['newdomain'] = domain
+                template_values['domain_error_message'] = domain_error_messages[domain_error]
+            logging.info(username_error)
+            logging.info(domain_error)
         elif setting == 'avatar':
             page_title = '头像设置'
             avatar_error = 0
@@ -1318,7 +1424,8 @@ class SettingsHandler(BaseHandler):
                 hashed = encrypt_password(new).encode('hex')
                 self.db.execute("update fd_People set password = %s where id = %s", hashed, self.current_user.id)
         template_values['errors'] = errors
-        template_values['success'] = 1
+        if errors == 0:
+            template_values['success'] = 1
         template_values['page_title'] = page_title
         template_values['id'] = self.current_user.id
         template_values['uuid'] = self.current_user.uuid_

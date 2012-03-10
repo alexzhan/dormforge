@@ -8,6 +8,7 @@ def get_namedomainuuid_by_id(db, client, userid):
         return [userinfo.name, userinfo.domain, userinfo.uuid_]
 
 def get_domain_by_name(db, client, username):
+    username = username.lower()
     domain = client.hmget("u:name:%s" % username, ["domain",])
     if domain[0]:
         return domain[0]
@@ -19,6 +20,7 @@ def get_domain_by_name(db, client, username):
     return None
 
 def get_id_by_name(db, client, username):
+    username = username.lower()
     user_id = client.hmget("u:name:%s" % username, ["id",])
     if user_id[0]:
         return user_id[0]
