@@ -147,7 +147,7 @@ class FollowBaseHandler(BaseHandler):
         template_values['uuid'] = people.uuid_
         template_values['username'] = people.name
         template_values['domain'] = people.domain
-        template_values['image'] = self.avatar("xl", self.current_user.id, self.current_user.uuid_)
+        template_values['image'] = self.avatar("xl", people.id, people.uuid_)
         ufg = UserFollowGraph(self.rd)
         template_values['follow_count'] = ufg.follow_count(people.id)
         template_values['follower_count'] = ufg.follower_count(people.id)
