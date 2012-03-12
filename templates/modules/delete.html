@@ -1,0 +1,19 @@
+<div class="tab-pane active" id="delete">
+    <div id="settingmodule">
+        <h2>删除账户</h2>
+        <div class="alert alert-block" style="margin: 20px 10px 0 20px;">
+            账户删除之后将不可恢复，这个账户的数据将被永久删除，注册这个账户的Email也不可再注册18周。
+        </div>
+        <form class="well" id='password' method='POST' action="{{ request.path }}">
+                <div id='passwordcontrol' class="control-group {{ _('error') if template_values['errors'] != 0 and template_values['password_error'] in [1,6] else '' }}">
+                    <label class="control-label" for="password">密码</label>
+                    <div class="controls">
+                        <input  id="pwd" name="old" class="input-xlarge" size="30" type="password" value="{{ escape(template_values['old']) if template_values['errors'] != 0 else '' }}">
+                        <span id="pwdhelp" class="help-inline">{{ escape(template_values['password_error_message']) if template_values['errors']!=0 else '' }}</span>
+                    </div>
+                </div>
+            <button type="submit" class="btn" onclick="return subdel();">删除账户</button>
+        </div>
+        {{ xsrf_form_html() }}
+    </form>
+</div>
