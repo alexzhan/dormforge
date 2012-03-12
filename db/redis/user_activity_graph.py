@@ -34,7 +34,7 @@ class UserActivityGraph(object):
         Activity_KEY = 'u:%s:%s' % (self.Activity_KEY, user)
         Activity_key = "u:%s:%s" % (self.Sub_Activity_KEYS[acttype], user)
         activity_key = "%s:%s:%s" % (self.sub_activity_KEYS[acttype], user, actto)
-        if acttype == 0:# follow somepeople
+        if acttype == 0:# unfollow somepeople
             if self.client.delete(activity_key):            
                 return self.client.lrem(Activity_key, 0, activity_key) and self.client.lrem(Activity_KEY, 0, activity_key) and self.del_my_activity(user, acttype, actto)
             else: return 0

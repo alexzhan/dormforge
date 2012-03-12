@@ -61,7 +61,8 @@ class Application(tornado.web.Application):
                 (r"/note/touch", PubnoteHandler),
                 (r"/viewnote", ViewnoteHandler),
                 (r"/note/([0-9a-z]+)", NoteHandler),
-                (r"/settings/(account|avatar|passwd)", SettingsHandler),
+                (r"/settings/(account|avatar|passwd|delete)", SettingsHandler),
+                (r"/link/edit", EditlinkHandler),
                 (r".*", PNFHandler),
                 ]
         settings = dict(
@@ -1206,6 +1207,8 @@ class SettingsHandler(BaseHandler):
             template_values['uuid'] = self.current_user.uuid_
         elif setting == 'passwd':
             page_title = '修改密码'
+        elif setting == 'delete':
+            page_title = '删除账户'
         else: 
             page_title = '18周'
         template_values['page_title'] = page_title
@@ -1434,6 +1437,11 @@ class SettingsHandler(BaseHandler):
 class SettingModule(tornado.web.UIModule):
     def render(self, template_values):
         return self.render_string("modules/%s.html" % template_values['setting'], template_values=template_values)
+
+class EditlinkHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.render("editlink.html")
 
 class PNFHandler(BaseHandler):
     def get(self):
