@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>编辑链接</title>
+<style type="text/css">
+    .pubform {
+        float: right;
+        margin-right: 200px;
+    }
+    .control-group {
+        margin-bottom: 0;
+    }
+    .input-xlarge {
+        width: 600px;
+        height: 15px;
+        padding: 7px;
+        font-size: 16px;
+    }
+    form #linksummary .input-xlarge {
+        width: 600px;
+        height: 140px;
+        font-size: 14px;
+        padding: 7px;
+    }
+    .sub-button .sub{
+        float: right;
+    }
+    .sub-button .secretbox{
+        float: right;
+        margin-right: 20px;
+        padding-top: 4px;
+    }
+    .form-horizontal .control-group > label {
+        padding-top: 0;
+        text-align: left;
+    }
+    .sub-button .cancel{
+        float: left;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="row">
+    <div id="myModal" class="modal hide fade">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal" >&times;</a>
+            <h3>关于查看18周代码</h3>
+        </div>
+        <div class="modal-body">
+            <h4>18周暂不开放代码</h4>
+            <p>之前开放代码到github之后，给我的编码效率带来了影响，遂又迁到了bitbucket上，等功能都开发完毕之后再开放代码到github。</p>
+            <h4>如果你想参与开发</h4>
+            <p>如果你认识我(<a href="http://weibo.com/alexzhan" target="_blank">alexzhan</a>)，直接告诉我你的邮箱，我会把你加入开发组。<br/>
+            如果你不认识我，在<a href="/contact">反馈</a>里描述下你的情况，我再把你加入开发组。
+            </p>
+        </div>
+        <div class="modal-footer">
+            <a href="/signup" class="btn btn-primary">去注册</a>
+            <a href="#" class="btn" data-dismiss="modal" >关闭</a>
+        </div>
+    </div>
+    <div class="pubform">
+        <form  id='editlink' method='POST' action="{{ request.path }}" class="form-horizontal">
+            <fieldset>
+                <div class="control-group" id="linkurl">
+                    <label class="control-label" for="url">URL</label>
+                    <input id="url" name="url" type="text" class="input-xlarge">
+                </div>
+                <div class="control-group" id="linktitle">
+                    <label class="control-label" for="title">标题</label>
+                    <input id="title" name="title" type="text" class="input-xlarge">
+                </div>
+                <div class="control-group" id="linksummary">
+                    <label class="control-label" for="sumary">描述</label>
+                    <textarea id="summary" name="summary"  class="input-xlarge"></textarea>
+                </div>
+                <div class="control-group" id="linktag">
+                    <label class="control-label" for="tag">标签</label>
+                    <input id="tag" name="tag" type="text" class="input-xlarge">
+                </div>
+            </fieldset>
+            <div class="sub-button">
+                <span class="sub">
+                    <button type="submit" class="btn btn-primary" onclick="return pubnote(0,0);">发布</button>
+                </span>
+                <span class="cancel">
+                    <a type="submit" class="btn" href="/">取消</a>
+                </span>
+            </div>
+        </form>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
+{% end %}
