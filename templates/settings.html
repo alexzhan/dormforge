@@ -58,7 +58,6 @@
             <li class="{{ 'active' if template_values['setting'] == 'account' else "" }}"><a href="/settings/account" data-toggle="tab">账户设置</a></li>
             <li class= {{ 'active' if template_values['setting'] == 'avatar' else "" }}><a href="/settings/avatar" data-toggle="tab">头像设置</a></li>
             <li class="{{ 'active' if template_values['setting'] == 'passwd' else "" }}"><a href="/settings/passwd" data-toggle="tab">修改密码</a></li>
-            <li class="{{ 'active' if template_values['setting'] == 'delete' else "" }}"><a href="/settings/delete" data-toggle="tab">删除账户</a></li>
         </ul>
         <div class="tab-content">
         {{ modules.Setting(template_values) }}

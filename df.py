@@ -751,6 +751,7 @@ class LogoutHandler(BaseHandler):
 class PeopleHandler(FilterHandler):
     def get(self, domain):
         people = self.db.get("SELECT * FROM fd_People WHERE domain = %s", domain) 
+        #people = self.db.get("SELECT * FROM fd_People WHERE domain = %s and status_ = 0", domain) 
         if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         if not self.current_user or self.current_user and self.current_user.id != people.id:

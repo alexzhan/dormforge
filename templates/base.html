@@ -36,6 +36,9 @@
                     <div class="nav-collapse">
                         <ul class="nav pull-right">
                             {% if current_user %}
+                            {% if current_user.status_ == 4 %}
+                            {{ handler.render("88.html") }}
+                            {% end %}
                             <li><a href="/people/{{ _(current_user['domain']) }}">{{ _(current_user['name']) }}</a></li>
                             <li><a href="/settings/account">{{ _("设置") }}</a></li>
                             <li><a href="/logout?next={{ url_escape(request.uri) }}">{{ _("退出") }}</a></li>
