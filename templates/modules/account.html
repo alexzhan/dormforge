@@ -24,7 +24,7 @@
                     </div>
                 </div>
             </fieldset>
-            <button type="submit" class="btn" onclick="return subac('{{ template_values["username"] }}', '{{ template_values["domain"] }}');">完成修改</button>
+            <button type="submit" class="btn" onclick="return subac('{{ template_values["username"] }}', '{{ template_values["domain"] }}');" style="margin-left: 20px">完成修改</button>
         </div>
         {{ xsrf_form_html() }}
     </form>
