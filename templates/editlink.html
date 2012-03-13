@@ -33,30 +33,45 @@
     .form-horizontal .control-group > label {
         padding-top: 0;
         text-align: left;
+        float: none;
     }
     .sub-button .cancel{
         float: left;
     }
+    .suggestbox{
+        float: right;
+        margin-right: 5px;
+        padding-top: 4px;
+    }
+    .suggestbox label {
+        display: inline-block;
+    }
+    #cancelbtn{
+        float: right;
+    }
+    .sub-button .bookmarklet {
+        float: right;
+        margin-right: 210px;
+        padding-top: 5px;
+    }
+
 </style>
 {% end %}
 {% block body %}
 <div class="row">
-    <div id="myModal" class="modal hide fade">
-        <div class="modal-header">
-            <a class="close" data-dismiss="modal" >&times;</a>
-            <h3>关于查看18周代码</h3>
-        </div>
+    <div id="crModal" class="modal hide fade">
         <div class="modal-body">
-            <h4>18周暂不开放代码</h4>
-            <p>之前开放代码到github之后，给我的编码效率带来了影响，遂又迁到了bitbucket上，等功能都开发完毕之后再开放代码到github。</p>
-            <h4>如果你想参与开发</h4>
-            <p>如果你认识我(<a href="http://weibo.com/alexzhan" target="_blank">alexzhan</a>)，直接告诉我你的邮箱，我会把你加入开发组。<br/>
-            如果你不认识我，在<a href="/contact">反馈</a>里描述下你的情况，我再把你加入开发组。
-            </p>
+            <p id="cr">为了方便你保存链接，建议将这个下面这个"保存"按钮拖到浏览器书签栏。</p>
+            <p id="ie">为了方便你保存链接，建议右键点击下面这个"保存"按钮，并选择"添加到收藏"("Add to Favorites...")</p>
+            <p style="text-align: center"><a href="#" class="btn btn-primary">保存</a></p>
+            <p>以后你可以点击书签栏的"保存"按钮，将正在浏览的任何网页保存到18周。</p>
         </div>
         <div class="modal-footer">
-            <a href="/signup" class="btn btn-primary">去注册</a>
-            <a href="#" class="btn" data-dismiss="modal" >关闭</a>
+            <a href="#" id="cancelbtn" class="btn" data-dismiss="modal" >关闭</a>
+            <span class="suggestbox">
+                <input type="checkbox" name="suggest" id="suggest" onclick="return cansug();">
+                <label for="suggest" id="suggest-label">下次不再提示</label>
+            </span>
         </div>
     </div>
     <div class="pubform">
@@ -81,16 +96,21 @@
             </fieldset>
             <div class="sub-button">
                 <span class="sub">
-                    <button type="submit" class="btn btn-primary" onclick="return pubnote(0,0);">发布</button>
+                    <button type="submit" class="btn btn-primary" onclick="return editlink(0,0);">保存</button>
+                </span>
+                <span class="bookmarklet">
+                    <a href="#" onclick="return modaltoggle(1);" style="color: #999;">添加浏览器书签</a>
                 </span>
                 <span class="cancel">
                     <a type="submit" class="btn" href="/">取消</a>
                 </span>
             </div>
         </form>
+        <div id="sug" style="display: none">{{ current_user.sugg_link }}</div>
     </div>
 </div>
 {% end %}
 {% block bottom %}
 <script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
+<script type="text/javascript" src="{{ static_url("js/editlink.js") }}"></script>
 {% end %}
