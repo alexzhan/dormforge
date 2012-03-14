@@ -9,6 +9,12 @@
     }
     .control-group {
         margin-bottom: 0;
+        width: 615px;
+    }
+    .control-group .desc {
+        font-size:12px;
+        color: #999;
+        float:right;
     }
     .input-xlarge {
         width: 600px;
@@ -33,17 +39,22 @@
     .form-horizontal .control-group > label {
         padding-top: 0;
         text-align: left;
-        float: none;
+        float: left;
     }
     .sub-button .cancel{
         float: left;
     }
-    .suggestbox{
+    .sub-button .secretbox{
+        float: right;
+        margin-right: 20px;
+        padding-top: 4px;
+    }
+    .sub-button .suggestbox{
         float: right;
         margin-right: 5px;
         padding-top: 4px;
     }
-    .suggestbox label {
+    .suggestbox label, .secretbox label {
         display: inline-block;
     }
     #cancelbtn{
@@ -51,7 +62,7 @@
     }
     .sub-button .bookmarklet {
         float: right;
-        margin-right: 210px;
+        margin-right: 170px;
         padding-top: 5px;
     }
 
@@ -79,24 +90,32 @@
             <fieldset>
                 <div class="control-group" id="linkurl">
                     <label class="control-label" for="url">URL</label>
+                    <div class="desc">必填</div>
                     <input id="url" name="url" type="text" class="input-xlarge">
                 </div>
                 <div class="control-group" id="linktitle">
                     <label class="control-label" for="title">标题</label>
+                    <div class="desc">选填</div>
                     <input id="title" name="title" type="text" class="input-xlarge">
                 </div>
                 <div class="control-group" id="linksummary">
                     <label class="control-label" for="sumary">描述</label>
+                    <div class="desc">选填</div>
                     <textarea id="summary" name="summary"  class="input-xlarge"></textarea>
                 </div>
                 <div class="control-group" id="linktag">
                     <label class="control-label" for="tag">标签</label>
-                    <input id="tag" name="tag" type="text" class="input-xlarge">
+                    <div class="desc">选填，以空格或逗号分割</div>
+                    <input id="tag" name="tag" type="text" class="input-xlarge" style="clear:both">
                 </div>
             </fieldset>
             <div class="sub-button">
                 <span class="sub">
                     <button type="submit" class="btn btn-primary" onclick="return editlink(0,0);">保存</button>
+                </span>
+                <span class="secretbox">
+                    <input type="checkbox" name="secret" id="secret">
+                    <label for="secret" id="secret-label">私密</label>
                 </span>
                 <span class="bookmarklet">
                     <a href="#" onclick="return modaltoggle(1);" style="color: #999;">添加浏览器书签</a>
