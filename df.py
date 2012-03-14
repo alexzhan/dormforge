@@ -844,6 +844,8 @@ class PeopleHandler(FilterHandler):
         template_values['status_count'] = uag.count_sub_activity(template_values['id'], 1) 
         template_values['notes'] = uag.get_top_sub_activities(template_values['id'], 2, isself) 
         template_values['note_count'] = uag.count_sub_activity(template_values['id'], 2) 
+        template_values['links'] = uag.get_top_sub_activities(template_values['id'], 3, isself) 
+        template_values['link_count'] = uag.count_sub_activity(template_values['id'], 3) 
         self.render("people.html", template_values=template_values)
 
 class FollowingHandler(FollowBaseHandler):
