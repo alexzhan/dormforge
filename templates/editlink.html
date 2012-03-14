@@ -121,7 +121,7 @@
                     <a href="#" onclick="return modaltoggle(1);" style="color: #999;">添加浏览器书签</a>
                 </span>
                 <span class="cancel">
-                    <a type="submit" class="btn" href="/">取消</a>
+                    <a type="submit" class="btn" href="/" onclick="return cancelbtn({{ template_values['pubtype'] }}, '{{ template_values['url'] if template_values['url'] else "0" }}');">取消</a>
                 </span>
             </div>
         </form>

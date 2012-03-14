@@ -1459,7 +1459,6 @@ class EditlinkHandler(BaseHandler):
         summary = self.get_argument("linksummary",None)
         tag = self.get_argument("linktag",None)
         linktype = self.get_argument("linktype",None)
-        pubtype = self.get_argument("pubtype",None)
         if not url:
             raise tornado.web.HTTPError(500)
         url = url if url[:7] != "http://" else url[7:]
@@ -1470,7 +1469,7 @@ class EditlinkHandler(BaseHandler):
             link_sql.append("summary = '%s'," % summary)
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
         redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
-        link_sql.append("user_id = %s,pubdate = '%s'" % (self.current_user.id,pubdate))
+        link_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
         fd_link_sql = "".join(link_sql)
         link_id = self.db.execute(fd_link_sql)
         if tag:
@@ -1488,7 +1487,15 @@ class EditlinkHandler(BaseHandler):
                     continue
                 tag_ids.append(tag_id)
                 ltag_id = self.db.execute("insert into fd_Ltag (link_id,tag_id) values (%s,%s)", link_id, tag_id)
-        self.write("http://" + url)
+        if link_id:
+            actdict = {'time':redpubdate, 'url':url, 'status':linktype}
+            if title:
+                actdict['title'] = title
+            if summary:
+                actdict['summary'] = summary
+            addresult = add_activity(self.rd, self.current_user.id, link_id, 3, actdict)
+            if addresult:
+                self.write("http://" + url)
 
 class PNFHandler(BaseHandler):
     def get(self):

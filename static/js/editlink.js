@@ -62,3 +62,9 @@ function editlink(pubtype) {
     });
     return false;
 }
+function cancelbtn(pubtype, url){
+    if(pubtype == 1 && url != 0){
+        window.location.href=url;
+        return false;
+    }
+}

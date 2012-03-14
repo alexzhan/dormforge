@@ -246,6 +246,8 @@
                     <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/status/{{ handler.encode(activity[2]) }}">更新了状态.</a> <span class="timestamp">{{ activity[0] }}</span>
                     {% elif activity[-1] == 2 %}
                     <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/note/{{ handler.encode(activity[4]) }}">发布了日志.</a> <span class="timestamp">{{ activity[0] }}</span>
+                    {% elif activity[-1] == 3 %}
+                    <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> 收藏了 <a href="http://{{ activity[1] }}" target="_blank">链接.</a> <span class="timestamp">{{ activity[0] }}</span>
                     {% end %}
                     </p>
                     {% end %}         
