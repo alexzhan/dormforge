@@ -74,7 +74,7 @@
         <div class="modal-body">
             <p id="cr">为了方便你保存链接，建议将这个下面这个"保存"按钮拖到浏览器书签栏。</p>
             <p id="ie">为了方便你保存链接，建议右键点击下面这个"保存"按钮，并选择"添加到收藏"("Add to Favorites...")</p>
-            <p style="text-align: center"><a href="#" class="btn btn-primary">保存</a></p>
+            <p style="text-align: center"><a href="javascript:function%20sl18(){location.href='http://18zhou.com/link/edit?pubtype=1&url='+encodeURIComponent(location.href)+'&title='+encodeURIComponent(document.title)+'';}sl18();void(0);" class="btn btn-primary">保存</a></p>
             <p>以后你可以点击书签栏的"保存"链接，将正在浏览的任何网页链接保存到18周。</p>
         </div>
         <div class="modal-footer">
@@ -91,12 +91,12 @@
                 <div class="control-group" id="linkurl">
                     <label class="control-label" for="url">URL</label>
                     <div class="desc">必填</div>
-                    <input id="url" name="url" type="text" class="input-xlarge">
+                    <input id="url" name="url" type="text" class="input-xlarge" value="{{ template_values['url'] if template_values['url'] else '' }}">
                 </div>
                 <div class="control-group" id="linktitle">
                     <label class="control-label" for="title">标题</label>
                     <div class="desc">选填</div>
-                    <input id="title" name="title" type="text" class="input-xlarge">
+                    <input id="title" name="title" type="text" class="input-xlarge" value="{{ template_values['title'] if template_values['title'] else '' }}">
                 </div>
                 <div class="control-group" id="linksummary">
                     <label class="control-label" for="sumary">描述</label>
@@ -111,7 +111,7 @@
             </fieldset>
             <div class="sub-button">
                 <span class="sub">
-                    <button type="submit" class="btn btn-primary" onclick="return editlink(0,0);">保存</button>
+                    <button type="submit" class="btn btn-primary" onclick="return editlink({{ template_values['pubtype'] }});">保存</button>
                 </span>
                 <span class="secretbox">
                     <input type="checkbox" name="secret" id="secret">
@@ -125,7 +125,7 @@
                 </span>
             </div>
         </form>
-        <div id="sug" style="display: none">{{ current_user.sugg_link }}</div>
+        <div id="sug" style="display: none">{{ template_values['sugg'] }}</div>
     </div>
 </div>
 {% end %}
