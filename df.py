@@ -63,6 +63,7 @@ class Application(tornado.web.Application):
                 (r"/note/([0-9a-z]+)", NoteHandler),
                 (r"/settings/(account|avatar|passwd|delete)", SettingsHandler),
                 (r"/link/edit", EditlinkHandler),
+                (r"/cansug", CansugHandler),
                 (r".*", PNFHandler),
                 ]
         settings = dict(
@@ -1448,6 +1449,12 @@ class PNFHandler(BaseHandler):
     def get(self):
         self.set_status(404)
         self.render("404.html")
+
+class CansugHandler(BaseHandler):
+    @tornado.web.authenticated
+    def post(self):
+        self.current_user.sugg_link = 1
+        self.db.execute("update fd_People set sugg_link = 1 where id = %s", self.current_user.id)
 
 def main():
     tornado.options.parse_command_line()
