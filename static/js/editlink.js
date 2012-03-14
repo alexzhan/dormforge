@@ -30,7 +30,7 @@ function modaltoggle(option) {
     $('#crModal').modal('toggle');
     return false;
 }
-function editlink() {
+function editlink(pubtype) {
     var linktype = 0;
     if ($("#secret").attr("checked")=="checked"){
         linktype = 1;
@@ -53,10 +53,12 @@ function editlink() {
         linktitle:linktitle,
         linksummary:linksummary,
         linktag:linktag,
-        _xsrf:getCookie('_xsrf')
-    },
+        linktype:linktype,
+        pubtype:pubtype,
+        _xsrf:getCookie('_xsrf')},
     success:function(data){
-    }       
+        window.location.href=pubtype == 1?data:"/";
+    } 
     });
     return false;
 }

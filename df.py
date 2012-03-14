@@ -1443,7 +1443,52 @@ class SettingModule(tornado.web.UIModule):
 class EditlinkHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        self.render("editlink.html")
+        template_values = {}
+        pubtype = self.get_argument("pubtype",0)
+        url = self.get_argument("url",None)
+        title = self.get_argument("title",None)
+        template_values['sugg'] = pubtype or self.current_user.sugg_link
+        template_values['pubtype'] = pubtype
+        template_values['url'] = url
+        template_values['title'] = title
+        self.render("editlink.html", template_values=template_values)
+    @tornado.web.authenticated
+    def post(self):
+        url = self.get_argument("linkurl",None)
+        title = self.get_argument("linktitle",None)
+        summary = self.get_argument("linksummary",None)
+        tag = self.get_argument("linktag",None)
+        linktype = self.get_argument("linktype",None)
+        pubtype = self.get_argument("pubtype",None)
+        if not url:
+            raise tornado.web.HTTPError(500)
+        url = url if url[:7] != "http://" else url[7:]
+        link_sql = ["insert into fd_Link set url = '%s'," % url]
+        if title:
+            link_sql.append("title = '%s'," % title)
+        if summary:
+            link_sql.append("summary = '%s'," % summary)
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+        redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
+        link_sql.append("user_id = %s,pubdate = '%s'" % (self.current_user.id,pubdate))
+        fd_link_sql = "".join(link_sql)
+        link_id = self.db.execute(fd_link_sql)
+        if tag:
+            tag = tag.strip().replace(' ',',')
+            tag = tag.strip().replace('，',',')
+            tags = tag.split(",")
+            tag_ids = []
+            for t in tags:
+                tag_id = self.db.get("select id from fd_Tag where tag = %s", t)
+                if tag_id:
+                    tag_id = tag_id.id
+                else:
+                    tag_id = self.db.execute("insert into fd_Tag (tag) values (%s)", t)
+                if tag_id in tag_ids:
+                    continue
+                tag_ids.append(tag_id)
+                ltag_id = self.db.execute("insert into fd_Ltag (link_id,tag_id) values (%s,%s)", link_id, tag_id)
+        self.write("http://" + url)
 
 class PNFHandler(BaseHandler):
     def get(self):
