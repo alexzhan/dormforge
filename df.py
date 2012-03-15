@@ -1464,6 +1464,7 @@ class EditlinkHandler(BaseHandler):
         if not url:
             raise tornado.web.HTTPError(500)
         url = url if url[:7] != "http://" else url[7:]
+        url = url if url[:8] != "https://" else url[8:]
         link_sql = ["insert into fd_Link set url = '%s'," % url]
         if title:
             link_sql.append("title = '%s'," % title)
