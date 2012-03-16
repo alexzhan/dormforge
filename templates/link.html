@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>链接：{{ template_values['link'].title }}</title>
+<title>链接：{{ template_values['link'].title if  template_values['link'].title else template_values['link'].url }}</title>
 <style type="text/css">
     .status-item {
         margin-left: 60px;

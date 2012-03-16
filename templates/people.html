@@ -264,7 +264,7 @@
                         <span class="cell">
                             <a href="http://{{ link[1] }}" target="_blank">
                                 <div class="status_preview">
-                                    {{ link[2] }} 
+                                    {{ link[2] if link[2] else link[1] }} 
                                 </div>
                                 <div class="timestamp">
                                     {{ link[0] }}
