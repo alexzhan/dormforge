@@ -1479,16 +1479,16 @@ class EditlinkHandler(BaseHandler):
             tag = tag.strip().replace(' ',',')
             tag = tag.strip().replace('，',',')
             tags = tag.split(",")
-            tag_ids = []
+            taglists = []
             for t in tags:
+                if t in taglists:
+                    continue
+                taglists.append(t)
                 tag_id = self.db.get("select id from fd_Tag where tag = %s", t)
                 if tag_id:
                     tag_id = tag_id.id
                 else:
                     tag_id = self.db.execute("insert into fd_Tag (tag) values (%s)", t)
-                if tag_id in tag_ids:
-                    continue
-                tag_ids.append(tag_id)
                 ltag_id = self.db.execute("insert into fd_Ltag (link_id,tag_id) values (%s,%s)", link_id, tag_id)
         if link_id:
             actdict = {'time':redpubdate, 'url':url, 'status':linktype}
