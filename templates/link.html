@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>链接：{{ template_values['link'].title }}</title>
+<style type="text/css">
+    .status-item {
+        margin-left: 60px;
+        min-height: 50px;
+        width: 600px;
+        border-bottom: 3px solid silver;
+        margin-bottom: 1px;
+    }
+    .status-text {
+        font-size: 15px;
+        width: 530px;
+        margin-bottom: 10px;
+        word-break: break-all;
+    }
+    .summary {
+        border-left: 5px solid #E2E2E2;
+        padding-left: 10px;
+    }
+    .status-text a{
+        color: #19558D;
+    }
+    .pubavatar {
+        float:right;
+        margin-left: 10px;
+        width: 50px;
+        height: 50px;
+    }
+    .status-info {
+        color: #999;
+        font-size: small;
+        margin-bottom: 5px;
+    }
+    .status-info a {
+        color: #999;
+    }
+    .status-comment {
+        margin-left: 60px;
+        width: 600px;
+        border-top: 1px solid silver;
+    }
+    .status-comment .comment-number {
+        padding-top: 10px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+    .status-comment .comment-item {
+        border-top: 1px solid #E0E0E0;
+        clear: both;
+    }
+    .status-comment .comment-item-content {
+        float: left;
+        padding: 5px 0 5px;
+        width: 600px;
+    }
+    .status-comment .comment-item-body {
+        margin-top: 5px;
+    }
+    .status-comment .comment-item-body p{
+        margin-bottom: 5px;
+        font-size: 14px;
+        word-break: break-all;
+    }
+    .status-comment .comment-item-body p a{
+        color: #19558D;;
+    }
+    .status-comment .comment-item-title a {
+        color: gray;
+    }
+    .status-comment .comment-item-title a:hover {
+        color: #005580;
+    }
+    .status-comment .comment-item-title .name {
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .status-comment .comment-item-title .time {
+        float: right;
+        text-align: right;
+        font-size: small;
+        color: #999;
+        width: 100px;
+    }
+    .status-comment .commavatar {
+        padding-top: 5px;
+        margin-left: -60px;
+        float: left;
+        width: 50px;
+    }
+    .add-comment {
+        margin-left: 60px;
+        width: 600px;
+    }
+    .clickable {
+        cursor: pointer;
+        display:inline;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="container" style="margin-left:60px;">
+    <div class="span7">
+        <div class="status-item">
+            <div class="pubavatar">
+                <a href="/people/{{ template_values['link'].domain }}"><img src="{{ handler.avatar('m', template_values['link'].id, template_values['link'].uuid_) }}" width="50px" height="50px"></a>
+            </div>
+            <div class="status-text url">
+                <a href="http://{{ template_values['link'].url }}">{{ template_values['link'].title if template_values['link'].title else template_values['link'].url }}</a>
+            </div>
+            <div class="status-text summary" style="">
+                {{ handler.br(handler.at(unicode(template_values['link'].summary))) if template_values['link'].summary else "" }}
+            </div>
+            <div class="status-info">
+                <a href="/people/{{ template_values['link'].domain }}">{{ template_values['link'].name }}</a> 发布于 {{ str(template_values['link'].pubdate)[5:-3] if str(template_values['link'].pubdate)[5] != '0' else str(template_values['link'].pubdate)[6:-3] }}
+                {% if current_user.name == template_values['link'].name %}
+                <span class="splitter"> • </span>
+                <span><a href="#" onclick="return delactivity('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}', 3);">删除</a></span>
+                {% end %}
+            </div>
+        </div>
+        <div class="status-comment">
+            <div class="comment-number">
+                <i class="icon-comment"></i><span id="number">评论({{ template_values['comments_length'] }})</span>
+            </div>
+            {% for comments in template_values['comments'] %}
+            <div class="comment-item">
+                <div class="commavatar">
+                    <a href="/people/{{ comments.domain }}"><img width="50px" height="50px" src="{{ handler.avatar('m', comments.id, comments.uuid_) }}"></a>
+                </div>
+                <div class="comment-item-content">
+                    <div class="comment-item-title">
+                        <a class="name" href="/people/{{ comments.domain }}">{{ comments.name }}</a>
+                        <span class="time">
+                            {{ str(comments.pubdate)[5:-3] if str(comments.pubdate)[5] != '0' else str(comments.pubdate)[6:-3] }}   
+                            <img src="{{ static_url('img/reply.png') }}" align="absmiddle" border="0" alt="回复 {{ comments.name }}" onclick="replyOne('{{ comments.name }}')" class="clickable">
+                        </span>
+                    </div>
+                    <div class="comment-item-body">
+                        <p>{{ handler.at(handler.br(comments.comments)) }}</p>
+                    </div>
+                </div>
+            </div>
+            {% end %}
+        </div>
+        <div class="add-comment">
+            <form id="comment-form" method="POST" action="{{ request.path }}" >
+                <textarea id="comment-box" name="comment" style="width:590px;height: 60px;margin-top:5px"></textarea>
+                <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}',2);">提交</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url('js/activity.js') }}"></script>
+{% end %}
