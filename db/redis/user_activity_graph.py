@@ -147,7 +147,7 @@ class UserActivityGraph(object):
             elif acttype == 'note':
                 real_activity = self.client.hmget(activity, ["time","title","content","status",'comm'])
             elif acttype == 'link':
-                real_activity = self.client.hmget(activity, ["time","url","title","summary",'status'])
+                real_activity = self.client.hmget(activity, ["time","url","title","summary",'status','comm'])
             real_activity.append(actto)
             real_activity.append(act_userid)
             real_activity.append(act_username)
@@ -174,7 +174,8 @@ class UserActivityGraph(object):
                 real_activity = self.client.hmget(activity, ["time","title","content","status",'comm'])
                 real_activity.append(actto)
             elif acttype == 'link':
-                real_activity = self.client.hmget(activity, ["time","url","title","summary",'status'])
+                real_activity = self.client.hmget(activity, ["time","url","title","summary",'status','comm'])
+                real_activity.append(actto)
             if acttype == 'follow':
                 actto_username,actto_domain,actto_uuid = get_namedomainuuid_by_id(db, self.client, actto)
                 real_activity = self.client.hmget(activity, ["time",])

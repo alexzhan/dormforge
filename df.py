@@ -63,6 +63,7 @@ class Application(tornado.web.Application):
                 (r"/note/([0-9a-z]+)", NoteHandler),
                 (r"/settings/(account|avatar|passwd|delete)", SettingsHandler),
                 (r"/link/edit", EditlinkHandler),
+                (r"/link/([0-9a-z]+)", LinkHandler),
                 (r"/cansug", CansugHandler),
                 (r".*", PNFHandler),
                 ]
@@ -1040,6 +1041,8 @@ class DeleteActivityHandler(BaseHandler):
             self.db.execute("update fd_Status set status_ = 1 where id = %s", actto)
         elif acttype == 2:
             self.db.execute("update fd_Note set status_ = 2 where id = %s", actto)
+        elif acttype == 3:
+            self.db.execute("update fd_Link set status_ = 2 where id = %s", actto)
         del_activity(self.rd, user_id, acttype, actto)
 
 class StatusHandler(FilterHandler):
@@ -1080,6 +1083,47 @@ class StatusHandler(FilterHandler):
             else:
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(status_key, 'comm', comments_num)
+            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.at(self.br(comments))]))
+
+class LinkHandler(FilterHandler):
+    @tornado.web.authenticated
+    def get(self, link_id):
+        template_values = {}
+        if len(link_id) < 8:
+            raise tornado.web.HTTPError(404)
+        link_id = decode(link_id)
+        link = self.db.get("select p.name,p.domain,p.uuid_,p.id,l.url,l.title,"
+                "l.summary,l.pubdate,l.status_ "
+                "from fd_People p, fd_Link l where l.user_id = p.id and "
+                "l.id = %s", link_id)
+        if not self.current_user or not link or link.status_ == 1:
+            raise tornado.web.HTTPError(404)
+        template_values['link'] = link
+        comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
+                "c.pubdate from fd_People p, fd_Linkcomm c where p.id"
+                "=c.user_id and link_id = %s", link_id)
+        template_values['comments_length'] = len(comments)
+        template_values['comments'] = comments
+        self.render("link.html", template_values=template_values)
+    @tornado.web.authenticated
+    def post(self, link_id):
+        if len(link_id) < 8:
+            raise tornado.web.HTTPError(404)
+        link_id = decode(link_id)
+        comments = self.get_argument("commenttext",None)
+        user_id = self.current_user.id
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+        comment_id = self.db.execute("insert into fd_Linkcomm (user_id, "
+                    " link_id, comments, pubdate) values (%s,%s,%s,%s)", 
+                    user_id, link_id, comments, pubdate)
+        if comment_id:
+            link_key = self.rd.keys('link*%s' % link_id)[0]
+            prev_comments_num = self.rd.hget(link_key, 'comm')
+            if not prev_comments_num:
+                comments_num = 1
+            else:
+                comments_num = int(prev_comments_num) + 1
+            self.rd.hset(link_key, 'comm', comments_num)
             self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.at(self.br(comments))]))
 
 class PubnoteHandler(BaseHandler):

@@ -230,15 +230,16 @@
                                 <p>{{ activity[3] if activity[3] else "" }}</p>
                             </div>
                             <div class="feed-item-footer">
-                                <div style="float:left"><span><a class="footerlink" href="http://{{ activity[1] }}" target="_blank">{{ activity[0] }}</a></span>
+                                <div style="float:left"><span><a class="footerlink" href="/link/{{ handler.encode(activity[6]) }}">{{ activity[0] }}</a></span>
                                 </div>
                                 <div style="float:right">
                                 {% if str(current_user.name) == activity[-5] %}
-                                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[5]) }}', 3);">删除</a></span>
-                                <!--<span class="splitter">•</span>
-                                <span><a class="footerlink" href="/link/edit?id={{ handler.encode(activity[5]) }}">编辑</a></span>
-                                -->
+                                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[6]) }}', 3);">删除</a></span>
+                                <span class="splitter">•</span>
+                                <span><a class="footerlink" href="/link/edit?id={{ handler.encode(activity[6]) }}">编辑</a></span>
+                                <span class="splitter">•</span>
                                 {% end %}
+                                <span><a class="footerlink" href="/link/{{ handler.encode(activity[6]) }}">{% if not activity[5] or activity[5]=='0' %}评论{% else %}评论({{ activity[5] }}){% end %}</a></span>
                                 </div>
                             </div>
                         </div>
