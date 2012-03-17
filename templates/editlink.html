@@ -101,12 +101,12 @@
                 <div class="control-group" id="linksummary">
                     <label class="control-label" for="sumary">描述</label>
                     <div class="desc">选填</div>
-                    <textarea id="summary" name="summary"  class="input-xlarge"></textarea>
+                    <textarea id="summary" name="summary" class="input-xlarge">{{ template_values['summary'] if 'summary' in template_values and template_values['summary'] else '' }}</textarea>
                 </div>
                 <div class="control-group" id="linktag">
                     <label class="control-label" for="tag">标签</label>
                     <div class="desc">选填，以空格或逗号分割</div>
-                    <input id="tag" name="tag" type="text" class="input-xlarge" style="clear:both">
+                    <input id="tag" name="tag" type="text" class="input-xlarge" style="clear:both" value="{{ template_values['tags'] if 'tags' in template_values and template_values['tags'] else '' }}">
                 </div>
             </fieldset>
             <div class="sub-button">
@@ -114,16 +114,18 @@
                     <button type="submit" class="btn btn-primary" onclick="return editlink({{ template_values['pubtype'] }});">保存</button>
                 </span>
                 <span class="secretbox">
-                    <input type="checkbox" name="secret" id="secret">
+                    <input type="checkbox" name="secret" id="secret" {% if 'checked' in template_values and template_values['checked'] == 'checked' %}checked="checked"{% end %}>
                     <label for="secret" id="secret-label">私密</label>
                 </span>
                 <span class="bookmarklet">
                     <a href="#" onclick="return modaltoggle(1);" style="color: #999;">添加浏览器书签</a>
                 </span>
                 <span class="cancel">
-                    <a type="submit" class="btn" href="/" onclick="return cancelbtn({{ template_values['pubtype'] }}, '{{ template_values['url'] if template_values['url'] else "0" }}');">取消</a>
+                    <a type="submit" class="btn" href="/" onclick="return cancelbtn({{ template_values['pubtype'] }}, '{{ template_values['url'] if template_values['url'] else "0" }}', '{{ template_values['id'] if 'id' in template_values and template_values['id'] else "0" }}');">取消</a>
                 </span>
             </div>
+            <input id="linkid" type="hidden" name="linkid" value="{{ template_values['id'] if 'id' in template_values else '' }}">
+            <input id="oldtag" type="hidden" name="oldtag" value="{{ template_values['tags'] if 'tags' in template_values else '' }}">
         </form>
         <div id="sug" style="display: none">{{ template_values['sugg'] }}</div>
     </div>

@@ -1096,7 +1096,7 @@ class LinkHandler(FilterHandler):
                 "l.summary,l.pubdate,l.status_ "
                 "from fd_People p, fd_Link l where l.user_id = p.id and "
                 "l.id = %s", link_id)
-        if not self.current_user or not link or link.status_ == 1:
+        if not self.current_user or not link or link.status_ == 1 and link.name != self.current_user.name:
             raise tornado.web.HTTPError(404)
         template_values['link'] = link
         comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
@@ -1491,12 +1491,29 @@ class EditlinkHandler(BaseHandler):
     def get(self):
         template_values = {}
         pubtype = self.get_argument("pubtype",0)
-        url = self.get_argument("url",None)
-        title = self.get_argument("title",None)
+        linkid = self.get_argument("id",None)
+        if linkid and pubtype == 0:
+            if len(linkid) < 8:
+                raise tornado.web.HTTPError(404)
+            link_id = decode(linkid)
+            link = self.db.get("select url,title,summary,user_id,status_, "
+                    "tags from fd_Link where id = %s", link_id)
+            if not link or link.user_id != self.current_user.id:
+                raise tornado.web.HTTPError(404)
+            template_values['url'] = link.url
+            template_values['title'] = link.title
+            template_values['summary'] = link.summary
+            template_values['tags'] = link.tags
+            template_values['id'] = linkid
+            template_values['checked'] = "checked" if link.status_ == 1 else ""
+            pubtype = 2
+        else:
+            url = self.get_argument("url",None)
+            title = self.get_argument("title",None)
+            template_values['url'] = url
+            template_values['title'] = title
         template_values['sugg'] = pubtype or self.current_user.sugg_link
         template_values['pubtype'] = pubtype
-        template_values['url'] = url
-        template_values['title'] = title
         self.render("editlink.html", template_values=template_values)
     @tornado.web.authenticated
     def post(self):
@@ -1504,12 +1521,24 @@ class EditlinkHandler(BaseHandler):
         title = self.get_argument("linktitle",None)
         summary = self.get_argument("linksummary",None)
         tag = self.get_argument("linktag",None)
+        oldtag = self.get_argument("oldtag",None)
         linktype = self.get_argument("linktype",None)
+        pubtype = self.get_argument("pubtype",0)
+        linkid = self.get_argument("linkid",None)
+        pubtype = int(pubtype)
+        if linkid:
+            linkid = decode(linkid)
+            link_user = self.db.get("select user_id from fd_Link where id = %s", linkid)
+            if not link_user or link_user.user_id != self.current_user.id:
+                raise tornado.web.HTTPError(404)
         if not url:
             raise tornado.web.HTTPError(500)
         url = url if url[:7] != "http://" else url[7:]
         url = url if url[:8] != "https://" else url[8:]
-        link_sql = ["insert into fd_Link set url = '%s'," % url]
+        if linkid:
+            link_sql = ["update fd_Link set url = '%s'," % url]
+        else:
+            link_sql = ["insert into fd_Link set url = '%s'," % url]
         if title:
             link_sql.append("title = '%s'," % title)
         if summary:
@@ -1523,21 +1552,36 @@ class EditlinkHandler(BaseHandler):
                 if t in taglists:
                     continue
                 taglists.append(t)
-            link_sql.append("tags = '%s'," % " ".join(taglists))
+            newtag = " ".join(taglists)
+            if not (pubtype == 2 and newtag == oldtag):
+                link_sql.append("tags = '%s'," % newtag)
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
         redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
-        link_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
+        if pubtype == 2:
+            link_sql.append("status_ = %s where id = %s" % (linktype,linkid))
+        else:
+            link_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
         fd_link_sql = "".join(link_sql)
         link_id = self.db.execute(fd_link_sql)
         if tag:
-            for t in taglists:
-                tag_id = self.db.get("select id from fd_Tag where tag = %s", t)
-                if tag_id:
-                    tag_id = tag_id.id
-                else:
-                    tag_id = self.db.execute("insert into fd_Tag (tag) values (%s)", t)
-                ltag_id = self.db.execute("insert into fd_Ltag (link_id,tag_id) values (%s,%s)", link_id, tag_id)
-        if link_id:
+            if pubtype != 2 or pubtype == 2 and newtag != oldtag:
+                for t in taglists:
+                    tag_id = self.db.get("select id from fd_Tag where tag = %s", t)
+                    if tag_id:
+                        tag_id = tag_id.id
+                    else:
+                        tag_id = self.db.execute("insert into fd_Tag (tag) values (%s)", t)
+                    ltag_id = self.db.execute("insert into fd_Ltag (link_id,tag_id) values (%s,%s)", link_id, tag_id)
+        if linkid: 
+            link_key = "link:%s:%s" % (self.current_user.id, linkid)
+            actdict = {'url':url, 'status':linktype}
+            if title:
+                actdict['title'] = title
+            if summary:
+                actdict['summary'] = summary
+            if self.rd.hmset(link_key, actdict):
+                self.write("/")
+        elif link_id:
             actdict = {'time':redpubdate, 'url':url, 'status':linktype}
             if title:
                 actdict['title'] = title

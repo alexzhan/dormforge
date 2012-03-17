@@ -39,6 +39,8 @@ function editlink(pubtype) {
     var linktitle = $("#title").val();
     var linksummary = $("#summary").val();
     var linktag = $("#tag").val();
+    var oldtag = $("#oldtag").val();
+    var linkid = $("#linkid").val();
     $("#linkurl").removeClass("error");
     if(linkurl.length == 0) {
         $("#linkurl").removeClass();
@@ -53,18 +55,24 @@ function editlink(pubtype) {
         linktitle:linktitle,
         linksummary:linksummary,
         linktag:linktag,
+        oldtag:oldtag,
         linktype:linktype,
         pubtype:pubtype,
+        linkid:linkid,
         _xsrf:getCookie('_xsrf')},
     success:function(data){
-        window.location.href=pubtype == 1?data:"/";
+        window.location.href=pubtype==1?data:"/";
     } 
     });
     return false;
 }
-function cancelbtn(pubtype, url){
-    if(pubtype == 1 && url != 0){
+function cancelbtn(pubtype, url, linkid){
+    if(pubtype == 1 && url != '0'){
         window.location.href=url;
+        return false;
+    }
+    else if (pubtype == 2 && linkid != '0'){
+        window.location.href="/link/" + linkid;
         return false;
     }
 }
