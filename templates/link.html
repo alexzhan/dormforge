@@ -114,7 +114,7 @@
                 {{ handler.br(handler.at(unicode(template_values['link'].summary))) if template_values['link'].summary else "" }}
             </div>
             <div class="status-info">
-                <a href="/people/{{ template_values['link'].domain }}">{{ template_values['link'].name }}</a> 发布于 {{ str(template_values['link'].pubdate)[5:-3] if str(template_values['link'].pubdate)[5] != '0' else str(template_values['link'].pubdate)[6:-3] }}
+                <a href="/people/{{ template_values['link'].domain }}">{{ template_values['link'].name }}</a> 收藏于 {{ str(template_values['link'].pubdate)[5:-3] if str(template_values['link'].pubdate)[5] != '0' else str(template_values['link'].pubdate)[6:-3] }}
                 {% if current_user.name == template_values['link'].name %}
                 <span class="splitter"> • </span>
                 <span><a href="#" onclick="return delactivity('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}', 3);">删除</a></span>
