@@ -224,7 +224,7 @@
                             <div class="feed-item-title">
                                 <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
                                 <span class="feed-item-title desc">收藏了链接:</span>
-                                <span><a href="http://{{ activity[1] }}" target="_blank">{{ activity[2] if activity[2] else activity[1] }}</a></span>
+                                <span><a href="/link/{{ handler.encode(activity[6]) }}">{{ activity[2] if activity[2] else activity[1] }}</a></span>
                             </div>
                             <div class="feed-item-body">
                                 <p>{{ activity[3] if activity[3] else "" }}</p>
@@ -236,9 +236,8 @@
                                 {% if str(current_user.name) == activity[-5] %}
                                 <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[6]) }}', 3);">删除</a></span>
                                 <span class="splitter">•</span>
-                                <!--<span><a class="footerlink" href="/link/edit?id={{ handler.encode(activity[6]) }}">编辑</a></span>
+                                <span><a class="footerlink" href="/link/edit?id={{ handler.encode(activity[6]) }}">编辑</a></span>
                                 <span class="splitter">•</span>
-                                -->
                                 {% end %}
                                 <span><a class="footerlink" href="/link/{{ handler.encode(activity[6]) }}">{% if not activity[5] or activity[5]=='0' %}评论{% else %}评论({{ activity[5] }}){% end %}</a></span>
                                 </div>
