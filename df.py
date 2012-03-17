@@ -1514,11 +1514,6 @@ class EditlinkHandler(BaseHandler):
             link_sql.append("title = '%s'," % title)
         if summary:
             link_sql.append("summary = '%s'," % summary)
-        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
-        redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
-        link_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
-        fd_link_sql = "".join(link_sql)
-        link_id = self.db.execute(fd_link_sql)
         if tag:
             tag = tag.strip().replace(' ',',')
             tag = tag.strip().replace('，',',')
@@ -1528,6 +1523,14 @@ class EditlinkHandler(BaseHandler):
                 if t in taglists:
                     continue
                 taglists.append(t)
+            link_sql.append("tags = '%s'," % " ".join(taglists))
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+        redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
+        link_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
+        fd_link_sql = "".join(link_sql)
+        link_id = self.db.execute(fd_link_sql)
+        if tag:
+            for t in taglists:
                 tag_id = self.db.get("select id from fd_Tag where tag = %s", t)
                 if tag_id:
                     tag_id = tag_id.id
