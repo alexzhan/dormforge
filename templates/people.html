@@ -262,7 +262,7 @@
                 <div class="row">
                     <div class="status_preview_link">
                         <span class="cell">
-                            <a href="http://{{ link[1] }}" target="_blank">
+                            <a href="/link/{{ handler.encode(link[4]) }}" target="_blank">
                                 <div class="status_preview">
                                     {{ link[2] if link[2] else link[1] }} 
                                 </div>
