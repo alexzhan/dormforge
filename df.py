@@ -186,7 +186,6 @@ class HomeHandler(FilterHandler):
             template_values = {}
             uag = UserActivityGraph(self.rd)
             template_values['all_activities'] = uag.get_all_activities(self.db)
-            #logging.info("%s--length", len(template_values['all_activities']))
             self.render("home.html", template_values=template_values)
         else:
             self.render("index.html")
@@ -1370,8 +1369,6 @@ class SettingsHandler(BaseHandler):
             if domain_error:
                 template_values['newdomain'] = domain
                 template_values['domain_error_message'] = domain_error_messages[domain_error]
-            logging.info(username_error)
-            logging.info(domain_error)
         elif setting == 'avatar':
             page_title = '头像设置'
             avatar_error = 0

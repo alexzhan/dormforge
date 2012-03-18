@@ -108,7 +108,7 @@
                 <a href="/people/{{ template_values['link'].domain }}"><img src="{{ handler.avatar('m', template_values['link'].id, template_values['link'].uuid_) }}" width="50px" height="50px"></a>
             </div>
             <div class="status-text url">
-                <a href="http://{{ template_values['link'].url }}">{{ template_values['link'].title if template_values['link'].title else template_values['link'].url }}</a>
+                <a href="http://{{ template_values['link'].url }}" target="_blank">{{ template_values['link'].title if template_values['link'].title else template_values['link'].url }}</a>
             </div>
             <div class="status-text summary" style="">
                 {{ handler.br(handler.at(unicode(template_values['link'].summary))) if template_values['link'].summary else "" }}
