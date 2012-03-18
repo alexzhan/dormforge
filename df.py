@@ -3,6 +3,7 @@
 import os.path
 import sys
 import re
+import string
 import time
 import uuid
 import binascii
@@ -31,6 +32,15 @@ define("mysql_host", default="127.0.0.1:3306", help="blog database host")
 define("mysql_database", default="df", help="blog database name")
 define("mysql_user", default="df", help="blog database user")
 define("mysql_password", default="df", help="blog database password")
+
+LEADING_PUNCTUATION  = ['(', '<', '&lt;']
+TRAILING_PUNCTUATION = ['.', ',', ')', '>', '\n', '&gt;']
+
+word_split_re = re.compile(r'(\s+)')
+punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
+        ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
+        '|'.join([re.escape(x) for x in TRAILING_PUNCTUATION])))
+simple_email_re = re.compile(r'^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$')
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -136,6 +146,24 @@ class FilterHandler(BaseHandler):
         return value
     def br(self, value):
         return value.replace("\n", "<br>")
+    def link(self, text):
+        words = word_split_re.split(text)
+        for i, word in enumerate(words):
+            match = punctuation_re.match(word)
+            if match:
+                lead, middle, trail = match.groups()
+            if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
+                    len(middle) > 0 and middle[0] in string.letters + string.digits and \
+                    (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
+                middle = '<a href="http://%s" target="_blank">%s</a>' % (middle, middle)
+            if middle.startswith('http://') or middle.startswith('https://'):
+                middle = '<a href="%s" target="_blank">%s</a>' % (middle, middle)
+            if '@' in middle and not middle.startswith('www.') and not ':' in middle \
+                    and simple_email_re.match(middle):
+                middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
+            if lead + middle + trail != word:
+                words[i] = lead + middle + trail
+        return ''.join(words)
 
 class FollowBaseHandler(BaseHandler):
     def follow(self, domain, follow_type):
@@ -1527,8 +1555,8 @@ class EditlinkHandler(BaseHandler):
                 raise tornado.web.HTTPError(404)
         if not url:
             raise tornado.web.HTTPError(500)
-        url = url if url[:7] != "http://" else url[7:]
-        url = url if url[:8] != "https://" else url[8:]
+        url = url[7:] if url.startswith("http://") else url
+        url = url[8:] if url.startswith("https://") else url
         if linkid:
             link_sql = ["update fd_Link set url = '%s'," % url]
         else:
