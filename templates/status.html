@@ -108,16 +108,18 @@
             </div>
             <div class="status-info">
                 <a href="/people/{{ template_values['status'].domain }}">{{ template_values['status'].name }}</a> 发布于 {{ str(template_values['status'].pubdate)[5:-3] if str(template_values['status'].pubdate)[5] != '0' else str(template_values['status'].pubdate)[6:-3] }}
-                {% if current_user.name == template_values['status'].name %}
+                {% if current_user and current_user.name == template_values['status'].name %}
                 <span class="splitter"> • </span>
                 <span><a href="#" onclick="return delactivity('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}', 1);">删除</a></span>
                 {% end %}
             </div>
         </div>
         <div class="status-comment">
+            {% if current_user or (not current_user and template_values['comments_length'] == '0') %}
             <div class="comment-number">
                 <i class="icon-comment"></i><span id="number">评论({{ template_values['comments_length'] }})</span>
             </div>
+            {% end %}
             {% for comments in template_values['comments'] %}
             <div class="comment-item">
                 <div class="commavatar">
@@ -138,12 +140,14 @@
             </div>
             {% end %}
         </div>
+        {% if current_user %}
         <div class="add-comment">
             <form id="comment-form" method="POST" action="{{ request.path }}" >
                 <textarea id="comment-box" name="comment" style="width:590px;height: 60px;margin-top:5px"></textarea>
                 <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}',2);">提交</button>
             </form>
         </div>
+        {% end %}
     </div>
 </div>
 {% end %}

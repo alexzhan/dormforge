@@ -1053,7 +1053,7 @@ class StatusHandler(FilterHandler):
         status = self.db.get("select p.name,p.domain,p.uuid_,p.id,s.status,s.pubdate,s.status_ "
                 "from fd_People p, fd_Status s where s.user_id = p.id and "
                 "s.id = %s", status_id)
-        if not self.current_user or not status or status.status_ == 1:
+        if not status or status.status_ == 1:
             raise tornado.web.HTTPError(404)
         template_values['status'] = status
         comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
@@ -1093,7 +1093,7 @@ class LinkHandler(FilterHandler):
                 "l.summary,l.pubdate,l.status_ "
                 "from fd_People p, fd_Link l where l.user_id = p.id and "
                 "l.id = %s", link_id)
-        if not self.current_user or not link or link.status_ == 1 and link.name != self.current_user.name:
+        if not link or link.status_ == 1 and link.name != self.current_user.name:
             raise tornado.web.HTTPError(404)
         template_values['link'] = link
         comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
@@ -1203,7 +1203,7 @@ class NoteHandler(FilterHandler):
         note = self.db.get("select p.name,p.domain,n.title,n.note,n.status_ "
                 ",n.pubdate from fd_People p, fd_Note n where n.user_id = p.id and "
                 "n.id = %s", note_id)
-        if not self.current_user or not note or note.status_ == 2 or \
+        if not note or note.status_ == 2 or \
         note.status_ == 1 and note.name != self.current_user.name:
             raise tornado.web.HTTPError(404)
         template_values['note'] = note
