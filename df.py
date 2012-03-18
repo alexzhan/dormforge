@@ -1045,7 +1045,6 @@ class DeleteActivityHandler(BaseHandler):
         del_activity(self.rd, user_id, acttype, actto)
 
 class StatusHandler(FilterHandler):
-    @tornado.web.authenticated
     def get(self, status_id):
         template_values = {}
         if len(status_id) < 8:
@@ -1085,7 +1084,6 @@ class StatusHandler(FilterHandler):
             self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.at(self.br(comments))]))
 
 class LinkHandler(FilterHandler):
-    @tornado.web.authenticated
     def get(self, link_id):
         template_values = {}
         if len(link_id) < 8:
@@ -1197,7 +1195,6 @@ class ViewnoteHandler(FilterHandler):
             self.write("wrong")
 
 class NoteHandler(FilterHandler):
-    @tornado.web.authenticated
     def get(self, note_id):
         template_values = {}
         if len(note_id) < 8:
