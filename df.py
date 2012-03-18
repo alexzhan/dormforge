@@ -1527,8 +1527,8 @@ class EditlinkHandler(BaseHandler):
                 raise tornado.web.HTTPError(404)
         if not url:
             raise tornado.web.HTTPError(500)
-        url = url if url[:7] != "http://" else url[7:]
-        url = url if url[:8] != "https://" else url[8:]
+        url = url[7:] if url.startswith("http://") else url
+        url = url[8:] if url.startswith("https://") else url
         if linkid:
             link_sql = ["update fd_Link set url = '%s'," % url]
         else:
