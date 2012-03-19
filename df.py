@@ -149,20 +149,22 @@ class FilterHandler(BaseHandler):
     def link(self, text):
         words = word_split_re.split(text)
         for i, word in enumerate(words):
+            logging.info(i)
+            logging.info(word)
             match = punctuation_re.match(word)
             if match:
                 lead, middle, trail = match.groups()
-            if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
-                    len(middle) > 0 and middle[0] in string.letters + string.digits and \
-                    (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
-                middle = '<a href="http://%s" target="_blank">%s</a>' % (middle, middle)
-            if middle.startswith('http://') or middle.startswith('https://'):
-                middle = '<a href="%s" target="_blank">%s</a>' % (middle, middle)
-            if '@' in middle and not middle.startswith('www.') and not ':' in middle \
-                    and simple_email_re.match(middle):
-                middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
-            if lead + middle + trail != word:
-                words[i] = lead + middle + trail
+                if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
+                        len(middle) > 0 and middle[0] in string.letters + string.digits and \
+                        (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
+                    middle = '<a href="http://%s" target="_blank">%s</a>' % (middle, middle)
+                if middle.startswith('http://') or middle.startswith('https://'):
+                    middle = '<a href="%s" target="_blank">%s</a>' % (middle, middle)
+                if '@' in middle and not middle.startswith('www.') and not ':' in middle \
+                        and simple_email_re.match(middle):
+                    middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
+                if lead + middle + trail != word:
+                    words[i] = lead + middle + trail
         return ''.join(words)
 
 class FollowBaseHandler(BaseHandler):
