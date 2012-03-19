@@ -146,11 +146,9 @@ class FilterHandler(BaseHandler):
         return value
     def br(self, value):
         return value.replace("\n", "<br>")
-    def link(self, text):
-        words = word_split_re.split(text)
+    def link(self, value):
+        words = word_split_re.split(value)
         for i, word in enumerate(words):
-            logging.info(i)
-            logging.info(word)
             match = punctuation_re.match(word)
             if match:
                 lead, middle, trail = match.groups()
