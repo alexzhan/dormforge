@@ -288,7 +288,7 @@
                     <div class="status_preview_link">
                         <span class="cell">
                             <div class="status_preview">
-                                {{ unicode(status[1]) }} 
+                                {{ handler.br(handler.at(linkify(status[1], extra_params="target='_blank' rel='nofollow'"))) }} 
                             </div>
                             <div class="timestamp">
                                 <a href="/status/{{ handler.encode(status[2]) }}">{{ status[0] }}</a>
