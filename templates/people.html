@@ -288,7 +288,7 @@
                     <div class="status_preview_link">
                         <span class="cell">
                             <div class="status_preview">
-                                {{ handler.br(handler.at(unicode(status[1]))) }} 
+                                {{ unicode(status[1]) }} 
                             </div>
                             <div class="timestamp">
                                 <a href="/status/{{ handler.encode(status[2]) }}">{{ status[0] }}</a>
