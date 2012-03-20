@@ -836,7 +836,7 @@ class PeopleHandler(BaseHandler):
             selfdesc = self.db.get("select selfdesc from fd_Selfdesc where user_id = %s", 
                     template_values['id'])
             if not selfdesc: raise tornado.web.HTTPError(405)
-            template_values['selfdesc'] = selfdesc.selfdesc.strip()
+            template_values['selfdesc'] = self.br(selfdesc.selfdesc).strip()
         uag = UserActivityGraph(self.rd)
         isself = template_values['id'] == self.current_user.id if self.current_user else False
         template_values['activities'] = uag.get_top_activities(template_values['id'], self.db, isself) 
@@ -995,7 +995,6 @@ class SelfdescHandler(BaseHandler):
     def post(self):
         selfdesc = self.get_argument("selfdesc",None)
         if not selfdesc: raise tornado.web.HTTPError(405)
-        selfdesc = br(link(selfdesc))
         if self.current_user.has_selfdesc:
             self.db.execute("update fd_Selfdesc set selfdesc = %s"
                     "where user_id = %s", selfdesc, self.current_user.id)
@@ -1005,7 +1004,7 @@ class SelfdescHandler(BaseHandler):
             if selfdesc_id:
                 self.db.execute("update fd_People set has_selfdesc"
                         " = 1 where id = %s", self.current_user.id)
-        self.write(selfdesc.strip())
+        self.write(self.br(selfdesc).strip())
 
 class PubstatusHandler(BaseHandler):
     @tornado.web.authenticated
