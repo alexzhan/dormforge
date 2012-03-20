@@ -19,7 +19,7 @@ import tempfile
 
 from tornado.options import define, options
 from util.encrypt import encrypt_password,validate_password
-from util.getby import get_domain_by_name,get_id_by_name
+from util.getby import get_id_by_name,get_domain_by_name
 from util.encode import encode,decode,key
 from util.redis_activity import add_activity,del_activity
 from db.redis.user_follow_graph import UserFollowGraph
@@ -32,15 +32,6 @@ define("mysql_host", default="127.0.0.1:3306", help="blog database host")
 define("mysql_database", default="df", help="blog database name")
 define("mysql_user", default="df", help="blog database user")
 define("mysql_password", default="df", help="blog database password")
-
-LEADING_PUNCTUATION  = ['(', '<', '&lt;']
-TRAILING_PUNCTUATION = ['.', ',', ')', '>', '\n', '&gt;']
-
-word_split_re = re.compile(r'(\s+)')
-punctuation_re = re.compile('^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % \
-        ('|'.join([re.escape(x) for x in LEADING_PUNCTUATION]),
-        '|'.join([re.escape(x) for x in TRAILING_PUNCTUATION])))
-simple_email_re = re.compile(r'^\S+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+$')
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -134,7 +125,6 @@ class BaseHandler(tornado.web.RequestHandler):
             hh.append(chr((ord(strorg[i])+ord(key[i % baselength]))%256))  
         return b64encode(''.join(hh)).encode("hex")
 
-class FilterHandler(BaseHandler):
     def at(self, value):
         ms = re.findall(u'(@[\u4e00-\u9fa5A-Za-z0-9_-]{2,16})', value)
         if (len(ms) > 0):
@@ -144,26 +134,9 @@ class FilterHandler(BaseHandler):
                 if domain:
                     value = value.replace(m, '@<a href="/people/' + domain + '">' + username + '</a>')
         return value
+
     def br(self, value):
         return value.replace("\n", "<br>")
-    def link(self, value):
-        words = word_split_re.split(value)
-        for i, word in enumerate(words):
-            match = punctuation_re.match(word)
-            if match:
-                lead, middle, trail = match.groups()
-                if middle.startswith('www.') or ('@' not in middle and not middle.startswith('http://') and \
-                        len(middle) > 0 and middle[0] in string.letters + string.digits and \
-                        (middle.endswith('.org') or middle.endswith('.net') or middle.endswith('.com'))):
-                    middle = '<a href="http://%s" target="_blank">%s</a>' % (middle, middle)
-                if middle.startswith('http://') or middle.startswith('https://'):
-                    middle = '<a href="%s" target="_blank">%s</a>' % (middle, middle)
-                if '@' in middle and not middle.startswith('www.') and not ':' in middle \
-                        and simple_email_re.match(middle):
-                    middle = '<a href="mailto:%s">%s</a>' % (middle, middle)
-                if lead + middle + trail != word:
-                    words[i] = lead + middle + trail
-        return ''.join(words)
 
 class FollowBaseHandler(BaseHandler):
     def follow(self, domain, follow_type):
@@ -208,7 +181,7 @@ class FollowBaseHandler(BaseHandler):
         template_values['type'] = follow_type 
         return template_values
 
-class HomeHandler(FilterHandler):
+class HomeHandler(BaseHandler):
     def get(self):
         if self.current_user:
             template_values = {}
@@ -218,7 +191,7 @@ class HomeHandler(FilterHandler):
         else:
             self.render("index.html")
 
-class MyhomeHandler(FilterHandler):
+class MyhomeHandler(BaseHandler):
     def get(self):
         if self.current_user:
             template_values = {}
@@ -777,7 +750,7 @@ class LogoutHandler(BaseHandler):
         self.clear_cookie("_xsrf")
         self.redirect(self.get_argument("next", "/"))
 
-class PeopleHandler(FilterHandler):
+class PeopleHandler(BaseHandler):
     def get(self, domain):
         people = self.db.get("SELECT * FROM fd_People WHERE domain = %s", domain) 
         #people = self.db.get("SELECT * FROM fd_People WHERE domain = %s and status_ = 0", domain) 
@@ -863,7 +836,7 @@ class PeopleHandler(FilterHandler):
             selfdesc = self.db.get("select selfdesc from fd_Selfdesc where user_id = %s", 
                     template_values['id'])
             if not selfdesc: raise tornado.web.HTTPError(405)
-            template_values['selfdesc'] = self.br(selfdesc.selfdesc).strip()
+            template_values['selfdesc'] = selfdesc.selfdesc.strip()
         uag = UserActivityGraph(self.rd)
         isself = template_values['id'] == self.current_user.id if self.current_user else False
         template_values['activities'] = uag.get_top_activities(template_values['id'], self.db, isself) 
@@ -1017,11 +990,12 @@ class UnfollowHandler(BaseHandler):
         else:
             self.write('already')
 
-class SelfdescHandler(FilterHandler):
+class SelfdescHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self):
         selfdesc = self.get_argument("selfdesc",None)
         if not selfdesc: raise tornado.web.HTTPError(405)
+        selfdesc = br(link(selfdesc))
         if self.current_user.has_selfdesc:
             self.db.execute("update fd_Selfdesc set selfdesc = %s"
                     "where user_id = %s", selfdesc, self.current_user.id)
@@ -1031,8 +1005,9 @@ class SelfdescHandler(FilterHandler):
             if selfdesc_id:
                 self.db.execute("update fd_People set has_selfdesc"
                         " = 1 where id = %s", self.current_user.id)
-        self.write(self.br(selfdesc).strip())
-class PubstatusHandler(FilterHandler):
+        self.write(selfdesc.strip())
+
+class PubstatusHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self):
         status = self.get_argument("statustext",None)
@@ -1072,7 +1047,7 @@ class DeleteActivityHandler(BaseHandler):
             self.db.execute("update fd_Link set status_ = 2 where id = %s", actto)
         del_activity(self.rd, user_id, acttype, actto)
 
-class StatusHandler(FilterHandler):
+class StatusHandler(BaseHandler):
     def get(self, status_id):
         template_values = {}
         if len(status_id) < 8:
@@ -1111,7 +1086,7 @@ class StatusHandler(FilterHandler):
             self.rd.hset(status_key, 'comm', comments_num)
             self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.at(self.br(comments))]))
 
-class LinkHandler(FilterHandler):
+class LinkHandler(BaseHandler):
     def get(self, link_id):
         template_values = {}
         if len(link_id) < 8:
@@ -1208,7 +1183,7 @@ class PubnoteHandler(BaseHandler):
                 else:
                     self.write("wrong")
 
-class ViewnoteHandler(FilterHandler):
+class ViewnoteHandler(BaseHandler):
     @tornado.web.authenticated
     def post(self):
         noteid = self.get_argument("note_id",None)
@@ -1222,7 +1197,7 @@ class ViewnoteHandler(FilterHandler):
         else:
             self.write("wrong")
 
-class NoteHandler(FilterHandler):
+class NoteHandler(BaseHandler):
     def get(self, note_id):
         template_values = {}
         if len(note_id) < 8:

@@ -111,7 +111,7 @@
                 {{ template_values['note'].title }}
             </div>
             <div class="note-text">
-                {{ handler.br(handler.link(handler.at(unicode(template_values['note'].note)))) }}
+                {{ handler.br(handler.at(linkify(template_values['note'].note, extra_params="target='_blank' rel='nofollow'"))) }}
             </div>
             <div class="note-bottom">
                 <span class="note-info">
@@ -146,7 +146,7 @@
                         </span>
                     </div>
                     <div class="comment-item-body">
-                        <p>{{ handler.at(handler.br(comments.comments)) }}</p>
+                        <p>{{ handler.br(handler.at(linkify(comments.comments, extra_params="target='_blank' rel='nofollow'"))) }}</p>
                     </div>
                 </div>
             </div>
