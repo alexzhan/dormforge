@@ -18,6 +18,7 @@ import redis
 import tempfile
 
 from tornado.options import define, options
+from tornado.escape import linkify
 from util.encrypt import encrypt_password,validate_password
 from util.getby import get_id_by_name,get_domain_by_name
 from util.encode import encode,decode,key
@@ -1022,7 +1023,7 @@ class PubstatusHandler(BaseHandler):
             actdict = {'time':redpubdate, 'status':status}
             addresult = add_activity(self.rd, user_id, status_id, 1, actdict)
             if addresult:
-                self.write(''.join([encode(str(status_id)), ',', self.avatar('m',self.current_user.id,self.current_user.uuid_),',', self.at(self.br(unicode(status)))]))
+                self.write(''.join([encode(str(status_id)), ',', self.avatar('m',self.current_user.id,self.current_user.uuid_),',', self.br(self.at(linkify(status, extra_params="target='_blank' rel='nofollow'")))]))
             else:
                 self.write("Something wrong...")
 
@@ -1083,7 +1084,7 @@ class StatusHandler(BaseHandler):
             else:
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(status_key, 'comm', comments_num)
-            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.at(self.br(comments))]))
+            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.br(self.at(linkify(comments, extra_params="target='_blank' rel='nofollow'")))]))
 
 class LinkHandler(BaseHandler):
     def get(self, link_id):
@@ -1123,7 +1124,7 @@ class LinkHandler(BaseHandler):
             else:
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(link_key, 'comm', comments_num)
-            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.at(self.br(comments))]))
+            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.br(self.at(linkify(comments, extra_params="target='_blank' rel='nofollow'")))]))
 
 class PubnoteHandler(BaseHandler):
     @tornado.web.authenticated
@@ -1192,7 +1193,7 @@ class ViewnoteHandler(BaseHandler):
         note = self.db.get("select note from fd_Note where "
                 "id = %s", noteid)
         if note:
-            self.write(self.at(self.br(note.note)))
+            self.write(self.br(self.at(linkify(note.note, extra_params="target='_blank' rel='nofollow'"))))
         else:
             self.write("wrong")
 
@@ -1234,7 +1235,7 @@ class NoteHandler(BaseHandler):
             else:
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(note_key, 'comm', comments_num)
-            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.at(self.br(comments))]))
+            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.br(self.at(linkify(comments, extra_params="target='_blank' rel='nofollow'")))]))
 
 class SettingsHandler(BaseHandler):
     @tornado.web.authenticated
