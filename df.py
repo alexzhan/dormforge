@@ -67,6 +67,7 @@ class Application(tornado.web.Application):
                 (r"/link/edit", EditlinkHandler),
                 (r"/link/([0-9a-z]+)", LinkHandler),
                 (r"/cansug", CansugHandler),
+                (r"/doc/edit", EditdocHandler),
                 (r".*", PNFHandler),
                 ]
         settings = dict(
@@ -1417,6 +1418,8 @@ class SettingsHandler(BaseHandler):
                 template_values['avatar_error'] = avatar_error
                 template_values['avatar_error_message'] = avatar_error_messages[avatar_error]
                 template_values['page_title'] = page_title
+                template_values['id'] = self.current_user.id
+                template_values['uuid'] = self.current_user.uuid_
                 return self.render("settings.html", template_values=template_values)
         elif setting == 'passwd':
             page_title = '修改密码'
@@ -1598,6 +1601,42 @@ class CansugHandler(BaseHandler):
     def post(self):
         self.current_user.sugg_link = 1
         self.db.execute("update fd_People set sugg_link = 1 where id = %s", self.current_user.id)
+
+class EditdocHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        template_values = {}
+        self.render("editdoc.html", template_values=template_values)
+        
+    @tornado.web.authenticated
+    def post(self):
+        errors = 0
+        title_error = 0
+        title_error_messages = ['',
+                u'请输入标题',
+                ]
+        title = self.get_argument("title", None)
+        if not title or len(title) == 0:
+            errors = errors + 1
+            title_error = 1
+        doc_error = 0
+        avatar_error_messages = ['',
+                u'请选择文档',
+                u'暂时不支持该文档格式',
+                u'文档不能大于20M',
+                ]
+        if not self.request.files:
+            errors = errors + 1
+            doc_error = 1
+        else:
+            f = self.request.files['avatar'][0]
+            if f['filename'].split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf"]:
+                errors = errors + 1
+                doc_error = 2
+            else:
+                if len(f['body']) > 1024*1024*20:
+                    errors = errors + 1
+                    doc_error = 3
 
 def main():
     tornado.options.parse_command_line()
