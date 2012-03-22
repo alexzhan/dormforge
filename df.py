@@ -1610,6 +1610,9 @@ class EditdocHandler(BaseHandler):
         
     @tornado.web.authenticated
     def post(self):
+        template_values = {}
+        summary = self.get_argument("summary", None)
+        tag = self.get_argument("tag", None)
         errors = 0
         title_error = 0
         title_error_messages = ['',
@@ -1619,8 +1622,10 @@ class EditdocHandler(BaseHandler):
         if not title or len(title) == 0:
             errors = errors + 1
             title_error = 1
+            template_values['title_error'] = title_error
+            template_values['title_error_message'] = title_error_messages[title_error]
         doc_error = 0
-        avatar_error_messages = ['',
+        doc_error_messages = ['',
                 u'请选择文档',
                 u'暂时不支持该文档格式',
                 u'文档不能大于20M',
@@ -1629,7 +1634,7 @@ class EditdocHandler(BaseHandler):
             errors = errors + 1
             doc_error = 1
         else:
-            f = self.request.files['avatar'][0]
+            f = self.request.files['doc'][0]
             if f['filename'].split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf"]:
                 errors = errors + 1
                 doc_error = 2
@@ -1637,6 +1642,17 @@ class EditdocHandler(BaseHandler):
                 if len(f['body']) > 1024*1024*20:
                     errors = errors + 1
                     doc_error = 3
+        if doc_error != 0:
+            template_values['doc_error'] = doc_error
+            template_values['doc_error_message'] = doc_error_messages[doc_error]
+        if errors != 0:
+            if title:
+                template_values['title'] = title
+            if summary:
+                template_values['summary'] = summary
+            if tag:
+                template_values['tag'] = tag
+            self.render("editdoc.html", template_values=template_values)
 
 def main():
     tornado.options.parse_command_line()

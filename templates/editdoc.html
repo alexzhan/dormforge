@@ -78,7 +78,7 @@
         <form  id='editlink' method='POST' action="{{ request.path }}" class="form-horizontal">
             <fieldset>
                 <div class="control-group {{ "error" if 'title_error' in template_values and template_values['title_error'] != 0 else '' }}" id="linktitle">
-                    <label class="control-label" for="title">{{ template_values['title_error_message'] if 'title_error' in template_values and template_values['error'] != 0 else '标题'}}</label>
+                    <label class="control-label" for="title">{{ template_values['title_error_message'] if 'title_error' in template_values and template_values['title_error'] != 0 else '标题'}}</label>
                     <div class="desc">必填</div>
                     <input id="title" name="title" type="text" class="input-xlarge" value="{{ template_values['title'] if 'title' in template_values and template_values['title'] else '' }}">
                 </div>
@@ -90,12 +90,12 @@
                 <div class="control-group" id="linktag">
                     <label class="control-label" for="tag">标签</label>
                     <div class="desc">选填，以空格或逗号分割</div>
-                    <input id="tag" name="tag" type="text" class="input-xlarge" style="clear:both" value="{{ template_values['tags'] if 'tags' in template_values and template_values['tags'] else '' }}">
+                    <input id="tag" name="tag" type="text" class="input-xlarge" style="clear:both" value="{{ template_values['tag'] if 'tag' in template_values and template_values['tag'] else '' }}">
                 </div>
                 <div class="doc" style="margin-bottom: 15px">
                     <div class="docdesc">支持 doc/docx/ppt/pptx/pdf 格式文档，每个文档不超过20M</div>
                     <input id="doc" type="file" name="doc">
-                    <span id="avatarhelp" class="help-inline" style="color: #B94A48">{{ escape(template_values['doc_error_message']) if 'doc_error' in template_values and template_values['doc_error']!=0 else '' }}</span>
+                    <span id="dochelp" class="help-inline" style="color: #B94A48">{{ escape(template_values['doc_error_message']) if 'doc_error' in template_values and template_values['doc_error']!=0 else '' }}</span>
                 </div>
             </fieldset>
             <div class="sub-button">
@@ -112,6 +112,7 @@
             </div>
             <input id="linkid" type="hidden" name="linkid" value="{{ template_values['id'] if 'id' in template_values else '' }}">
             <input id="oldtag" type="hidden" name="oldtag" value="{{ template_values['tags'] if 'tags' in template_values else '' }}">
+            {{ xsrf_form_html() }}
         </form>
     </div>
 </div>
