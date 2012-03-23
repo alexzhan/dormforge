@@ -1540,9 +1540,9 @@ class EditlinkHandler(BaseHandler):
         else:
             link_sql = ["insert into fd_Link set url = '%s'," % url]
         if title:
-            link_sql.append("title = '%s'," % title)
+            link_sql.append("title = '%s'," % title.replace("'", "''"))
         if summary:
-            link_sql.append("summary = '%s'," % summary)
+            link_sql.append("summary = '%s'," % summary.replace("'", "''"))
         if tag:
             tag = tag.strip().replace(' ',',')
             tag = tag.strip().replace('，',',')
@@ -1554,7 +1554,7 @@ class EditlinkHandler(BaseHandler):
                 taglists.append(t)
             newtag = " ".join(taglists)
             if not (pubtype == 2 and newtag == oldtag):
-                link_sql.append("tags = '%s'," % newtag)
+                link_sql.append("tags = '%s'," % newtag.replace("'", "''"))
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
         redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
         if pubtype == 2:
@@ -1624,27 +1624,37 @@ class EditdocHandler(BaseHandler):
             title_error = 1
             template_values['title_error'] = title_error
             template_values['title_error_message'] = title_error_messages[title_error]
-        doc_error = 0
-        doc_error_messages = ['',
-                u'请选择文档',
-                u'暂时不支持该文档格式',
-                u'文档不能大于20M',
-                ]
-        if not self.request.files:
-            errors = errors + 1
-            doc_error = 1
         else:
-            f = self.request.files['doc'][0]
-            if f['filename'].split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf"]:
+            doc_error = 0
+            doc_error_messages = ['',
+                    u'请选择文档',
+                    u'暂时不支持该文档格式',
+                    u'文档不能大于20M',
+                    ]
+            if not self.request.files:
                 errors = errors + 1
-                doc_error = 2
+                doc_error = 1
             else:
-                if len(f['body']) > 1024*1024*20:
+                f = self.request.files['doc'][0]
+                if f['filename'].split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf"]:
                     errors = errors + 1
-                    doc_error = 3
-        if doc_error != 0:
-            template_values['doc_error'] = doc_error
-            template_values['doc_error_message'] = doc_error_messages[doc_error]
+                    doc_error = 2
+                else:
+                    if len(f['body']) > 1024*1024*20:
+                        errors = errors + 1
+                        doc_error = 3
+                    else:
+                        docpath = "/data/static/usrdoc/%s/" % self.current_user.id
+                        try:
+                            docfile = open(os.path.join(docpath, f['filename']), 'rb')
+                        except IOError:
+                            os.makedirs(docpath)
+                            docfile = open(os.path.join(docpath, f['filename']), 'rb')
+                        docfile.write(f['body'])
+                        docfile.close()
+            if doc_error != 0:
+                template_values['doc_error'] = doc_error
+                template_values['doc_error_message'] = doc_error_messages[doc_error]
         if errors != 0:
             if title:
                 template_values['title'] = title
