@@ -16,6 +16,7 @@ import unicodedata
 import logging
 import redis
 import tempfile
+import shutil
 
 from tornado.options import define, options
 from tornado.escape import linkify
@@ -1515,6 +1516,7 @@ class EditlinkHandler(BaseHandler):
         template_values['sugg'] = pubtype or self.current_user.sugg_link
         template_values['pubtype'] = pubtype
         self.render("editlink.html", template_values=template_values)
+
     @tornado.web.authenticated
     def post(self):
         url = self.get_argument("linkurl",None)
@@ -1540,9 +1542,9 @@ class EditlinkHandler(BaseHandler):
         else:
             link_sql = ["insert into fd_Link set url = '%s'," % url]
         if title:
-            link_sql.append("title = '%s'," % title)
+            link_sql.append("title = '%s'," % title.replace("'", "''"))
         if summary:
-            link_sql.append("summary = '%s'," % summary)
+            link_sql.append("summary = '%s'," % summary.replace("'", "''"))
         if tag:
             tag = tag.strip().replace(' ',',')
             tag = tag.strip().replace('，',',')
@@ -1554,7 +1556,7 @@ class EditlinkHandler(BaseHandler):
                 taglists.append(t)
             newtag = " ".join(taglists)
             if not (pubtype == 2 and newtag == oldtag):
-                link_sql.append("tags = '%s'," % newtag)
+                link_sql.append("tags = '%s'," % newtag.replace("'", "''"))
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
         redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
         if pubtype == 2:
@@ -1619,32 +1621,69 @@ class EditdocHandler(BaseHandler):
                 u'请输入标题',
                 ]
         title = self.get_argument("title", None)
+        name = self.get_argument("doc.name", None)
+        content_type = self.get_argument("doc.content_type", None)
+        path = self.get_argument("doc.path", None)
+        md5 = self.get_argument("doc.md5", None)
+        size = self.get_argument("doc.size", None)
+        logging.info(title)
+        logging.info(name)
+        logging.info(content_type)
+        logging.info(path)
+        logging.info(md5)
+        logging.info(size)
         if not title or len(title) == 0:
             errors = errors + 1
             title_error = 1
             template_values['title_error'] = title_error
             template_values['title_error_message'] = title_error_messages[title_error]
-        doc_error = 0
-        doc_error_messages = ['',
-                u'请选择文档',
-                u'暂时不支持该文档格式',
-                u'文档不能大于20M',
-                ]
-        if not self.request.files:
-            errors = errors + 1
-            doc_error = 1
         else:
-            f = self.request.files['doc'][0]
-            if f['filename'].split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf"]:
+            doc_error = 0
+            doc_error_messages = ['',
+                    u'请选择文档',
+                    u'暂时不支持该文档格式',
+                    u'文档不能大于20M',
+                    u'该文档已被上传过',
+                    ]
+            if not (name and path and md5 and size):
                 errors = errors + 1
-                doc_error = 2
+                doc_error = 1
             else:
-                if len(f['body']) > 1024*1024*20:
+                if name.split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf", "xls"]:
+                    os.remove(path)
                     errors = errors + 1
-                    doc_error = 3
-        if doc_error != 0:
-            template_values['doc_error'] = doc_error
-            template_values['doc_error_message'] = doc_error_messages[doc_error]
+                    doc_error = 2
+                else:
+                    if int(size) > 1024*1024*20:
+                        os.remove(path)
+                        errors = errors + 1
+                        doc_error = 3
+                    else:
+                        usrpath = "/data/static/usrdoc/%s/" % self.current_user.id
+                        staticpath = "/work/Dormforge/static/usrdoc/%s/" % self.current_user.id
+                        if not os.path.exists(usrpath):
+                            os.makedirs(usrpath)
+                        if not os.path.exists(staticpath):
+                            os.makedirs(staticpath)
+                        usrdoc = os.path.join(usrpath, name)
+                        shutil.move(path, usrdoc)
+                        if name.split(".").pop().lower() != 'pdf':
+                            usrpdf = ''.join([usrpath, path.split("/").pop(), ".pdf"])
+                            usrjpg = ''.join([staticpath, path.split("/").pop(), ".jpg"])
+                            usrswf = ''.join([staticpath, path.split("/").pop(), ".swf"])
+                            os.system("python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
+                            os.system("convert -sample 150x150 %s[0] %s" % (usrpdf, usrjpg))
+                            os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrpdf, usrswf))
+                            os.remove(usrpdf)
+                        else:
+                            usrjpg = ''.join([staticpath, path.split("/").pop(), ".jpg"])
+                            usrswf = ''.join([staticpath, path.split("/").pop(), ".swf"])
+                            os.system("convert -sample 150x150 %s[0] %s" % (usrdoc, usrjpg))
+                            os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrdoc, usrswf))
+
+            if doc_error != 0:
+                template_values['doc_error'] = doc_error
+                template_values['doc_error_message'] = doc_error_messages[doc_error]
         if errors != 0:
             if title:
                 template_values['title'] = title
