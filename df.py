@@ -16,6 +16,7 @@ import unicodedata
 import logging
 import redis
 import tempfile
+import shutil
 
 from tornado.options import define, options
 from tornado.escape import linkify
@@ -1515,6 +1516,7 @@ class EditlinkHandler(BaseHandler):
         template_values['sugg'] = pubtype or self.current_user.sugg_link
         template_values['pubtype'] = pubtype
         self.render("editlink.html", template_values=template_values)
+
     @tornado.web.authenticated
     def post(self):
         url = self.get_argument("linkurl",None)
@@ -1619,6 +1621,17 @@ class EditdocHandler(BaseHandler):
                 u'请输入标题',
                 ]
         title = self.get_argument("title", None)
+        name = self.get_argument("doc.name", None)
+        content_type = self.get_argument("doc.content_type", None)
+        path = self.get_argument("doc.path", None)
+        md5 = self.get_argument("doc.md5", None)
+        size = self.get_argument("doc.size", None)
+        logging.info(title)
+        logging.info(name)
+        logging.info(content_type)
+        logging.info(path)
+        logging.info(md5)
+        logging.info(size)
         if not title or len(title) == 0:
             errors = errors + 1
             title_error = 1
@@ -1630,28 +1643,28 @@ class EditdocHandler(BaseHandler):
                     u'请选择文档',
                     u'暂时不支持该文档格式',
                     u'文档不能大于20M',
+                    u'该文档已存在',
                     ]
-            if not self.request.files:
+            if not (name and path and md5 and size):
                 errors = errors + 1
                 doc_error = 1
             else:
-                f = self.request.files['doc'][0]
-                if f['filename'].split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf"]:
+                if name.split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf", "xls"]:
+                    os.remove(path)
                     errors = errors + 1
                     doc_error = 2
                 else:
-                    if len(f['body']) > 1024*1024*20:
+                    if int(size) > 1024*1024*20:
+                        os.remove(path)
                         errors = errors + 1
                         doc_error = 3
                     else:
-                        docpath = "/data/static/usrdoc/%s/" % self.current_user.id
-                        try:
-                            docfile = open(os.path.join(docpath, f['filename']), 'rb')
-                        except IOError:
-                            os.makedirs(docpath)
-                            docfile = open(os.path.join(docpath, f['filename']), 'rb')
-                        docfile.write(f['body'])
-                        docfile.close()
+                        usrdoc = "/data/static/usrdoc/%s" % self.current_user.id
+                        if not os.path.exists(usrdoc):
+                            logging.info("not exist")
+                            os.makedirs(usrdoc)
+                        else:
+                            shutil.move(path, os.path.join(usrdoc, name))
             if doc_error != 0:
                 template_values['doc_error'] = doc_error
                 template_values['doc_error_message'] = doc_error_messages[doc_error]
