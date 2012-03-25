@@ -112,7 +112,6 @@
             </div>
             <input id="docid" type="hidden" name="linkid" value="{{ template_values['id'] if 'id' in template_values else '' }}">
             <input id="oldtag" type="hidden" name="oldtag" value="{{ template_values['tag'] if 'tag' in template_values else '' }}">
-            <input type="hidden" name="test" value="/doc/edit">
             {{ xsrf_form_html() }}
         </form>
     </div>
