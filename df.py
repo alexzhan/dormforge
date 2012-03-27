@@ -1659,25 +1659,30 @@ class EditdocHandler(BaseHandler):
                         errors = errors + 1
                         doc_error = 3
                     else:
-                        usrpath = "/data/static/usrdoc/%s/" % self.current_user.id
-                        staticpath = "/work/Dormforge/static/usrdoc/%s/" % self.current_user.id
+                        usrpath = u"/data/static/usrdoc/%s/" % self.current_user.id
+                        staticpath = u"/work/Dormforge/static/usrdoc/%s/" % self.current_user.id
                         if not os.path.exists(usrpath):
                             os.makedirs(usrpath)
                         if not os.path.exists(staticpath):
                             os.makedirs(staticpath)
-                        usrdoc = os.path.join(usrpath, name)
+                        docid = path.split("/").pop()
+                        doctype = name.split(".").pop().lower()
+                        usrdoc = ''.join([usrpath, docid, '.', doctype])
                         shutil.move(path, usrdoc)
                         if name.split(".").pop().lower() != 'pdf':
-                            usrpdf = ''.join([usrpath, path.split("/").pop(), ".pdf"])
-                            usrjpg = ''.join([staticpath, path.split("/").pop(), ".jpg"])
-                            usrswf = ''.join([staticpath, path.split("/").pop(), ".swf"])
-                            os.system("python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
+                            usrpdf = ''.join([usrpath, docid, ".pdf"])
+                            usrjpg = ''.join([staticpath, docid, ".jpg"])
+                            usrswf = ''.join([staticpath, docid, ".swf"])
+                            if os.path.exists("/opt/libreoffice3.5/program/python"):
+                                os.system("/opt/libreoffice3.5/program/python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
+                            else:
+                                os.system("python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
                             os.system("convert -sample 150x150 %s[0] %s" % (usrpdf, usrjpg))
                             os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrpdf, usrswf))
                             os.remove(usrpdf)
                         else:
-                            usrjpg = ''.join([staticpath, path.split("/").pop(), ".jpg"])
-                            usrswf = ''.join([staticpath, path.split("/").pop(), ".swf"])
+                            usrjpg = ''.join([staticpath, docid, ".jpg"])
+                            usrswf = ''.join([staticpath, docid, ".swf"])
                             os.system("convert -sample 150x150 %s[0] %s" % (usrdoc, usrjpg))
                             os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrdoc, usrswf))
 
