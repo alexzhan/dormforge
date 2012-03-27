@@ -1615,6 +1615,7 @@ class EditdocHandler(BaseHandler):
         template_values = {}
         summary = self.get_argument("summary", None)
         tag = self.get_argument("tag", None)
+        secret = self.get_argument("secret", None)
         errors = 0
         title_error = 0
         title_error_messages = ['',
@@ -1659,32 +1660,62 @@ class EditdocHandler(BaseHandler):
                         errors = errors + 1
                         doc_error = 3
                     else:
-                        usrpath = u"/data/static/usrdoc/%s/" % self.current_user.id
-                        staticpath = u"/work/Dormforge/static/usrdoc/%s/" % self.current_user.id
-                        if not os.path.exists(usrpath):
-                            os.makedirs(usrpath)
-                        if not os.path.exists(staticpath):
-                            os.makedirs(staticpath)
-                        docid = path.split("/").pop()
-                        doctype = name.split(".").pop().lower()
-                        usrdoc = ''.join([usrpath, docid, '.', doctype])
-                        shutil.move(path, usrdoc)
-                        if name.split(".").pop().lower() != 'pdf':
-                            usrpdf = ''.join([usrpath, docid, ".pdf"])
-                            usrjpg = ''.join([staticpath, docid, ".jpg"])
-                            usrswf = ''.join([staticpath, docid, ".swf"])
-                            if os.path.exists("/opt/libreoffice3.5/program/python"):
-                                os.system("/opt/libreoffice3.5/program/python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
-                            else:
-                                os.system("python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
-                            os.system("convert -sample 150x150 %s[0] %s" % (usrpdf, usrjpg))
-                            os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrpdf, usrswf))
-                            os.remove(usrpdf)
+                        predoc = self.db.get("select * from fd_Doc where md5 = %s", md5)
+                        if predoc:
+                            os.remove(path)
+                            errors = errors + 1
+                            doc_error = 4
                         else:
-                            usrjpg = ''.join([staticpath, docid, ".jpg"])
-                            usrswf = ''.join([staticpath, docid, ".swf"])
-                            os.system("convert -sample 150x150 %s[0] %s" % (usrdoc, usrjpg))
-                            os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrdoc, usrswf))
+                            usrpath = u"/data/static/usrdoc/%s/" % self.current_user.id
+                            staticpath = u"/work/Dormforge/static/usrdoc/%s/" % self.current_user.id
+                            if not os.path.exists(usrpath):
+                                os.makedirs(usrpath)
+                            if not os.path.exists(staticpath):
+                                os.makedirs(staticpath)
+                            docid = path.split("/").pop()
+                            doctype = name.split(".").pop().lower()
+                            usrdoc = ''.join([usrpath, docid, '.', doctype])
+                            shutil.move(path, usrdoc)
+                            if name.split(".").pop().lower() != 'pdf':
+                                usrpdf = ''.join([usrpath, docid, ".pdf"])
+                                usrjpg = ''.join([staticpath, docid, ".jpg"])
+                                usrswf = ''.join([staticpath, docid, ".swf"])
+                                if os.path.exists("/opt/libreoffice3.5/program/python"):
+                                    os.system("/opt/libreoffice3.5/program/python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
+                                else:
+                                    os.system("python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
+                                os.system("convert -sample 150x150 %s[0] %s" % (usrpdf, usrjpg))
+                                os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrpdf, usrswf))
+                                os.remove(usrpdf)
+                            else:
+                                usrjpg = ''.join([staticpath, docid, ".jpg"])
+                                usrswf = ''.join([staticpath, docid, ".swf"])
+                                os.system("convert -sample 150x150 %s[0] %s" % (usrdoc, usrjpg))
+                                os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrdoc, usrswf))
+                            if os.path.exists(usrjpg) and os.path.exists(usrswf):
+                                doc_sql = ["insert into fd_Doc set doc_id = %s,name = '%s',content_type = '%s',md5 = '%s', docsize = %s," % (int(docid),name.replace("'", "''"),content_type,md5,int(size))]
+                                doc_sql.append("title = '%s'," % title.replace("'", "''"))
+                                if summary:
+                                    doc_sql.append("summary = '%s'," % summary.replace("'", "''"))
+                                if tag:
+                                    tag = tag.strip().replace(' ',',')
+                                    tag = tag.strip().replace('，',',')
+                                    tags = tag.split(",")
+                                    taglists = []
+                                    for t in tags:
+                                        if t in taglists:
+                                            continue
+                                        taglists.append(t)
+                                    newtag = " ".join(taglists)
+                                    doc_sql.append("tags = '%s'," % newtag.replace("'", "''"))
+                                pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+                                redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
+                                linktype = 0
+                                if not secret and secret == "on":
+                                    linktype = 1
+                                doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
+                                logging.info("".join(doc_sql))
+                                doc_id = self.db.execute("".join(doc_sql))
 
             if doc_error != 0:
                 template_values['doc_error'] = doc_error
