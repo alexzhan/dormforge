@@ -1710,10 +1710,10 @@ class EditdocHandler(BaseHandler):
                                     doc_sql.append("tags = '%s'," % newtag.replace("'", "''"))
                                 pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
                                 redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
-                                linktype = 0
+                                doctype = 0
                                 if not secret and secret == "on":
-                                    linktype = 1
-                                doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
+                                    doctype = 1
+                                doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,doctype))
                                 logging.info("".join(doc_sql))
                                 doc_id = self.db.execute("".join(doc_sql))
                                 if doc_id:
@@ -1725,6 +1725,15 @@ class EditdocHandler(BaseHandler):
                                             else:
                                                 tag_id = self.db.execute("insert into fd_Doctag (tag) values (%s)", t)
                                                 dtag_id = self.db.execute("insert into fd_Dtag (doc_id,tag_id) values (%s,%s)", doc_id, tag_id)
+                                    actdict = {'time':redpubdate, 'docid':docid, 'status':doctype}#docid not doc_id
+                                    if title:
+                                        actdict['title'] = title
+                                    if summary:
+                                        actdict['summary'] = summary
+                                    addresult = add_activity(self.rd, self.current_user.id, doc_id, 4, actdict)
+                                    if addresult:
+                                        #self.redirect("/doc/" + encode(doc_id))
+                                        self.redirect("/")
 
             if doc_error != 0:
                 template_values['doc_error'] = doc_error

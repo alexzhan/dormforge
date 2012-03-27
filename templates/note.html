@@ -6,7 +6,7 @@
     .note-item {
         margin-left: 100px;
         min-height: 50px;
-        width: 640px;
+        width: 680px;
         border-bottom: 3px solid silver;
         margin-bottom: 1px;
     }
@@ -14,13 +14,13 @@
         font-size: 16px;
         font-weight: bold;
         text-align: center;
-        width: 640px;
+        width: 680px;
         margin-bottom: 20px;
         word-break: break-all;
     }
     .note-text {
         font-size: 14px;
-        width: 640px;
+        width: 680px;
         margin-bottom: 10px;
         word-break: break-all;
         line-height: 22px;
@@ -42,7 +42,7 @@
     }
     .note-comment {
         margin-left: 100px;
-        width: 640px;
+        width: 680px;
         border-top: 1px solid silver;
     }
     .note-comment .comment-number {
@@ -57,7 +57,7 @@
     .note-comment .comment-item-content {
         float: left;
         padding: 5px 0 5px;
-        width: 640px;
+        width: 680px;
     }
     .note-comment .comment-item-body {
         margin-top: 5px;
@@ -95,7 +95,7 @@
     }
     .add-comment {
         margin-left: 100px;
-        width: 640px;
+        width: 680px;
     }
     .clickable {
         cursor: pointer;
@@ -155,7 +155,7 @@
         {% if current_user %}
         <div class="add-comment">
             <form id="comment-form" method="POST" action="{{ request.path }}" >
-                <textarea id="comment-box" name="comment" style="width:630px;height: 60px;margin-top:5px"></textarea>
+                <textarea id="comment-box" name="comment" style="width:670px;height: 60px;margin-top:5px"></textarea>
                 <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}',1);">提交</button>
             </form>
         </div>
