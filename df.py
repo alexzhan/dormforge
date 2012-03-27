@@ -1180,8 +1180,8 @@ class PubnoteHandler(BaseHandler):
                         'content':rednotecontent, 'status':status_}
                 addresult = add_activity(self.rd, user_id, note_id, 2, actdict)
                 if addresult:
-                    #self.write(encode(str(status_id)))
-                    self.write("right")
+                    self.write(encode(str(note_id)))
+                    #self.write("right")
                 else:
                     self.write("wrong")
 
@@ -1716,6 +1716,15 @@ class EditdocHandler(BaseHandler):
                                 doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
                                 logging.info("".join(doc_sql))
                                 doc_id = self.db.execute("".join(doc_sql))
+                                if doc_id:
+                                    if tag:
+                                        for t in taglists:
+                                            tag_id = self.db.get("select id from fd_Doctag where tag = %s", t)
+                                            if tag_id:
+                                                tag_id = tag_id.id
+                                            else:
+                                                tag_id = self.db.execute("insert into fd_Doctag (tag) values (%s)", t)
+                                                dtag_id = self.db.execute("insert into fd_Dtag (doc_id,tag_id) values (%s,%s)", doc_id, tag_id)
 
             if doc_error != 0:
                 template_values['doc_error'] = doc_error
