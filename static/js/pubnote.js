@@ -30,8 +30,14 @@ function pubnote(notetype,pubtype) {
             id:$("#noteid").val(),
             _xsrf:getCookie('_xsrf')},
         success:function(data){
-            if(data == "right")
-              window.location.href="/";
+            if(data != "wrong"){
+                if(pubtype == 1){
+                    window.location.href="/note/" + $("#noteid").val();
+                }
+                else{
+                    window.location.href="/note/" + data;
+                }
+            }
         }
     });
     return false;

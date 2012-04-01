@@ -69,6 +69,7 @@ class Application(tornado.web.Application):
                 (r"/link/([0-9a-z]+)", LinkHandler),
                 (r"/cansug", CansugHandler),
                 (r"/doc/edit", EditdocHandler),
+                (r"/doc/([0-9a-z]+)", DocHandler),
                 (r".*", PNFHandler),
                 ]
         settings = dict(
@@ -1180,8 +1181,8 @@ class PubnoteHandler(BaseHandler):
                         'content':rednotecontent, 'status':status_}
                 addresult = add_activity(self.rd, user_id, note_id, 2, actdict)
                 if addresult:
-                    #self.write(encode(str(status_id)))
-                    self.write("right")
+                    self.write(encode(str(note_id)))
+                    #self.write("right")
                 else:
                     self.write("wrong")
 
@@ -1693,7 +1694,7 @@ class EditdocHandler(BaseHandler):
                                 os.system("convert -sample 150x150 %s[0] %s" % (usrdoc, usrjpg))
                                 os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrdoc, usrswf))
                             if os.path.exists(usrjpg) and os.path.exists(usrswf):
-                                doc_sql = ["insert into fd_Doc set doc_id = %s,name = '%s',content_type = '%s',md5 = '%s', docsize = %s," % (int(docid),name.replace("'", "''"),content_type,md5,int(size))]
+                                doc_sql = ["insert into fd_Doc set doc_id = '%s',name = '%s',content_type = '%s',md5 = '%s', docsize = %s," % (docid,name.replace("'", "''"),content_type,md5,int(size))]
                                 doc_sql.append("title = '%s'," % title.replace("'", "''"))
                                 if summary:
                                     doc_sql.append("summary = '%s'," % summary.replace("'", "''"))
@@ -1710,12 +1711,30 @@ class EditdocHandler(BaseHandler):
                                     doc_sql.append("tags = '%s'," % newtag.replace("'", "''"))
                                 pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
                                 redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
-                                linktype = 0
+                                doctype = 0
                                 if not secret and secret == "on":
-                                    linktype = 1
-                                doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
+                                    doctype = 1
+                                doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,doctype))
                                 logging.info("".join(doc_sql))
                                 doc_id = self.db.execute("".join(doc_sql))
+                                if doc_id:
+                                    if tag:
+                                        for t in taglists:
+                                            tag_id = self.db.get("select id from fd_Doctag where tag = %s", t)
+                                            if tag_id:
+                                                tag_id = tag_id.id
+                                            else:
+                                                tag_id = self.db.execute("insert into fd_Doctag (tag) values (%s)", t)
+                                                dtag_id = self.db.execute("insert into fd_Dtag (doc_id,tag_id) values (%s,%s)", doc_id, tag_id)
+                                    actdict = {'time':redpubdate, 'docid':docid, 'status':doctype}#docid not doc_id
+                                    if title:
+                                        actdict['title'] = title
+                                    if summary:
+                                        actdict['summary'] = summary
+                                    addresult = add_activity(self.rd, self.current_user.id, doc_id, 4, actdict)
+                                    if addresult:
+                                        #self.redirect("/doc/" + encode(doc_id))
+                                        self.redirect("/")
 
             if doc_error != 0:
                 template_values['doc_error'] = doc_error
@@ -1728,6 +1747,26 @@ class EditdocHandler(BaseHandler):
             if tag:
                 template_values['tag'] = tag
             self.render("editdoc.html", template_values=template_values)
+
+class DocHandler(BaseHandler):
+    def get(self, doc_id):
+        template_values = {}
+        if len(doc_id) < 8:
+            raise tornado.web.HTTPError(404)
+        doc_id = decode(doc_id)
+        doc = self.db.get("select p.id ,p.name,p.domain,d.title,d.summary,d.status_,d.doc_id "
+                ",d.pubdate from fd_People p, fd_Doc d where d.user_id = p.id and "
+                "d.id = %s", doc_id)
+        if not doc or doc.status_ == 2 or \
+        doc.status_ == 1 and doc.name != self.current_user.name:
+            raise tornado.web.HTTPError(404)
+        template_values['doc'] = doc
+        comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
+                "c.pubdate from fd_People p, fd_Doccomm c where p.id"
+                "=c.user_id and doc_id = %s", doc_id)
+        template_values['comments_length'] = len(comments)
+        template_values['comments'] = comments
+        self.render("doc.html", template_values=template_values)
 
 def main():
     tornado.options.parse_command_line()

@@ -5,8 +5,8 @@ class UserActivityGraph(object):
     def __init__(self, client):
         self.client = client
         self.Activity_KEY = 'A'
-        self.Sub_Activity_KEYS = ['Follow','Status','Note','Link']
-        self.sub_activity_KEYS = ['follow','status','note','link']
+        self.Sub_Activity_KEYS = ['Follow','Status','Note','Link','Doc']
+        self.sub_activity_KEYS = ['follow','status','note','link','doc']
 
     #Activity_key's format:'u:A:1' ('u:A:user_id')
     
@@ -18,7 +18,7 @@ class UserActivityGraph(object):
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
         activity_key = self.add_sub_activity(user, actto, acttype, actdict)
         addresult = self.client.lpush(Activity_key, activity_key)
-        if acttype in [1,2,3]:
+        if acttype in [1,2,3,4]:
             self.client.lpush("all", activity_key)
         self.add_my_activity(user, activity_key)
         return addresult
@@ -104,6 +104,12 @@ class UserActivityGraph(object):
                     continue
                 sub_activity.append(actto)#actto
                 sub_activity.append(3)#type:3
+            elif acttype == 'doc':
+                sub_activity = self.client.hmget(sub_activity_key, ["time","docid","title","status"])
+                if not isself and sub_activity[3] != '0':
+                    continue
+                sub_activity.append(actto)#actto
+                sub_activity.append(4)#type:4
             Activity_list.append(sub_activity)                    
             index = index + 1
             if index == 5:
@@ -130,6 +136,11 @@ class UserActivityGraph(object):
                 if not isself and sub_activity[3] != '0':
                     continue
                 sub_activity.append(actto)
+            if acttype == 4:
+                sub_activity = self.client.hmget(sub_activity_key, ["time","docid","title","status"])
+                if not isself and sub_activity[3] != '0':
+                    continue
+                sub_activity.append(actto)
             Sub_Activity_list.append(sub_activity)
             index = index + 1
             if index == 3:
@@ -150,6 +161,8 @@ class UserActivityGraph(object):
                 real_activity = self.client.hmget(activity, ["time","title","content","status",'comm'])
             elif acttype == 'link':
                 real_activity = self.client.hmget(activity, ["time","url","title","summary",'status','comm'])
+            elif acttype == 'doc':
+                real_activity = self.client.hmget(activity, ["time","docid","title","summary",'status','comm'])
             real_activity.append(actto)
             real_activity.append(act_userid)
             real_activity.append(act_username)
@@ -177,6 +190,9 @@ class UserActivityGraph(object):
                 real_activity.append(actto)
             elif acttype == 'link':
                 real_activity = self.client.hmget(activity, ["time","url","title","summary",'status','comm'])
+                real_activity.append(actto)
+            elif acttype == 'doc':
+                real_activity = self.client.hmget(activity, ["time","docid","title","summary",'status','comm'])
                 real_activity.append(actto)
             if acttype == 'follow':
                 actto_username,actto_domain,actto_uuid = get_namedomainuuid_by_id(db, self.client, actto)
