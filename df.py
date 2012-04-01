@@ -1761,6 +1761,8 @@ class DocHandler(BaseHandler):
         doc.status_ == 1 and doc.name != self.current_user.name:
             raise tornado.web.HTTPError(404)
         template_values['doc'] = doc
+        template_values['path'] = self.static_url("usrdoc/%s/%s.swf" % (doc.id, doc.doc_id))
+        template_values['epath'] = self.static_url("usrdoc/expressInstall.swf")
         comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
                 "c.pubdate from fd_People p, fd_Doccomm c where p.id"
                 "=c.user_id and doc_id = %s", doc_id)
