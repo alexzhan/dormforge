@@ -2,7 +2,10 @@
 
 {% block head %}
 <title>{{ template_values['doc'].title }}</title>
-<script type="text/javascript" src="{{ static_url('js/fp.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('js/swfobject.js') }}"></script>
+<script type="text/javascript">
+    swfobject.embedSWF(" {{ template_values['path'] }}", "myContent", "680", "480", "9.0.0", "{{ template_values['epath'] }}");
+</script>
 <style type="text/css">
     .doc-item {
         margin-left: 100px;
@@ -111,37 +114,10 @@
             <div class="doc-title">
                 {{ template_values['doc'].title }}
             </div>
-            <div>
-                <a id="viewerPlaceHolder" style="width:680px;height:480px;display:block"></a>            
-                <script type="text/javascript"> 
-                    var fp = new FlexPaperViewer(	
-						 'FlexPaperViewer',
-						 'viewerPlaceHolder', { config : {
-                         SwfFile : escape("http://18zhou.com/static/usrdoc/{{ template_values['doc'].id }}/{{ template_values['doc'].doc_id }}.swf"),
-						 Scale : 0.6, 
-						 ZoomTransition : 'easeOut',
-						 ZoomTime : 0.5,
-						 ZoomInterval : 0.2,
-						 FitPageOnLoad : true,
-						 FitWidthOnLoad : false,
-						 FullScreenAsMaxWindow : false,
-						 ProgressiveLoading : false,
-						 MinZoomSize : 0.2,
-						 MaxZoomSize : 5,
-						 SearchMatchAll : false,
-						 InitViewMode : 'Portrait',
-						 PrintPaperAsBitmap : false,
-						 
-						 ViewModeToolsVisible : true,
-						 ZoomToolsVisible : true,
-						 NavToolsVisible : true,
-						 CursorToolsVisible : true,
-						 SearchToolsVisible : true,
-  						
-  						 localeChain: 'en_US'
-                         }});
-                     </script>
-                     </div>           
+            <div id="myContent">
+                <h1>Alternative content</h1>
+                <p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>
+            </div>
                 <div class="doc-bottom">
                 <span class="doc-info">
                 <a href="/people/{{ template_values['doc'].domain }}">{{ template_values['doc'].name }}</a> 发布于 {{ str(template_values['doc'].pubdate)[5:-3] if str(template_values['doc'].pubdate)[5] != '0' else str(template_values['doc'].pubdate)[6:-3] }}
