@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{ template_values['doc'].title }}</title>
+<script type="text/javascript" src="{{ static_url('js/fp.js') }}"></script>
+<style type="text/css">
+    .doc-item {
+        margin-left: 100px;
+        min-height: 50px;
+        width: 680px;
+        border-bottom: 3px solid silver;
+        margin-bottom: 1px;
+    }
+    .doc-title {
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        width: 680px;
+        margin-bottom: 20px;
+        word-break: break-all;
+    }
+    .doc-text {
+        position:absolute;
+        left:10px;
+        top:10px;
+    }
+    #viewerPlaceHolder {
+        width:680px;
+        height:480px;
+        display:block;
+    }
+    .doc-bottom {
+        color: #999;
+        font-size: small;
+        margin-bottom: 5px;
+        text-align: right;
+    }
+    .doc-bottom .doc-action {
+        float: left;
+    }
+    .doc-bottom .doc-info a,.doc-bottom .doc-action a {
+        color: #999;
+    }
+    .doc-comment {
+        margin-left: 100px;
+        width: 680px;
+        border-top: 1px solid silver;
+    }
+    .doc-comment .comment-number {
+        padding-top: 10px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+    .doc-comment .comment-item {
+        border-top: 1px solid #E0E0E0;
+        clear: both;
+    }
+    .doc-comment .comment-item-content {
+        float: left;
+        padding: 5px 0 5px;
+        width: 680px;
+    }
+    .doc-comment .comment-item-body {
+        margin-top: 5px;
+    }
+    .doc-comment .comment-item-body p{
+        margin-bottom: 5px;
+        font-size: 14px;
+        word-break: break-all;
+    }
+    .doc-comment .comment-item-body p a{
+        color: #19558D;;
+    }
+    .doc-comment .comment-item-title a {
+        color: gray;
+    }
+    .doc-comment .comment-item-title a:hover {
+        color: #005580;
+    }
+    .doc-comment .comment-item-title .name {
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .doc-comment .comment-item-title .time {
+        float: right;
+        text-align: right;
+        font-size: small;
+        color: #999;
+        width: 100px;
+    }
+    .doc-comment .commavatar {
+        padding-top: 5px;
+        margin-left: -60px;
+        float: left;
+        width: 50px;
+    }
+    .add-comment {
+        margin-left: 100px;
+        width: 680px;
+    }
+    .clickable {
+        cursor: pointer;
+        display:inline;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="container">
+    <div class="span7">
+        <div class="doc-item">
+            <div class="doc-title">
+                {{ template_values['doc'].title }}
+            </div>
+            <div>
+                <a id="viewerPlaceHolder" style="width:680px;height:480px;display:block"></a>            
+                <script type="text/javascript"> 
+                    var fp = new FlexPaperViewer(	
+						 'FlexPaperViewer',
+						 'viewerPlaceHolder', { config : {
+                         SwfFile : escape("http://18zhou.com/static/usrdoc/{{ template_values['doc'].id }}/{{ template_values['doc'].doc_id }}.swf"),
+						 Scale : 0.6, 
+						 ZoomTransition : 'easeOut',
+						 ZoomTime : 0.5,
+						 ZoomInterval : 0.2,
+						 FitPageOnLoad : true,
+						 FitWidthOnLoad : false,
+						 FullScreenAsMaxWindow : false,
+						 ProgressiveLoading : false,
+						 MinZoomSize : 0.2,
+						 MaxZoomSize : 5,
+						 SearchMatchAll : false,
+						 InitViewMode : 'Portrait',
+						 PrintPaperAsBitmap : false,
+						 
+						 ViewModeToolsVisible : true,
+						 ZoomToolsVisible : true,
+						 NavToolsVisible : true,
+						 CursorToolsVisible : true,
+						 SearchToolsVisible : true,
+  						
+  						 localeChain: 'en_US'
+                         }});
+                     </script>
+                     </div>           
+                <div class="doc-bottom">
+                <span class="doc-info">
+                <a href="/people/{{ template_values['doc'].domain }}">{{ template_values['doc'].name }}</a> 发布于 {{ str(template_values['doc'].pubdate)[5:-3] if str(template_values['doc'].pubdate)[5] != '0' else str(template_values['doc'].pubdate)[6:-3] }}
+                </span>
+                {% if current_user and current_user.name == template_values['doc'].name %}
+                <span class="doc-action">
+                    <span><a href="/doc/edit?id={{ request.path.split("/")[-1] }}">编辑</a></span>
+                    <span class="splitter"> • </span>
+                    <span><a href="#" onclick="return delactivity('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}', 2);">删除</a></span>
+                </span>
+                {% end %}
+            </div>
+        </div>
+        <div class="doc-comment">
+            {% if current_user or (not current_user and template_values['comments_length'] == '0') %}
+            <div class="comment-number">
+                <i class="icon-comment"></i><span id="number">评论({{ template_values['comments_length'] }})</span>
+            </div>
+            {% end %}
+            {% for comments in template_values['comments'] %}
+            <div class="comment-item">
+                <div class="commavatar">
+                    <a href="/people/{{ comments.domain }}"><img width="50px" height="50px" src="{{ handler.avatar('m', comments.id, comments.uuid_) }}"></a>
+                </div>
+                <div class="comment-item-content">
+                    <div class="comment-item-title">
+                        <a class="name" href="/people/{{ comments.domain }}">{{ comments.name }}</a>
+                        <span class="time">
+                            {{ str(comments.pubdate)[5:-3] if str(comments.pubdate)[5] != '0' else str(comments.pubdate)[6:-3] }}   
+                            <img src="{{ static_url('img/reply.png') }}" align="absmiddle" border="0" alt="回复 {{ comments.name }}" onclick="replyOne('{{ comments.name }}')" class="clickable">
+                        </span>
+                    </div>
+                    <div class="comment-item-body">
+                        <p>{{ handler.br(handler.at(linkify(comments.comments, extra_params="target='_blank' rel='nofollow'"))) }}</p>
+                    </div>
+                </div>
+            </div>
+            {% end %}
+        </div>
+        {% if current_user %}
+        <div class="add-comment">
+            <form id="comment-form" method="POST" action="{{ request.path }}" >
+                <textarea id="comment-box" name="comment" style="width:670px;height: 60px;margin-top:5px"></textarea>
+                <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}',1);">提交</button>
+            </form>
+        </div>
+        {% end %}
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url('js/activity.js') }}"></script>
+{% end %}
