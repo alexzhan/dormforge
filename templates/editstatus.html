@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>编辑文档</title>
+<style type="text/css">
+    .pubform {
+        float: right;
+        margin-right: 200px;
+    }
+    .control-group {
+        margin-bottom: 0;
+        width: 615px;
+    }
+    .input-xlarge {
+        width: 600px;
+        height: 150px;
+        padding: 7px;
+        font-size: 16px;
+    }
+    .sub-button .sub{
+        float: right;
+    }
+    .sub-button .secretbox{
+        float: right;
+        margin-right: 20px;
+        padding-top: 4px;
+    }
+    .form-horizontal .control-group > label {
+        padding-top: 0;
+        text-align: left;
+        float: left;
+    }
+    .sub-button .cancel{
+        float: left;
+    }
+    .sub-button .secretbox{
+        float: right;
+        margin-right: 20px;
+        padding-top: 4px;
+    }
+    #cancelbtn{
+        float: right;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="row">
+    <div class="pubform">
+        <form  id='editstatus' method='POST' action="{{ request.path }}" class="form-horizontal">
+            <div id="statuscontrol" class="control-group">
+                <textarea id="status" name="status" class="input-xlarge">{{ template_values['status'] }}</textarea>
+            </div>
+            <div class="sub-button">
+                <span class="sub">
+                    <button type="submit" class="btn btn-primary" onclick="return submitsta();">保存</button>
+                </span>
+                <span class="cancel">
+                    <a type="submit" class="btn" href="/status/{{ template_values['id'] }}">取消</a>
+                </span>
+            </div>
+            <input id="statusid" type="hidden" name="statusid" value="{{ template_values['id'] }}">
+            <div id="oldstatus" style="display: none">{{ template_values['status'] }}</div>
+            {{ xsrf_form_html() }}
+        </form>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url('js/editstatus.js') }}"></script>
+{% end %}

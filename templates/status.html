@@ -17,6 +17,9 @@
             <div class="activity-info">
                 <a href="/people/{{ template_values['activity'].domain }}">{{ template_values['activity'].name }}</a> 发布于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
                 {% if current_user and current_user.name == template_values['activity'].name %}
+
+                <span class="splitter"> • </span>
+                <span><a href="/status/edit?id={{ request.path.split("/")[-1] }}">编辑</a></span>
                 <span class="splitter"> • </span>
                 <span><a href="#" onclick="return delactivity('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}', 1);">删除</a></span>
                 {% end %}
