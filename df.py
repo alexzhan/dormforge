@@ -60,6 +60,7 @@ class Application(tornado.web.Application):
                 (r"/selfdesc", SelfdescHandler),
                 (r"/pubstatus", PubstatusHandler),
                 (r"/deleteactivity", DeleteActivityHandler),
+                (r"/status/edit", EditstatusHandler),
                 (r"/status/([0-9a-z]+)", StatusHandler),
                 (r"/note/touch", PubnoteHandler),
                 (r"/viewnote", ViewnoteHandler),
@@ -1789,6 +1790,41 @@ class DocHandler(BaseHandler):
                 comments_num = int(prev_comments_num) + 1
             self.rd.hset(doc_key, 'comm', comments_num)
             self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.br(self.at(linkify(comments, extra_params="target='_blank' rel='nofollow'")))]))
+
+class EditstatusHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        template_values = {}
+        statusid = self.get_argument("id",None)
+        if not statusid:
+            raise tornado.web.HTTPError(404)
+        else:
+            if len(statusid) < 8:
+                raise tornado.web.HTTPError(404)
+            status_id = decode(statusid)
+            status = self.db.get("select status,user_id,status_ "
+                    "from fd_Status where id = %s", status_id)
+            if not status or status.user_id != self.current_user.id:
+                raise tornado.web.HTTPError(404)
+            template_values['status'] = status.status
+            template_values['id'] = statusid
+        self.render("editstatus.html", template_values=template_values)
+    @tornado.web.authenticated
+    def post(self):
+        statusid = self.get_argument("statusid",None)
+        statuscontent = self.get_argument("status",None)
+        user_id = self.current_user.id
+        if statusid and statuscontent and statuscontent != "":
+            statusid = decode(statusid)
+            status_user = self.db.get("select user_id from fd_Status where id = %s", statusid)
+            if not status_user or status_user.user_id != user_id:
+                raise tornado.web.HTTPError(404)
+            self.db.execute("update fd_Status set status = %s "
+                    "where id = %s", statuscontent, statusid)
+            status_key = "status:%s:%s" % (user_id, statusid)
+            actdict = {'status':statuscontent}
+            if self.rd.hmset(status_key, actdict):
+                self.redirect("/status/%s" % encode(statusid))
 
 def main():
     tornado.options.parse_command_line()

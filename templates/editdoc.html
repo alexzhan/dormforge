@@ -60,11 +60,6 @@
     #cancelbtn{
         float: right;
     }
-    .sub-button .bookmarklet {
-        float: right;
-        margin-right: 170px;
-        padding-top: 5px;
-    }
     .docdesc {
         color: #999;
         margin-bottom: 5px;
@@ -110,7 +105,7 @@
                     <a type="submit" class="btn" href="/" onclick="return cancelbtn('{{ template_values['id'] if 'id' in template_values and template_values['id'] else "0" }}');">取消</a>
                 </span>
             </div>
-            <input id="docid" type="hidden" name="linkid" value="{{ template_values['id'] if 'id' in template_values else '' }}">
+            <input id="docid" type="hidden" name="docid" value="{{ template_values['id'] if 'id' in template_values else '' }}">
             <input id="oldtag" type="hidden" name="oldtag" value="{{ template_values['tag'] if 'tag' in template_values else '' }}">
             {{ xsrf_form_html() }}
         </form>
