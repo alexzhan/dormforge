@@ -3,111 +3,12 @@
 {% block head %}
 <title>{{ template_values['activity'].title }}</title>
 <script type="text/javascript" src="{{ static_url('js/flexpaper_flash.js') }}"></script>
-<style type="text/css">
-    .activity-item {
-        margin-left: 100px;
-        min-height: 50px;
-        width: 680px;
-        border-bottom: 3px solid silver;
-        margin-bottom: 1px;
-    }
-    .activity-title {
-        font-size: 16px;
-        font-weight: bold;
-        text-align: center;
-        width: 680px;
-        margin-bottom: 20px;
-        word-break: break-all;
-    }
-    .activity-text {
-        position:absolute;
-        left:10px;
-        top:10px;
-    }
-    #viewerPlaceHolder {
-        width:680px;
-        height:480px;
-        display:block;
-    }
-    .activity-bottom {
-        color: #999;
-        font-size: small;
-        margin-bottom: 5px;
-        text-align: right;
-    }
-    .activity-bottom .activity-action {
-        float: left;
-    }
-    .activity-bottom .activity-info a,.activity-bottom .activity-action a {
-        color: #999;
-    }
-    .activity-comment {
-        margin-left: 100px;
-        width: 680px;
-        border-top: 1px solid silver;
-    }
-    .activity-comment .comment-number {
-        padding-top: 10px;
-        margin-bottom: 10px;
-        font-weight: bold;
-    }
-    .activity-comment .comment-item {
-        border-top: 1px solid #E0E0E0;
-        clear: both;
-    }
-    .activity-comment .comment-item-content {
-        float: left;
-        padding: 5px 0 5px;
-        width: 680px;
-    }
-    .activity-comment .comment-item-body {
-        margin-top: 5px;
-    }
-    .activity-comment .comment-item-body p{
-        margin-bottom: 5px;
-        font-size: 14px;
-        word-break: break-all;
-    }
-    .activity-comment .comment-item-body p a{
-        color: #19558D;;
-    }
-    .activity-comment .comment-item-title a {
-        color: gray;
-    }
-    .activity-comment .comment-item-title a:hover {
-        color: #005580;
-    }
-    .activity-comment .comment-item-title .name {
-        font-weight: bold;
-        font-size: 14px;
-    }
-    .activity-comment .comment-item-title .time {
-        float: right;
-        text-align: right;
-        font-size: small;
-        color: #999;
-        width: 100px;
-    }
-    .activity-comment .commavatar {
-        padding-top: 5px;
-        margin-left: -60px;
-        float: left;
-        width: 50px;
-    }
-    .add-comment {
-        margin-left: 100px;
-        width: 680px;
-    }
-    .clickable {
-        cursor: pointer;
-        display:inline;
-    }
-</style>
+<link rel="stylesheet" href="{{ static_url("css/activity.css") }}" type="text/css"/>
 {% end %}
 {% block body %}
 <div class="container">
     <div class="span7">
-        <div class="activity-item">
+        <div class="activity-item docnote-item">
             <div class="activity-title">
                 {{ template_values['activity'].title }}
             </div>
@@ -155,7 +56,7 @@
                 {% end %}
             </div>
         </div>
-        <div class="activity-comment">
+        <div class="activity-comment docnote-comment">
             {% if current_user or (not current_user and template_values['comments_length'] == '0') %}
             <div class="comment-number">
                 <i class="icon-comment"></i><span id="number">评论({{ template_values['comments_length'] }})</span>
@@ -166,7 +67,7 @@
                 <div class="commavatar">
                     <a href="/people/{{ comments.domain }}"><img width="50px" height="50px" src="{{ handler.avatar('m', comments.id, comments.uuid_) }}"></a>
                 </div>
-                <div class="comment-item-content">
+                <div class="comment-item-content docnote-content">
                     <div class="comment-item-title">
                         <a class="name" href="/people/{{ comments.domain }}">{{ comments.name }}</a>
                         <span class="time">
@@ -182,10 +83,10 @@
             {% end %}
         </div>
         {% if current_user %}
-        <div class="add-comment">
+        <div class="add-comment-docnote">
             <form id="comment-form" method="POST" action="{{ request.path }}" >
                 <textarea id="comment-box" name="comment" style="width:670px;height: 60px;margin-top:5px"></textarea>
-                <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}');">提交</button>
+                <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}',2);">提交</button>
             </form>
         </div>
         {% end %}
