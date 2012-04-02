@@ -100,7 +100,7 @@
             </fieldset>
             <div class="sub-button">
                 <span class="sub">
-                    <button type="submit" class="btn btn-primary" onclick="return editlink();">保存</button>
+                    <button type="submit" id="docbtn" class="btn btn-primary" onclick="return submitdoc();">保存</button>
                 </span>
                 <span class="secretbox">
                     <input type="checkbox" name="secret" id="secret" {% if 'checked' in template_values and template_values['checked'] == 'checked' %}checked="checked"{% end %}>
@@ -118,4 +118,5 @@
 </div>
 {% end %}
 {% block bottom %}
+<script type="text/javascript" src="{{ static_url('js/editdoc.js') }}"></script>
 {% end %}

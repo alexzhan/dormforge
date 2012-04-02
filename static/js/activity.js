@@ -16,8 +16,11 @@ function submitfunc(requesturl,name,domain,prevnum,commentype) {
             if(commentype == 1){
                 $(".note-comment").append(new_comment_item);
             }
-            else {
+            else if(commentype == 2) {
                 $(".status-comment").append(new_comment_item);
+            }
+            else if(commentype == 3) {
+                $(".doc-comment").append(new_comment_item);
             }
         }       
     });

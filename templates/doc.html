@@ -185,7 +185,7 @@
         <div class="add-comment">
             <form id="comment-form" method="POST" action="{{ request.path }}" >
                 <textarea id="comment-box" name="comment" style="width:670px;height: 60px;margin-top:5px"></textarea>
-                <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}',1);">提交</button>
+                <button class="btn" style="float:right" onclick="return submitfunc('{{ request.path }}','{{ current_user.name}}','{{ current_user.domain }}','{{ template_values['comments_length'] }}',3);">提交</button>
             </form>
         </div>
         {% end %}

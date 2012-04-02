@@ -1769,6 +1769,26 @@ class DocHandler(BaseHandler):
         template_values['comments_length'] = len(comments)
         template_values['comments'] = comments
         self.render("doc.html", template_values=template_values)
+    @tornado.web.authenticated
+    def post(self, doc_id):
+        if len(doc_id) < 8:
+            raise tornado.web.HTTPError(404)
+        doc_id = decode(doc_id)
+        comments = self.get_argument("commenttext",None)
+        user_id = self.current_user.id
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+        comment_id = self.db.execute("insert into fd_Doccomm (user_id, "
+                    " doc_id, comments, pubdate) values (%s,%s,%s,%s)", 
+                    user_id, doc_id, comments, pubdate)
+        if comment_id:
+            doc_key = self.rd.keys('doc*%s' % doc_id)[0]
+            prev_comments_num = self.rd.hget(doc_key, 'comm')
+            if not prev_comments_num:
+                comments_num = 1
+            else:
+                comments_num = int(prev_comments_num) + 1
+            self.rd.hset(doc_key, 'comm', comments_num)
+            self.write(''.join([self.avatar('m',self.current_user.id,self.current_user.uuid_), ',', self.br(self.at(linkify(comments, extra_params="target='_blank' rel='nofollow'")))]))
 
 def main():
     tornado.options.parse_command_line()
