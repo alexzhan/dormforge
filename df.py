@@ -1624,31 +1624,41 @@ class EditdocHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         template_values = {}
+        doc_id = self.get_argument("id", None)
+        if doc_id:
+            if len(doc_id) < 8:
+                raise tornado.web.HTTPError(404)
+            docid = decode(doc_id)
+            doc = self.db.get("select title,summary,tags,user_id,status_ "
+                    "from fd_Doc where id = %s", docid)
+            if not doc or doc.user_id != self.current_user.id:
+                raise tornado.web.HTTPError(404)
+            template_values['title'] = doc.title
+            template_values['summary'] = doc.summary
+            template_values['tag'] = doc.tags
+            template_values['id'] = doc_id
         self.render("editdoc.html", template_values=template_values)
         
     @tornado.web.authenticated
     def post(self):
         template_values = {}
+        title = self.get_argument("title", None)
         summary = self.get_argument("summary", None)
         tag = self.get_argument("tag", None)
         secret = self.get_argument("secret", None)
+        docid = self.get_argument("docid", None)
+        oldtag = self.get_argument("oldtag", None)
         errors = 0
         title_error = 0
         title_error_messages = ['',
                 u'请输入标题',
                 ]
-        title = self.get_argument("title", None)
-        name = self.get_argument("doc.name", None)
-        content_type = self.get_argument("doc.content_type", None)
-        path = self.get_argument("doc.path", None)
-        md5 = self.get_argument("doc.md5", None)
-        size = self.get_argument("doc.size", None)
-        logging.info(title)
-        logging.info(name)
-        logging.info(content_type)
-        logging.info(path)
-        logging.info(md5)
-        logging.info(size)
+        if docid and docid != "":
+            name = self.get_argument("doc.name", None)
+            content_type = self.get_argument("doc.content_type", None)
+            path = self.get_argument("doc.path", None)
+            md5 = self.get_argument("doc.md5", None)
+            size = self.get_argument("doc.size", None)
         if not title or len(title) == 0:
             errors = errors + 1
             title_error = 1
