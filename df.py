@@ -1050,6 +1050,19 @@ class DeleteActivityHandler(BaseHandler):
             self.db.execute("update fd_Note set status_ = 2 where id = %s", actto)
         elif acttype == 3:
             self.db.execute("update fd_Link set status_ = 2 where id = %s", actto)
+        elif acttype == 4:
+            doc_id = self.db.get("select doc_id,name,user_id from fd_Doc where id = %s", actto)
+            if not doc_id:
+                raise tornado.web.HTTPError(500)
+            tld = doc_id.name.split(".").pop()
+            prepath = "/data/static/usrdoc/%s/%s.%s" % (doc_id.user_id, doc_id.doc_id, tld)
+            jpgpath = "/work/Dormforge/static/usrdoc/%s/%s.jpg" % (doc_id.user_id, doc_id.doc_id)
+            swfpath = "/work/Dormforge/static/usrdoc/%s/%s.swf" % (doc_id.user_id, doc_id.doc_id)
+            if os.path.exists(prepath) and os.path.exists(jpgpath) and os.path.exists(swfpath):
+                os.remove(prepath)
+                os.remove(jpgpath)
+                os.remove(swfpath)
+                self.db.execute("update fd_Doc set status_ = 2 where id = %s", actto)
         del_activity(self.rd, user_id, acttype, actto)
 
 class StatusHandler(BaseHandler):
@@ -1647,7 +1660,7 @@ class EditdocHandler(BaseHandler):
                     u'请选择文档',
                     u'暂时不支持该文档格式',
                     u'文档不能大于20M',
-                    u'该文档已被上传过',
+                    u"该文档已被上传过",
                     ]
             if not (name and path and md5 and size):
                 errors = errors + 1
@@ -1663,7 +1676,7 @@ class EditdocHandler(BaseHandler):
                         errors = errors + 1
                         doc_error = 3
                     else:
-                        predoc = self.db.get("select * from fd_Doc where md5 = %s", md5)
+                        predoc = self.db.get("select * from fd_Doc where md5 = %s and status_ = 0", md5)
                         if predoc:
                             os.remove(path)
                             errors = errors + 1
