@@ -1061,7 +1061,7 @@ class StatusHandler(BaseHandler):
                 "s.id = %s", status_id)
         if not status or status.status_ == 1:
             raise tornado.web.HTTPError(404)
-        template_values['status'] = status
+        template_values['activity'] = status
         comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
                 "c.pubdate from fd_People p, fd_Stacomm c where p.id"
                 "=c.user_id and status_id = %s", status_id)
@@ -1101,7 +1101,7 @@ class LinkHandler(BaseHandler):
                 "l.id = %s", link_id)
         if not link or link.status_ == 1 and link.name != self.current_user.name:
             raise tornado.web.HTTPError(404)
-        template_values['link'] = link
+        template_values['activity'] = link
         comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
                 "c.pubdate from fd_People p, fd_Linkcomm c where p.id"
                 "=c.user_id and link_id = %s", link_id)
@@ -1212,7 +1212,7 @@ class NoteHandler(BaseHandler):
         if not note or note.status_ == 2 or \
         note.status_ == 1 and note.name != self.current_user.name:
             raise tornado.web.HTTPError(404)
-        template_values['note'] = note
+        template_values['activity'] = note
         comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "
                 "c.pubdate from fd_People p, fd_Notecomm c where p.id"
                 "=c.user_id and note_id = %s", note_id)
@@ -1760,7 +1760,7 @@ class DocHandler(BaseHandler):
         if not doc or doc.status_ == 2 or \
         doc.status_ == 1 and doc.name != self.current_user.name:
             raise tornado.web.HTTPError(404)
-        template_values['doc'] = doc
+        template_values['activity'] = doc
         template_values['path'] = self.static_url("usrdoc/%s/%s.swf" % (doc.id, doc.doc_id))
         template_values['epath'] = self.static_url("usrdoc/expressInstall.swf")
         comments = self.db.query("select p.name,p.domain,p.uuid_,p.id,c.comments, "

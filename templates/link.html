@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>链接：{{ template_values['link'].title if  template_values['link'].title else template_values['link'].url }}</title>
+<title>链接：{{ template_values['activity'].title if  template_values['activity'].title else template_values['activity'].url }}</title>
 <style type="text/css">
-    .status-item {
+    .activity-item {
         margin-left: 60px;
         min-height: 50px;
         width: 600px;
         border-bottom: 3px solid silver;
         margin-bottom: 1px;
     }
-    .status-text {
+    .activity-text {
         font-size: 15px;
         width: 530px;
         margin-bottom: 10px;
@@ -20,7 +20,7 @@
         border-left: 5px solid #E2E2E2;
         padding-left: 10px;
     }
-    .status-text a{
+    .activity-text a{
         color: #19558D;
     }
     .pubavatar {
@@ -29,62 +29,62 @@
         width: 50px;
         height: 50px;
     }
-    .status-info {
+    .activity-info {
         color: #999;
         font-size: small;
         margin-bottom: 5px;
     }
-    .status-info a {
+    .activity-info a {
         color: #999;
     }
-    .status-comment {
+    .activity-comment {
         margin-left: 60px;
         width: 600px;
         border-top: 1px solid silver;
     }
-    .status-comment .comment-number {
+    .activity-comment .comment-number {
         padding-top: 10px;
         margin-bottom: 10px;
         font-weight: bold;
     }
-    .status-comment .comment-item {
+    .activity-comment .comment-item {
         border-top: 1px solid #E0E0E0;
         clear: both;
     }
-    .status-comment .comment-item-content {
+    .activity-comment .comment-item-content {
         float: left;
         padding: 5px 0 5px;
         width: 600px;
     }
-    .status-comment .comment-item-body {
+    .activity-comment .comment-item-body {
         margin-top: 5px;
     }
-    .status-comment .comment-item-body p{
+    .activity-comment .comment-item-body p{
         margin-bottom: 5px;
         font-size: 14px;
         word-break: break-all;
     }
-    .status-comment .comment-item-body p a{
+    .activity-comment .comment-item-body p a{
         color: #19558D;;
     }
-    .status-comment .comment-item-title a {
+    .activity-comment .comment-item-title a {
         color: gray;
     }
-    .status-comment .comment-item-title a:hover {
+    .activity-comment .comment-item-title a:hover {
         color: #005580;
     }
-    .status-comment .comment-item-title .name {
+    .activity-comment .comment-item-title .name {
         font-weight: bold;
         font-size: 14px;
     }
-    .status-comment .comment-item-title .time {
+    .activity-comment .comment-item-title .time {
         float: right;
         text-align: right;
         font-size: small;
         color: #999;
         width: 100px;
     }
-    .status-comment .commavatar {
+    .activity-comment .commavatar {
         padding-top: 5px;
         margin-left: -60px;
         float: left;
@@ -103,19 +103,19 @@
 {% block body %}
 <div class="container" style="margin-left:60px;">
     <div class="span7">
-        <div class="status-item">
+        <div class="activity-item">
             <div class="pubavatar">
-                <a href="/people/{{ template_values['link'].domain }}"><img src="{{ handler.avatar('m', template_values['link'].id, template_values['link'].uuid_) }}" width="50px" height="50px"></a>
+                <a href="/people/{{ template_values['activity'].domain }}"><img src="{{ handler.avatar('m', template_values['activity'].id, template_values['activity'].uuid_) }}" width="50px" height="50px"></a>
             </div>
-            <div class="status-text url">
-                <a href="http://{{ template_values['link'].url }}" target="_blank">{{ template_values['link'].title if template_values['link'].title else template_values['link'].url }}</a>
+            <div class="activity-text url">
+                <a href="http://{{ template_values['activity'].url }}" target="_blank">{{ template_values['activity'].title if template_values['activity'].title else template_values['activity'].url }}</a>
             </div>
-            <div class="status-text summary" style="">
-                {{ handler.br(handler.at(linkify(template_values['link'].summary, extra_params="target='_blank' rel='nofollow'"))) if template_values['link'].summary else "" }}
+            <div class="activity-text summary" style="">
+                {{ handler.br(handler.at(linkify(template_values['activity'].summary, extra_params="target='_blank' rel='nofollow'"))) if template_values['activity'].summary else "" }}
             </div>
-            <div class="status-info">
-                <a href="/people/{{ template_values['link'].domain }}">{{ template_values['link'].name }}</a> 收藏于 {{ str(template_values['link'].pubdate)[5:-3] if str(template_values['link'].pubdate)[5] != '0' else str(template_values['link'].pubdate)[6:-3] }}
-                {% if current_user and current_user.name == template_values['link'].name %}
+            <div class="activity-info">
+                <a href="/people/{{ template_values['activity'].domain }}">{{ template_values['activity'].name }}</a> 收藏于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
+                {% if current_user and current_user.name == template_values['activity'].name %}
                 <span class="splitter"> • </span>
                 <span><a href="/link/edit?id={{ request.path.split("/")[-1] }}">编辑</a></span>
                 <span class="splitter"> • </span>
@@ -123,7 +123,7 @@
                 {% end %}
             </div>
         </div>
-        <div class="status-comment">
+        <div class="activity-comment">
             {% if current_user or (not current_user and template_values['comments_length'] == '0') %}
             <div class="comment-number">
                 <i class="icon-comment"></i><span id="number">评论({{ template_values['comments_length'] }})</span>

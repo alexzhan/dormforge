@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>{{ template_values['note'].title }}</title>
+<title>{{ template_values['activity'].title }}</title>
 <style type="text/css">
-    .note-item {
+    .activity-item {
         margin-left: 100px;
         min-height: 50px;
         width: 680px;
         border-bottom: 3px solid silver;
         margin-bottom: 1px;
     }
-    .note-title {
+    .activity-title {
         font-size: 16px;
         font-weight: bold;
         text-align: center;
@@ -18,76 +18,76 @@
         margin-bottom: 20px;
         word-break: break-all;
     }
-    .note-text {
+    .activity-text {
         font-size: 14px;
         width: 680px;
         margin-bottom: 10px;
         word-break: break-all;
         line-height: 22px;
     }
-    .note-text a{
+    .activity-text a{
         color: #19558D;
     }
-    .note-bottom {
+    .activity-bottom {
         color: #999;
         font-size: small;
         margin-bottom: 5px;
         text-align: right;
     }
-    .note-bottom .note-action {
+    .activity-bottom .activity-action {
         float: left;
     }
-    .note-bottom .note-info a,.note-bottom .note-action a {
+    .activity-bottom .activity-info a,.activity-bottom .activity-action a {
         color: #999;
     }
-    .note-comment {
+    .activity-comment {
         margin-left: 100px;
         width: 680px;
         border-top: 1px solid silver;
     }
-    .note-comment .comment-number {
+    .activity-comment .comment-number {
         padding-top: 10px;
         margin-bottom: 10px;
         font-weight: bold;
     }
-    .note-comment .comment-item {
+    .activity-comment .comment-item {
         border-top: 1px solid #E0E0E0;
         clear: both;
     }
-    .note-comment .comment-item-content {
+    .activity-comment .comment-item-content {
         float: left;
         padding: 5px 0 5px;
         width: 680px;
     }
-    .note-comment .comment-item-body {
+    .activity-comment .comment-item-body {
         margin-top: 5px;
     }
-    .note-comment .comment-item-body p{
+    .activity-comment .comment-item-body p{
         margin-bottom: 5px;
         font-size: 14px;
         word-break: break-all;
     }
-    .note-comment .comment-item-body p a{
+    .activity-comment .comment-item-body p a{
         color: #19558D;;
     }
-    .note-comment .comment-item-title a {
+    .activity-comment .comment-item-title a {
         color: gray;
     }
-    .note-comment .comment-item-title a:hover {
+    .activity-comment .comment-item-title a:hover {
         color: #005580;
     }
-    .note-comment .comment-item-title .name {
+    .activity-comment .comment-item-title .name {
         font-weight: bold;
         font-size: 14px;
     }
-    .note-comment .comment-item-title .time {
+    .activity-comment .comment-item-title .time {
         float: right;
         text-align: right;
         font-size: small;
         color: #999;
         width: 100px;
     }
-    .note-comment .commavatar {
+    .activity-comment .commavatar {
         padding-top: 5px;
         margin-left: -60px;
         float: left;
@@ -106,19 +106,19 @@
 {% block body %}
 <div class="container">
     <div class="span7">
-        <div class="note-item">
-            <div class="note-title">
-                {{ template_values['note'].title }}
+        <div class="activity-item">
+            <div class="activity-title">
+                {{ template_values['activity'].title }}
             </div>
-            <div class="note-text">
-                {{ handler.br(handler.at(linkify(template_values['note'].note, extra_params="target='_blank' rel='nofollow'"))) }}
+            <div class="activity-text">
+                {{ handler.br(handler.at(linkify(template_values['activity'].note, extra_params="target='_blank' rel='nofollow'"))) }}
             </div>
-            <div class="note-bottom">
-                <span class="note-info">
-                <a href="/people/{{ template_values['note'].domain }}">{{ template_values['note'].name }}</a> 发布于 {{ str(template_values['note'].pubdate)[5:-3] if str(template_values['note'].pubdate)[5] != '0' else str(template_values['note'].pubdate)[6:-3] }}
+            <div class="activity-bottom">
+                <span class="activity-info">
+                <a href="/people/{{ template_values['activity'].domain }}">{{ template_values['activity'].name }}</a> 发布于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
                 </span>
-                {% if current_user and current_user.name == template_values['note'].name %}
-                <span class="note-action">
+                {% if current_user and current_user.name == template_values['activity'].name %}
+                <span class="activity-action">
                     <span><a href="/note/touch?id={{ request.path.split("/")[-1] }}">编辑</a></span>
                     <span class="splitter"> • </span>
                     <span><a href="#" onclick="return delactivity('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}', 2);">删除</a></span>
@@ -126,7 +126,7 @@
                 {% end %}
             </div>
         </div>
-        <div class="note-comment">
+        <div class="activity-comment">
             {% if current_user or (not current_user and template_values['comments_length'] == '0') %}
             <div class="comment-number">
                 <i class="icon-comment"></i><span id="number">评论({{ template_values['comments_length'] }})</span>

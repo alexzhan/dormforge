@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>{{ template_values['doc'].title }}</title>
+<title>{{ template_values['activity'].title }}</title>
 <script type="text/javascript" src="{{ static_url('js/flexpaper_flash.js') }}"></script>
 <style type="text/css">
-    .doc-item {
+    .activity-item {
         margin-left: 100px;
         min-height: 50px;
         width: 680px;
         border-bottom: 3px solid silver;
         margin-bottom: 1px;
     }
-    .doc-title {
+    .activity-title {
         font-size: 16px;
         font-weight: bold;
         text-align: center;
@@ -19,7 +19,7 @@
         margin-bottom: 20px;
         word-break: break-all;
     }
-    .doc-text {
+    .activity-text {
         position:absolute;
         left:10px;
         top:10px;
@@ -29,66 +29,66 @@
         height:480px;
         display:block;
     }
-    .doc-bottom {
+    .activity-bottom {
         color: #999;
         font-size: small;
         margin-bottom: 5px;
         text-align: right;
     }
-    .doc-bottom .doc-action {
+    .activity-bottom .activity-action {
         float: left;
     }
-    .doc-bottom .doc-info a,.doc-bottom .doc-action a {
+    .activity-bottom .activity-info a,.activity-bottom .activity-action a {
         color: #999;
     }
-    .doc-comment {
+    .activity-comment {
         margin-left: 100px;
         width: 680px;
         border-top: 1px solid silver;
     }
-    .doc-comment .comment-number {
+    .activity-comment .comment-number {
         padding-top: 10px;
         margin-bottom: 10px;
         font-weight: bold;
     }
-    .doc-comment .comment-item {
+    .activity-comment .comment-item {
         border-top: 1px solid #E0E0E0;
         clear: both;
     }
-    .doc-comment .comment-item-content {
+    .activity-comment .comment-item-content {
         float: left;
         padding: 5px 0 5px;
         width: 680px;
     }
-    .doc-comment .comment-item-body {
+    .activity-comment .comment-item-body {
         margin-top: 5px;
     }
-    .doc-comment .comment-item-body p{
+    .activity-comment .comment-item-body p{
         margin-bottom: 5px;
         font-size: 14px;
         word-break: break-all;
     }
-    .doc-comment .comment-item-body p a{
+    .activity-comment .comment-item-body p a{
         color: #19558D;;
     }
-    .doc-comment .comment-item-title a {
+    .activity-comment .comment-item-title a {
         color: gray;
     }
-    .doc-comment .comment-item-title a:hover {
+    .activity-comment .comment-item-title a:hover {
         color: #005580;
     }
-    .doc-comment .comment-item-title .name {
+    .activity-comment .comment-item-title .name {
         font-weight: bold;
         font-size: 14px;
     }
-    .doc-comment .comment-item-title .time {
+    .activity-comment .comment-item-title .time {
         float: right;
         text-align: right;
         font-size: small;
         color: #999;
         width: 100px;
     }
-    .doc-comment .commavatar {
+    .activity-comment .commavatar {
         padding-top: 5px;
         margin-left: -60px;
         float: left;
@@ -107,9 +107,9 @@
 {% block body %}
 <div class="container">
     <div class="span7">
-        <div class="doc-item">
-            <div class="doc-title">
-                {{ template_values['doc'].title }}
+        <div class="activity-item">
+            <div class="activity-title">
+                {{ template_values['activity'].title }}
             </div>
     	<div style="margin-bottom: 10px">
 	        <a id="viewerPlaceHolder" style="width:680px;height:480px;display:block"></a>
@@ -142,12 +142,12 @@
 						 }});
 	        </script>
         </div>
-                <div class="doc-bottom">
-                <span class="doc-info">
-                <a href="/people/{{ template_values['doc'].domain }}">{{ template_values['doc'].name }}</a> 发布于 {{ str(template_values['doc'].pubdate)[5:-3] if str(template_values['doc'].pubdate)[5] != '0' else str(template_values['doc'].pubdate)[6:-3] }}
+                <div class="activity-bottom">
+                <span class="activity-info">
+                <a href="/people/{{ template_values['activity'].domain }}">{{ template_values['activity'].name }}</a> 发布于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
                 </span>
-                {% if current_user and current_user.name == template_values['doc'].name %}
-                <span class="doc-action">
+                {% if current_user and current_user.name == template_values['activity'].name %}
+                <span class="activity-action">
                     <span><a href="/doc/edit?id={{ request.path.split("/")[-1] }}">编辑</a></span>
                     <span class="splitter"> • </span>
                     <span><a href="#" onclick="return delactivity('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}', 2);">删除</a></span>
@@ -155,7 +155,7 @@
                 {% end %}
             </div>
         </div>
-        <div class="doc-comment">
+        <div class="activity-comment">
             {% if current_user or (not current_user and template_values['comments_length'] == '0') %}
             <div class="comment-number">
                 <i class="icon-comment"></i><span id="number">评论({{ template_values['comments_length'] }})</span>
