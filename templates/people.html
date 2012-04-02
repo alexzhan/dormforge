@@ -278,6 +278,29 @@
                 {% end %}
             </div>
             {% end %}
+            {% if template_values['doc_count'] != 0 %}
+            <div class="span4">
+                <div class="col_header">
+                    <a href="#" class="tabtitle">文档 {{ template_values['doc_count'] }}</a>
+                </div>
+                {% for doc in template_values['docs'] %}
+                <div class="row">
+                    <div class="status_preview_link">
+                        <span class="cell">
+                            <a href="/doc/{{ handler.encode(doc[4]) }}">
+                                <div class="status_preview">
+                                    {{ doc[2] }} 
+                                </div>
+                                <div class="timestamp">
+                                    {{ doc[0] }}
+                                </div>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+                {% end %}
+            </div>
+            {% end %}
         </div>
         <div class="col2">
             {% if template_values['status_count'] != 0 %}
