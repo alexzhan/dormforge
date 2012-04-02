@@ -1,0 +1,149 @@
+.activity-item {
+    border-bottom: 3px solid silver;
+    margin-bottom: 1px;
+}
+.linkstatus-item {
+    margin-left: 60px;
+    min-height: 50px;
+    width: 600px;
+}
+.docnote-item {
+    margin-left: 100px;
+    min-height: 50px;
+    width: 680px;
+}
+.activity-title {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    width: 680px;
+    margin-bottom: 20px;
+    word-break: break-all;
+}
+.activity-text {
+    margin-bottom: 10px;
+    word-break: break-all;
+}
+.link-text {
+    font-size: 15px;
+    width: 530px;
+}
+.status-text {
+    font-size: 15px;
+    width: 540px;
+}
+.note-text {
+    font-size: 14px;
+    width: 680px;
+    line-height: 22px;
+}
+.activity-text a{
+    color: #19558D;
+}
+.pubavatar {
+    float:right;
+    margin-left: 10px;
+    width: 50px;
+    height: 50px;
+}
+.activity-info {
+    color: #999;
+    font-size: small;
+    margin-bottom: 5px;
+}
+.activity-info a {
+    color: #999;
+}
+.activity-bottom {
+    color: #999;
+    font-size: small;
+    margin-bottom: 5px;
+    text-align: right;
+}
+.activity-bottom .activity-action {
+    float: left;
+}
+.activity-bottom .activity-info a,.activity-bottom .activity-action a {
+    color: #999;
+}
+.activity-comment {
+    border-top: 1px solid silver;
+}
+.linkstatus-comment {
+    margin-left: 60px;
+    width: 600px;
+}
+.docnote-comment {
+    margin-left: 100px;
+    width: 680px;
+}
+.activity-comment .comment-number {
+    padding-top: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.activity-comment .comment-item {
+    border-top: 1px solid #E0E0E0;
+    clear: both;
+}
+.activity-comment .comment-item-content {
+    float: left;
+    padding: 5px 0 5px;
+}
+.linkstatus-content {
+    width: 600px;
+}
+.docnote-content {
+    width: 680px;
+}
+.activity-comment .comment-item-body {
+    margin-top: 5px;
+}
+.activity-comment .comment-item-body p{
+    margin-bottom: 5px;
+    font-size: 14px;
+    word-break: break-all;
+}
+.activity-comment .comment-item-body p a{
+    color: #19558D;
+}
+.activity-comment .comment-item-title a {
+    color: gray;
+}
+.activity-comment .comment-item-title a:hover {
+    color: #005580;
+}
+.activity-comment .comment-item-title .name {
+    font-weight: bold;
+    font-size: 14px;
+}
+.activity-comment .comment-item-title .time {
+    float: right;
+    text-align: right;
+    font-size: small;
+    color: #999;
+    width: 100px;
+}
+.activity-comment .commavatar {
+    padding-top: 5px;
+    margin-left: -60px;
+    float: left;
+    width: 50px;
+}
+.add-comment-linkstatus {
+    margin-left: 60px;
+    width: 600px;
+}
+.add-comment-docnote {
+    margin-left: 100px;
+    width: 680px;
+}
+.clickable {
+    cursor: pointer;
+    display:inline;
+}
+#viewerPlaceHolder {
+    width:680px;
+    height:480px;
+    display:block;
+}

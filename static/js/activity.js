@@ -12,16 +12,14 @@ function submitfunc(requesturl,name,domain,prevnum,commentype) {
             $("#number").text("评论("+(parseInt(prevnum)+1)+")");
             $('#comment-box').val("");
             var replystr = "replyOne('" + name + "')";
-            var new_comment_item = "<div class='comment-item'><div class='commavatar'><a href='/people/"+domain+"'><img width='50px' height='50px' src=" + avapath + "></a></div><div class='comment-item-content'><div class='comment-item-title'><a class='name' href='/people/"+domain+"'>"+name+"</a><span class='time'>刚刚   <img src='/static/img/reply.png' align='absmiddle' border='0' alt='回复 "+name+"' onclick="+replystr+" class='clickable'></span></div><div class='comment-item-body'><p>"+comments+"</p></div></div></div>";
             if(commentype == 1){
-                $(".note-comment").append(new_comment_item);
+                content_css = " linkstatus-content";
             }
-            else if(commentype == 2) {
-                $(".status-comment").append(new_comment_item);
+            else {
+                content_css = " docnote-content";
             }
-            else if(commentype == 3) {
-                $(".doc-comment").append(new_comment_item);
-            }
+            var new_comment_item = "<div class='comment-item'><div class='commavatar'><a href='/people/"+domain+"'><img width='50px' height='50px' src=" + avapath + "></a></div><div class='comment-item-content"+content_css+"'><div class='comment-item-title'><a class='name' href='/people/"+domain+"'>"+name+"</a><span class='time'>刚刚   <img src='/static/img/reply.png' align='absmiddle' border='0' alt='回复 "+name+"' onclick="+replystr+" class='clickable'></span></div><div class='comment-item-body'><p>"+comments+"</p></div></div></div>";
+            $(".activity-comment").append(new_comment_item);
         }       
     });
     return false;
