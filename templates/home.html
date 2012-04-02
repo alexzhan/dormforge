@@ -231,7 +231,7 @@
                                 </div>
                                 <div style="float:right">
                                 {% if str(current_user.name) == activity[-5] %}
-                                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[6]) }}', 3);">删除</a></span>
+                                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[6]) }}', 4);">删除</a></span>
                                 <span class="splitter">•</span>
                                 <span><a class="footerlink" href="/doc/edit?id={{ handler.encode(activity[6]) }}">编辑</a></span>
                                 <span class="splitter">•</span>

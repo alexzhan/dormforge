@@ -45,13 +45,13 @@
         </div>
                 <div class="activity-bottom">
                 <span class="activity-info">
-                <a href="/people/{{ template_values['activity'].domain }}">{{ template_values['activity'].name }}</a> 发布于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
+                <a href="/people/{{ template_values['activity'].domain }}">{{ template_values['activity'].name }}</a> 上传于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
                 </span>
                 {% if current_user and current_user.name == template_values['activity'].name %}
                 <span class="activity-action">
                     <span><a href="/doc/edit?id={{ request.path.split("/")[-1] }}">编辑</a></span>
                     <span class="splitter"> • </span>
-                    <span><a href="#" onclick="return delactivity('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}', 2);">删除</a></span>
+                    <span><a href="#" onclick="return delactivity('{{ current_user.name }}', '{{ request.path.split("/")[-1] }}', 4);">删除</a></span>
                 </span>
                 {% end %}
             </div>
