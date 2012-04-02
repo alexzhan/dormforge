@@ -758,7 +758,6 @@ class LogoutHandler(BaseHandler):
 class PeopleHandler(BaseHandler):
     def get(self, domain):
         people = self.db.get("SELECT * FROM fd_People WHERE domain = %s", domain) 
-        #people = self.db.get("SELECT * FROM fd_People WHERE domain = %s and status_ = 0", domain) 
         if not people: raise tornado.web.HTTPError(404)
         template_values = {}
         if not self.current_user or self.current_user and self.current_user.id != people.id:
@@ -852,6 +851,8 @@ class PeopleHandler(BaseHandler):
         template_values['note_count'] = uag.count_sub_activity(template_values['id'], 2) 
         template_values['links'] = uag.get_top_sub_activities(template_values['id'], 3, isself) 
         template_values['link_count'] = uag.count_sub_activity(template_values['id'], 3) 
+        template_values['docs'] = uag.get_top_sub_activities(template_values['id'], 4, isself) 
+        template_values['doc_count'] = uag.count_sub_activity(template_values['id'], 4) 
         self.render("people.html", template_values=template_values)
 
 class FollowingHandler(FollowBaseHandler):
