@@ -1,4 +1,4 @@
-function submitfunc(requesturl,name,domain,prevnum,commentype) {
+function submitfunc(requesturl,name,domain,prevnum) {
     var commenttext = $('#comment-box').val();
     if (commenttext == '')
         return false;
