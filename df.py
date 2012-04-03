@@ -1589,7 +1589,11 @@ class EditlinkHandler(BaseHandler):
                         tag_id = tag_id.id
                     else:
                         tag_id = self.db.execute("insert into fd_Tag (tag) values (%s)", t)
-                    ltag_id = self.db.execute("insert into fd_Ltag (link_id,tag_id) values (%s,%s)", link_id, tag_id)
+                    if linkid:
+                        with_link_id = linkid
+                    elif link_id:
+                        with_link_id = link_id
+                    ltag_id = self.db.execute("insert into fd_Ltag (link_id,tag_id) values (%s,%s)", with_link_id, tag_id)
         if linkid: 
             link_key = "link:%s:%s" % (self.current_user.id, linkid)
             actdict = {'url':url, 'status':linktype}
@@ -1636,6 +1640,8 @@ class EditdocHandler(BaseHandler):
             template_values['title'] = doc.title
             template_values['summary'] = doc.summary
             template_values['tag'] = doc.tags
+            if doc.status_ == 1:
+                template_values['checked'] = 'checked'
             template_values['id'] = doc_id
         self.render("editdoc.html", template_values=template_values)
         
@@ -1646,14 +1652,14 @@ class EditdocHandler(BaseHandler):
         summary = self.get_argument("summary", None)
         tag = self.get_argument("tag", None)
         secret = self.get_argument("secret", None)
-        docid = self.get_argument("docid", None)
+        endocid = self.get_argument("docid", None)
         oldtag = self.get_argument("oldtag", None)
         errors = 0
         title_error = 0
         title_error_messages = ['',
                 u'请输入标题',
                 ]
-        if not docid:
+        if not endocid:
             name = self.get_argument("doc.name", None)
             content_type = self.get_argument("doc.content_type", None)
             path = self.get_argument("doc.path", None)
@@ -1672,93 +1678,113 @@ class EditdocHandler(BaseHandler):
                     u'文档不能大于20M',
                     u"该文档已被上传过",
                     ]
-            if not (name and path and md5 and size):
-                errors = errors + 1
-                doc_error = 1
-            else:
-                if name.split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf", "xls"]:
-                    os.remove(path)
+            if not endocid:
+                if not (name and path and md5 and size):
                     errors = errors + 1
-                    doc_error = 2
+                    doc_error = 1
                 else:
-                    if int(size) > 1024*1024*20:
+                    if name.split(".").pop().lower() not in ["doc", "docx", "ppt", "pptx", "pdf", "xls"]:
                         os.remove(path)
                         errors = errors + 1
-                        doc_error = 3
+                        doc_error = 2
                     else:
-                        predoc = self.db.get("select * from fd_Doc where md5 = %s and status_ = 0", md5)
-                        if predoc:
+                        if int(size) > 1024*1024*20:
                             os.remove(path)
                             errors = errors + 1
-                            doc_error = 4
+                            doc_error = 3
                         else:
-                            usrpath = u"/data/static/usrdoc/%s/" % self.current_user.id
-                            staticpath = u"/work/Dormforge/static/usrdoc/%s/" % self.current_user.id
-                            if not os.path.exists(usrpath):
-                                os.makedirs(usrpath)
-                            if not os.path.exists(staticpath):
-                                os.makedirs(staticpath)
-                            docid = path.split("/").pop()
-                            doctype = name.split(".").pop().lower()
-                            usrdoc = ''.join([usrpath, docid, '.', doctype])
-                            shutil.move(path, usrdoc)
-                            if name.split(".").pop().lower() != 'pdf':
-                                usrpdf = ''.join([usrpath, docid, ".pdf"])
-                                usrjpg = ''.join([staticpath, docid, ".jpg"])
-                                usrswf = ''.join([staticpath, docid, ".swf"])
-                                if os.path.exists("/opt/libreoffice3.5/program/python"):
-                                    os.system("/opt/libreoffice3.5/program/python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
-                                else:
-                                    os.system("python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
-                                os.system("convert -sample 150x150 %s[0] %s" % (usrpdf, usrjpg))
-                                os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrpdf, usrswf))
-                                os.remove(usrpdf)
+                            predoc = self.db.get("select * from fd_Doc where md5 = %s and status_ = 0", md5)
+                            if predoc:
+                                os.remove(path)
+                                errors = errors + 1
+                                doc_error = 4
                             else:
-                                usrjpg = ''.join([staticpath, docid, ".jpg"])
-                                usrswf = ''.join([staticpath, docid, ".swf"])
-                                os.system("convert -sample 150x150 %s[0] %s" % (usrdoc, usrjpg))
-                                os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrdoc, usrswf))
-                            if os.path.exists(usrjpg) and os.path.exists(usrswf):
-                                doc_sql = ["insert into fd_Doc set doc_id = '%s',name = '%s',content_type = '%s',md5 = '%s', docsize = %s," % (docid,name.replace("'", "''"),content_type,md5,int(size))]
-                                doc_sql.append("title = '%s'," % title.replace("'", "''"))
-                                if summary:
-                                    doc_sql.append("summary = '%s'," % summary.replace("'", "''"))
-                                if tag:
-                                    tag = tag.strip().replace(' ',',')
-                                    tag = tag.strip().replace('，',',')
-                                    tags = tag.split(",")
-                                    taglists = []
-                                    for t in tags:
-                                        if t in taglists:
-                                            continue
-                                        taglists.append(t)
-                                    newtag = " ".join(taglists)
-                                    doc_sql.append("tags = '%s'," % newtag.replace("'", "''"))
-                                pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
-                                redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
-                                doctype = 0
-                                if not secret and secret == "on":
-                                    doctype = 1
-                                doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,doctype))
-                                logging.info("".join(doc_sql))
-                                doc_id = self.db.execute("".join(doc_sql))
-                                if doc_id:
-                                    if tag:
-                                        for t in taglists:
-                                            tag_id = self.db.get("select id from fd_Doctag where tag = %s", t)
-                                            if tag_id:
-                                                tag_id = tag_id.id
-                                            else:
-                                                tag_id = self.db.execute("insert into fd_Doctag (tag) values (%s)", t)
-                                                dtag_id = self.db.execute("insert into fd_Dtag (doc_id,tag_id) values (%s,%s)", doc_id, tag_id)
-                                    actdict = {'time':redpubdate, 'docid':docid, 'status':doctype}#docid not doc_id
-                                    if title:
-                                        actdict['title'] = title
-                                    if summary:
-                                        actdict['summary'] = summary
-                                    addresult = add_activity(self.rd, self.current_user.id, doc_id, 4, actdict)
-                                    if addresult:
-                                        self.redirect("/doc/" + encode(str(doc_id)))
+                                usrpath = u"/data/static/usrdoc/%s/" % self.current_user.id
+                                staticpath = u"/work/Dormforge/static/usrdoc/%s/" % self.current_user.id
+                                if not os.path.exists(usrpath):
+                                    os.makedirs(usrpath)
+                                if not os.path.exists(staticpath):
+                                    os.makedirs(staticpath)
+                                docid = path.split("/").pop()
+                                doctype = name.split(".").pop().lower()
+                                usrdoc = ''.join([usrpath, docid, '.', doctype])
+                                shutil.move(path, usrdoc)
+                                if name.split(".").pop().lower() != 'pdf':
+                                    usrpdf = ''.join([usrpath, docid, ".pdf"])
+                                    usrjpg = ''.join([staticpath, docid, ".jpg"])
+                                    usrswf = ''.join([staticpath, docid, ".swf"])
+                                    if os.path.exists("/opt/libreoffice3.5/program/python"):
+                                        os.system("/opt/libreoffice3.5/program/python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
+                                    else:
+                                        os.system("python /work/Dormforge/util/DocumentConverter.py %s %s" % (usrdoc, usrpdf))
+                                    os.system("convert -sample 150x150 %s[0] %s" % (usrpdf, usrjpg))
+                                    os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrpdf, usrswf))
+                                    os.remove(usrpdf)
+                                else:
+                                    usrjpg = ''.join([staticpath, docid, ".jpg"])
+                                    usrswf = ''.join([staticpath, docid, ".swf"])
+                                    os.system("convert -sample 150x150 %s[0] %s" % (usrdoc, usrjpg))
+                                    os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrdoc, usrswf))
+            if endocid:
+                doc_sql = ["update fd_Doc set "]
+            else:
+                if os.path.exists(usrjpg) and os.path.exists(usrswf):
+                    doc_sql = ["insert into fd_Doc set doc_id = '%s',name = '%s',content_type = '%s',md5 = '%s', docsize = %s," % (docid,name.replace("'", "''"),content_type,md5,int(size))]
+            doc_sql.append("title = '%s'," % title.replace("'", "''"))
+            if summary:
+                doc_sql.append("summary = '%s'," % summary.replace("'", "''"))
+            if tag:
+                tag = tag.strip().replace(' ',',')
+                tag = tag.strip().replace('，',',')
+                tags = tag.split(",")
+                taglists = []
+                for t in tags:
+                    if t in taglists:
+                        continue
+                    taglists.append(t)
+                newtag = " ".join(taglists)
+                if not (endocid and newtag == oldtag):
+                    doc_sql.append("tags = '%s'," % newtag.replace("'", "''"))
+            pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+            redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
+            doctype = 0
+            if secret and secret == "on":
+                doctype = 1
+            if endocid:
+                doc_sql.append("status_ = %s where id = %s" % (doctype, decode(endocid)))
+            else:
+                doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,doctype))
+            logging.info("".join(doc_sql))
+            doc_id = self.db.execute("".join(doc_sql))
+            if tag:
+                if (not endocid) or (endocid and newtag != oldtag):
+                    for t in taglists:
+                        tag_id = self.db.get("select id from fd_Doctag where tag = %s", t)
+                        if tag_id:
+                            tag_id = tag_id.id
+                        else:
+                            tag_id = self.db.execute("insert into fd_Doctag (tag) values (%s)", t)
+                        if endocid:
+                            with_doc_id = decode(endocid)
+                        elif doc_id:
+                            with_doc_id = doc_id
+                        dtag_id = self.db.execute("insert into fd_Dtag (doc_id,tag_id) values (%s,%s)", with_doc_id, tag_id)
+            if endocid:
+                doc_key = "doc:%s:%s" % (self.current_user.id, decode(endocid))
+                actdict = {'status':doctype}
+            elif doc_id:
+                actdict = {'time':redpubdate, 'docid':docid, 'status':doctype}#docid not doc_id
+            if title:
+                actdict['title'] = title
+            if summary:
+                actdict['summary'] = summary
+            if endocid:
+                if self.rd.hmset(doc_key, actdict):
+                    self.redirect("/doc/" + endocid)
+            elif doc_id:
+                addresult = add_activity(self.rd, self.current_user.id, doc_id, 4, actdict)
+                if addresult:
+                    self.redirect("/doc/" + encode(str(doc_id)))
 
             if doc_error != 0:
                 template_values['doc_error'] = doc_error
