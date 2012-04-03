@@ -130,7 +130,8 @@
                 <div class="feed-body">
                     {% module Template("modules/activities.html", template_values=template_values) %}                    
                 </div>
-                <a href="#" id="morebtn" class="btn">更多</a>
+                <div id="li" style="display: none">{{ template_values['lastindex'] }}</div>
+                <a href="#" id="morebtn" class="btn" onclick="return morefeed('home')">更多</a>
             </div>
         </div>
         <div class="span3">

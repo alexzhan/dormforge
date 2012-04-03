@@ -1,8 +1,11 @@
 $(document).ready(function() {
-    var ie = document.all ? 1 : 0
+    var ie = document.all ? 1 : 0;
     if(ie){
         $("#pubtextarea").val("你在想什么?");
         $("#pubtextarea").css("color","#A9A9A9");
+    }
+    if($("#hn20").text() == "0") {
+        $("#morebtn").hide();
     }
 });
 
@@ -85,5 +88,26 @@ function viewnote(note_id, note_index) {
 function togglenote(note_index){
     $("#allnote"+note_index).hide();
     $("#note"+note_index).show();
+    return false;
+}
+function morefeed(prop) {
+    var lastindex = $("#li").text();
+    $("#morebtn").text("加载中...");
+    $.ajax({
+    type:'GET',
+    url:'/more/' + prop,
+    data:{lastindex:lastindex,_xsrf:getCookie('_xsrf')},
+    success:function(data){
+        $(".feed-body").append(data);
+        $("#li").text(parseInt(lastindex) + 20);
+        var hnid = "#hn"+(parseInt(lastindex) + 20);
+        if($(hnid).text() == "1"){
+            $("#morebtn").text("更多");
+        }
+        else {
+            $("#morebtn").hide();
+        }
+    }       
+    });
     return false;
 }

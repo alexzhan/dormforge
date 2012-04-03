@@ -115,6 +115,11 @@
     .noinfo {
         margin:10px 0 0 60px;
     }
+    #morebtn {
+        margin-left: 60px;
+        margin-top: 5px;
+        width: 490px;
+    }
 </style>
 {% end %}
 {% block body %}
@@ -149,6 +154,8 @@
                     {% end %}
                     {% module Template("modules/activities.html", template_values=template_values) %}
                 </div>
+                <div id="li" style="display: none">{{ template_values['lastindex'] }}</div>
+                <a href="#" id="morebtn" class="btn" onclick="return morefeed('myhome')">更多</a>
             </div>
         </div>
         <div class="span3">

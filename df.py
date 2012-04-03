@@ -199,6 +199,10 @@ class HomeHandler(BaseHandler):
         if self.current_user:
             template_values = {}
             template_values['all_activities'] = self.uag.get_all_activities(self.db, 0)
+            template_values['lastindex'] = 20
+            template_values['hasnext'] = 1
+            if template_values['lastindex'] >= self.uag.count_all_activity():
+                template_values['hasnext'] = 0
             self.render("home.html", template_values=template_values)
         else:
             self.render("index.html")
@@ -208,17 +212,28 @@ class MyhomeHandler(BaseHandler):
         if self.current_user:
             template_values = {}
             template_values['all_activities'] = self.uag.get_my_activities(self.db, self.current_user.id, 0)
+            template_values['lastindex'] = 20
+            template_values['hasnext'] = 1
+            if template_values['lastindex'] >= self.uag.count_my_activity(self.current_user.id):
+                template_values['hasnext'] = 0
             self.render("myhome.html", template_values=template_values)
         else:
             self.render("index.html")
 
 class MoreHandler(BaseHandler):
     def get(self, prop):
-        if prop == "home":
-            template_values = {}
-            startindex = self.get_argument("startindex")
-            template_values['all_activities'] = self.uag.get_all_activities(self.db, int(startindex))
-            self.render("home.html", template_values=template_values)
+        template_values = {}
+        if prop in ["home", "myhome"]:
+            startindex = self.get_argument("lastindex")
+            if prop == "home":
+                template_values['all_activities'] = self.uag.get_all_activities(self.db, int(startindex))
+            elif prop == "myhome":
+                template_values['all_activities'] = self.uag.get_my_activities(self.db, self.current_user.id, int(startindex))
+            template_values['lastindex'] = int(startindex) + 20
+            template_values['hasnext'] = 1
+            if template_values['lastindex'] >= self.uag.count_all_activity():
+                template_values['hasnext'] = 0
+            self.render("modules/activities.html", template_values=template_values)
 
 class SignupHandler(BaseHandler):
     def get(self):
