@@ -214,9 +214,11 @@ class MyhomeHandler(BaseHandler):
 
 class MoreHandler(BaseHandler):
     def get(self, prop):
-        template_values = {}
         if prop == "home":
-            template_values['all_activities'] = self.uag.get_all_activities(self.db, 0)
+            template_values = {}
+            startindex = self.get_argument("startindex")
+            template_values['all_activities'] = self.uag.get_all_activities(self.db, int(startindex))
+            self.render("home.html", template_values=template_values)
 
 class SignupHandler(BaseHandler):
     def get(self):

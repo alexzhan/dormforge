@@ -99,7 +99,7 @@
         </div>
         <div class="feed-item-body">
             <p>{{ activity[3] if activity[3] else "" }}</p>
-            <a href="/doc/{{ handler.encode(activity[6]) }}"><img src="static/usrdoc/{{ activity[-6] }}/{{ activity[1] }}.jpg"></a>
+            <a href="/doc/{{ handler.encode(activity[6]) }}"><img src="/static/usrdoc/{{ activity[-6] }}/{{ activity[1] }}.jpg"></a>
         </div>
         <div class="feed-item-footer">
             <div style="float:left"><span><a class="footerlink" href="/doc/{{ handler.encode(activity[6]) }}">{{ activity[0] }}</a></span>
