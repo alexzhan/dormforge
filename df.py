@@ -1653,7 +1653,7 @@ class EditdocHandler(BaseHandler):
         title_error_messages = ['',
                 u'请输入标题',
                 ]
-        if docid and docid != "":
+        if not docid:
             name = self.get_argument("doc.name", None)
             content_type = self.get_argument("doc.content_type", None)
             path = self.get_argument("doc.path", None)
@@ -1758,8 +1758,7 @@ class EditdocHandler(BaseHandler):
                                         actdict['summary'] = summary
                                     addresult = add_activity(self.rd, self.current_user.id, doc_id, 4, actdict)
                                     if addresult:
-                                        #self.redirect("/doc/" + encode(doc_id))
-                                        self.redirect("/")
+                                        self.redirect("/doc/" + encode(str(doc_id)))
 
             if doc_error != 0:
                 template_values['doc_error'] = doc_error
