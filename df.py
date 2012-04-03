@@ -1705,7 +1705,7 @@ class EditdocHandler(BaseHandler):
                                     os.makedirs(usrpath)
                                 if not os.path.exists(staticpath):
                                     os.makedirs(staticpath)
-                                docid = path.split("/").pop()
+                                docid = "".join([path.split("/").pop(), str(time.time()).split(".")[0]])
                                 doctype = name.split(".").pop().lower()
                                 usrdoc = ''.join([usrpath, docid, '.', doctype])
                                 shutil.move(path, usrdoc)
@@ -1725,70 +1725,72 @@ class EditdocHandler(BaseHandler):
                                     usrswf = ''.join([staticpath, docid, ".swf"])
                                     os.system("convert -sample 150x150 %s[0] %s" % (usrdoc, usrjpg))
                                     os.system("pdf2swf %s -o %s -f -T 9 -t -s storeallcharacters" % (usrdoc, usrswf))
-            if endocid:
-                doc_sql = ["update fd_Doc set "]
-            else:
-                if os.path.exists(usrjpg) and os.path.exists(usrswf):
-                    doc_sql = ["insert into fd_Doc set doc_id = '%s',name = '%s',content_type = '%s',md5 = '%s', docsize = %s," % (docid,name.replace("'", "''"),content_type,md5,int(size))]
-            doc_sql.append("title = '%s'," % title.replace("'", "''"))
-            if summary:
-                doc_sql.append("summary = '%s'," % summary.replace("'", "''"))
-            if tag:
-                tag = tag.strip().replace(' ',',')
-                tag = tag.strip().replace('，',',')
-                tags = tag.split(",")
-                taglists = []
-                for t in tags:
-                    if t in taglists:
-                        continue
-                    taglists.append(t)
-                newtag = " ".join(taglists)
-                if not (endocid and newtag == oldtag):
-                    doc_sql.append("tags = '%s'," % newtag.replace("'", "''"))
-            pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
-            redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
-            doctype = 0
-            if secret and secret == "on":
-                doctype = 1
-            if endocid:
-                doc_sql.append("status_ = %s where id = %s" % (doctype, decode(endocid)))
-            else:
-                doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,doctype))
-            logging.info("".join(doc_sql))
-            doc_id = self.db.execute("".join(doc_sql))
-            if tag:
-                if (not endocid) or (endocid and newtag != oldtag):
-                    for t in taglists:
-                        tag_id = self.db.get("select id from fd_Doctag where tag = %s", t)
-                        if tag_id:
-                            tag_id = tag_id.id
-                        else:
-                            tag_id = self.db.execute("insert into fd_Doctag (tag) values (%s)", t)
-                        if endocid:
-                            with_doc_id = decode(endocid)
-                        elif doc_id:
-                            with_doc_id = doc_id
-                        dtag_id = self.db.execute("insert into fd_Dtag (doc_id,tag_id) values (%s,%s)", with_doc_id, tag_id)
-            if endocid:
-                doc_key = "doc:%s:%s" % (self.current_user.id, decode(endocid))
-                actdict = {'status':doctype}
-            elif doc_id:
-                actdict = {'time':redpubdate, 'docid':docid, 'status':doctype}#docid not doc_id
-            if title:
-                actdict['title'] = title
-            if summary:
-                actdict['summary'] = summary
-            if endocid:
-                if self.rd.hmset(doc_key, actdict):
-                    self.redirect("/doc/" + endocid)
-            elif doc_id:
-                addresult = add_activity(self.rd, self.current_user.id, doc_id, 4, actdict)
-                if addresult:
-                    self.redirect("/doc/" + encode(str(doc_id)))
 
             if doc_error != 0:
                 template_values['doc_error'] = doc_error
                 template_values['doc_error_message'] = doc_error_messages[doc_error]
+            else:
+                if endocid:
+                    doc_sql = ["update fd_Doc set "]
+                else:
+                    if os.path.exists(usrjpg) and os.path.exists(usrswf):
+                        doc_sql = ["insert into fd_Doc set doc_id = '%s',name = '%s',content_type = '%s',md5 = '%s', docsize = %s," % (docid,name.replace("'", "''"),content_type,md5,int(size))]
+                doc_sql.append("title = '%s'," % title.replace("'", "''"))
+                if summary:
+                    doc_sql.append("summary = '%s'," % summary.replace("'", "''"))
+                if tag:
+                    tag = tag.strip().replace(' ',',')
+                    tag = tag.strip().replace('，',',')
+                    tags = tag.split(",")
+                    taglists = []
+                    for t in tags:
+                        if t in taglists:
+                            continue
+                        taglists.append(t)
+                    newtag = " ".join(taglists)
+                    if not (endocid and newtag == oldtag):
+                        doc_sql.append("tags = '%s'," % newtag.replace("'", "''"))
+                pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
+                redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
+                doctype = 0
+                if secret and secret == "on":
+                    doctype = 1
+                if endocid:
+                    doc_sql.append("status_ = %s where id = %s" % (doctype, decode(endocid)))
+                else:
+                    doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,doctype))
+                logging.info("".join(doc_sql))
+                doc_id = self.db.execute("".join(doc_sql))
+                if tag:
+                    if (not endocid) or (endocid and newtag != oldtag):
+                        for t in taglists:
+                            tag_id = self.db.get("select id from fd_Doctag where tag = %s", t)
+                            if tag_id:
+                                tag_id = tag_id.id
+                            else:
+                                tag_id = self.db.execute("insert into fd_Doctag (tag) values (%s)", t)
+                            if endocid:
+                                with_doc_id = decode(endocid)
+                            elif doc_id:
+                                with_doc_id = doc_id
+                            dtag_id = self.db.execute("insert into fd_Dtag (doc_id,tag_id) values (%s,%s)", with_doc_id, tag_id)
+                if endocid:
+                    doc_key = "doc:%s:%s" % (self.current_user.id, decode(endocid))
+                    actdict = {'status':doctype}
+                elif doc_id:
+                    actdict = {'time':redpubdate, 'docid':docid, 'status':doctype}#docid not doc_id
+                if title:
+                    actdict['title'] = title
+                if summary:
+                    actdict['summary'] = summary
+                if endocid:
+                    if self.rd.hmset(doc_key, actdict):
+                        self.redirect("/doc/" + endocid)
+                elif doc_id:
+                    addresult = add_activity(self.rd, self.current_user.id, doc_id, 4, actdict)
+                    if addresult:
+                        self.redirect("/doc/" + encode(str(doc_id)))
+
         if errors != 0:
             if title:
                 template_values['title'] = title
