@@ -174,7 +174,7 @@ class UserActivityGraph(object):
             all_activities.append(real_activity)
         return all_activities
 
-    #whole-site activities
+    #my following activities
     def get_my_activities(self, db, user, startindex):
         my_activities = []
         activities_list = self.client.lrange("my:%s"%user, startindex, startindex+19)
@@ -218,3 +218,9 @@ class UserActivityGraph(object):
     def count_sub_activity(self, user, acttype):
         Sub_Activity_key = 'u:%s:%s' % (self.Sub_Activity_KEYS[acttype], user)
         return self.client.llen(Sub_Activity_key)
+
+    def count_all_activity(self):
+        return self.client.llen("all")
+
+    def count_my_activity(self, user):
+        return self.client.llen("my:%s" % user)

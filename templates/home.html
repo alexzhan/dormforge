@@ -2,108 +2,7 @@
 
 {% block head %}
 <title>18周 › 首页</title>
-<style type="text/css">
-    .container .row .span3 {
-        float: right;
-        margin-right:10px;
-    }
-    .publish {
-        margin: 0 0 10px 60px;
-    }
-    .btn-small {
-        padding: 2px 5px;
-        width: 55px;
-    }
-    i {
-        margin-right: 3px;
-    }
-    .publish {
-        width: 510px;
-    }
-    .pubbox {
-        margin-top: 10px;
-    }
-    #pubtextarea {
-        height: 18px;
-        width: 500px;
-    }
-    .main-tab {
-        color: #666;
-        background: #E0E0E0;
-        border-color: #E0E0E0;
-    }
-    .feed-item {
-        width:570px;
-    }
-    .feed-title {
-        margin-left: 60px;
-        color: #666;
-        font-weight: bold;
-        border-bottom: 1px solid #B0B0B0;
-        padding-bottom: 5px;
-        width:510px;
-    }
-    .submit-btn {
-        text-align: right;
-        display: none;
-    }
-    .avatar {
-        padding-top: 5px;
-        float: left;
-        width: 50px;
-    }
-    .feed-item-content {
-        margin-left: 10px;
-        float: left;
-        width: 510px;
-        border-bottom: 1px solid #E0E0E0;
-        padding: 5px 0 5px;
-    }
-    .feed-item-title a{
-        color: gray;
-    }
-    .feed-item-title a:hover{
-        color: #005580;
-    }
-    .feed-item-title .name {
-        font-weight: bold;
-        font-size: 14px;
-    }
-    .feed-item-title .desc {
-        color: #999;
-        font-size: 12px;
-    }
-    .feed-item-body{
-        margin-top: 5px;
-    }
-    .feed-item-body p{
-        margin-bottom: 5px;
-        font-size: 14px;
-        word-break: break-all;
-    }
-    .feed-item-body p a {
-        color: #19558D;
-    }
-    .feed-item-footer {
-        font-size: 13px;
-        color: #999;
-    }
-    .footerlink {
-        color: #999;
-    }
-    .splitter {
-        padding: 0 4px;
-    }
-    .nav-pills .active > a, .nav-pills .active > a:hover {
-        color: #333;
-        background-color: #E0E0E0;
-    }
-    #morebtn {
-        margin-left: 60px;
-        margin-top: 5px;
-        width: 490px;
-    }
-</style>
+<link rel="stylesheet" href="{{ static_url("css/home.css") }}" type="text/css"/>
 {% end %}
 {% block body %}
 <div class="container">
@@ -130,7 +29,8 @@
                 <div class="feed-body">
                     {% module Template("modules/activities.html", template_values=template_values) %}                    
                 </div>
-                <a href="#" id="morebtn" class="btn">更多</a>
+                <div id="li" style="display: none">{{ template_values['lastindex'] }}</div>
+                <a href="#" id="morebtn" class="btn" onclick="return morefeed('home')">更多</a>
             </div>
         </div>
         <div class="span3">
