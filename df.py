@@ -191,7 +191,7 @@ class HomeHandler(BaseHandler):
         if self.current_user:
             template_values = {}
             uag = UserActivityGraph(self.rd)
-            template_values['all_activities'] = uag.get_all_activities(self.db)
+            template_values['all_activities'] = uag.get_all_activities(self.db, 0)
             self.render("home.html", template_values=template_values)
         else:
             self.render("index.html")
@@ -201,7 +201,7 @@ class MyhomeHandler(BaseHandler):
         if self.current_user:
             template_values = {}
             uag = UserActivityGraph(self.rd)
-            template_values['all_activities'] = uag.get_my_activities(self.db, self.current_user.id)
+            template_values['all_activities'] = uag.get_my_activities(self.db, self.current_user.id, 0)
             self.render("myhome.html", template_values=template_values)
         else:
             self.render("index.html")

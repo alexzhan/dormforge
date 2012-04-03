@@ -148,10 +148,10 @@ class UserActivityGraph(object):
         return Sub_Activity_list
 
     #whole-site activities
-    def get_all_activities(self, db):
+    def get_all_activities(self, db, startindex):
         all_activities = []
-        activities_list = self.client.lrange("all", 0, -1)
-        index = 1
+        activities_list = self.client.lrange("all", startindex, startindex+19)
+        index = startindex + 1
         for activity in activities_list:
             acttype, act_userid, actto = activity.split(":")
             act_username,act_domain,act_uuid = get_namedomainuuid_by_id(db, self.client, act_userid)
@@ -175,10 +175,10 @@ class UserActivityGraph(object):
         return all_activities
 
     #whole-site activities
-    def get_my_activities(self, db, user):
+    def get_my_activities(self, db, user, startindex):
         my_activities = []
-        activities_list = self.client.lrange("my:%s"%user, 0, -1)
-        index = 1
+        activities_list = self.client.lrange("my:%s"%user, startindex, startindex+19)
+        index = startindex + 1
         for activity in activities_list:
             acttype, act_userid, actto = activity.split(":")
             act_username,act_domain,act_uuid = get_namedomainuuid_by_id(db, self.client, act_userid)
