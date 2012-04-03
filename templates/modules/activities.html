@@ -1,120 +1,120 @@
 {% for activity in template_values['all_activities'] %}
-                    {% if activity[-2] == 'status' %}
-                    <div id="feed-item{{ activity[-1] }}" class="feed-item">
-                        <div class="avatar">
-                            <a href="/people/{{ activity[-4] }}"><img width="50px" height="50px" src="{{ handler.avatar('m', int(activity[-6]), activity[-3]) }}"></a>
-                        </div>
-                        <div class="feed-item-content">
-                            <div class="feed-item-title">
-                                <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
-                                <span class="feed-item-title desc">更新了状态:</span>
-                            </div>
-                            <div class="feed-item-body">
-                                <p>{{ handler.br(handler.at(linkify(activity[1], extra_params="target='_blank' rel='nofollow'"))) }}</p>
-                            </div>
-                            <div class="feed-item-footer">
-                                <div style="float:left"><span><a class="footerlink" href="/status/{{ handler.encode(activity[3]) }}">{{ activity[0] }}</a></span>
-                                </div>
-                                <div style="float:right">
-                                {% if str(current_user.name) == activity[-5] %}
-                                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[3]) }}', 1);">删除</a></span>
-                                <span class="splitter">•</span>
-                                <span><a class="footerlink" href="/status/edit?id={{ handler.encode(activity[3]) }}">编辑</a></span>
-                                <span class="splitter">•</span>
-                                {% end %}
-                                <span><a class="footerlink" href="/status/{{ handler.encode(activity[3]) }}">{% if not activity[2] or activity[2]=='0' %}评论{% else %}评论({{ activity[2] }}){% end %}</a></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% elif activity[-2] == 'note' and activity[3] == '0' %}
-                    <div id="feed-item{{ activity[-1] }}" class="feed-item">
-                        <div class="avatar">
-                            <a href="/people/{{ activity[-4] }}"><img width="50px" height="50px" src="{{ handler.avatar('m', int(activity[-6]), activity[-3]) }}"></a>
-                        </div>
-                        <div class="feed-item-content">
-                            <div class="feed-item-title">
-                                <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
-                                <span class="feed-item-title desc">发布了日志:</span>
-                                <span><a href="/note/{{ handler.encode(activity[5]) }}">{{ activity[1] }}</a></span>
-                            </div>
-                            <div class="feed-item-body">
-                                <p id="note{{ activity[-1] }}">{{ "".join([handler.at(linkify(activity[2], extra_params="target='_blank' rel='nofollow'")), " <a href='#' onclick=\"return viewnote('" + handler.encode(activity[5]) +"', '" + str(activity[-1]) + "');\">显示全部 »</a>"]) if len(unicode(activity[2])) < 150 and unicode(activity[2])[-4:]==" ..." else handler.br(handler.at(linkify(activity[2], extra_params="target='_blank' rel='nofollow'"))) }}</p>
-                                <p id="allnote{{ activity[-1] }}"></p>
-                            </div>
-                            <div class="feed-item-footer">
-                                <div style="float:left"><span><a class="footerlink" href="/note/{{ handler.encode(activity[5]) }}">{{ activity[0] }}</a></span>
-                                </div>
-                                <div style="float:right">
-                                {% if str(current_user.name) == activity[-5] %}
-                                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[5]) }}', 2);">删除</a></span>
-                                <span class="splitter">•</span>
-                                <span><a class="footerlink" href="/note/touch?id={{ handler.encode(activity[5]) }}">编辑</a></span>
-                                <span class="splitter">•</span>
-                                {% end %}
-                                <span><a class="footerlink" href="/note/{{ handler.encode(activity[5]) }}">{% if not activity[4] or activity[4]=='0' %}评论{% else %}评论({{ activity[4] }}){% end %}</a></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% elif activity[-2] == 'link' and activity[4] == '0' %}
-                    <div id="feed-item{{ activity[-1] }}" class="feed-item">
-                        <div class="avatar">
-                            <a href="/people/{{ activity[-4] }}"><img width="50px" height="50px" src="{{ handler.avatar('m', int(activity[-6]), activity[-3]) }}"></a>
-                        </div>
-                        <div class="feed-item-content">
-                            <div class="feed-item-title">
-                                <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
-                                <span class="feed-item-title desc">收藏了链接:</span>
-                                <span><a href="/link/{{ handler.encode(activity[6]) }}">{{ activity[2] if activity[2] else activity[1] }}</a></span>
-                            </div>
-                            <div class="feed-item-body">
-                                <p>{{ activity[3] if activity[3] else "" }}</p>
-                            </div>
-                            <div class="feed-item-footer">
-                                <div style="float:left"><span><a class="footerlink" href="/link/{{ handler.encode(activity[6]) }}">{{ activity[0] }}</a></span>
-                                </div>
-                                <div style="float:right">
-                                {% if str(current_user.name) == activity[-5] %}
-                                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[6]) }}', 3);">删除</a></span>
-                                <span class="splitter">•</span>
-                                <span><a class="footerlink" href="/link/edit?id={{ handler.encode(activity[6]) }}">编辑</a></span>
-                                <span class="splitter">•</span>
-                                {% end %}
-                                <span><a class="footerlink" href="/link/{{ handler.encode(activity[6]) }}">{% if not activity[5] or activity[5]=='0' %}评论{% else %}评论({{ activity[5] }}){% end %}</a></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% elif activity[-2] == 'doc' and activity[4] == '0' %}
-                    <div id="feed-item{{ activity[-1] }}" class="feed-item">
-                        <div class="avatar">
-                            <a href="/people/{{ activity[-4] }}"><img width="50px" height="50px" src="{{ handler.avatar('m', int(activity[-6]), activity[-3]) }}"></a>
-                        </div>
-                        <div class="feed-item-content">
-                            <div class="feed-item-title">
-                                <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
-                                <span class="feed-item-title desc">分享了文档:</span>
-                                <span><a href="/doc/{{ handler.encode(activity[6]) }}">{{ activity[2] }}</a></span>
-                            </div>
-                            <div class="feed-item-body">
-                                <p>{{ activity[3] if activity[3] else "" }}</p>
-                                <a href="/doc/{{ handler.encode(activity[6]) }}"><img src="static/usrdoc/{{ activity[-6] }}/{{ activity[1] }}.jpg"></a>
-                            </div>
-                            <div class="feed-item-footer">
-                                <div style="float:left"><span><a class="footerlink" href="/doc/{{ handler.encode(activity[6]) }}">{{ activity[0] }}</a></span>
-                                </div>
-                                <div style="float:right">
-                                {% if str(current_user.name) == activity[-5] %}
-                                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[6]) }}', 4);">删除</a></span>
-                                <span class="splitter">•</span>
-                                <span><a class="footerlink" href="/doc/edit?id={{ handler.encode(activity[6]) }}">编辑</a></span>
-                                <span class="splitter">•</span>
-                                {% end %}
-                                <span><a class="footerlink" href="/doc/{{ handler.encode(activity[6]) }}">{% if not activity[5] or activity[5]=='0' %}评论{% else %}评论({{ activity[5] }}){% end %}</a></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% end %}
-                    {% end %}
+{% if activity[-2] == 'status' %}
+<div id="feed-item{{ activity[-1] }}" class="feed-item">
+    <div class="avatar">
+        <a href="/people/{{ activity[-4] }}"><img width="50px" height="50px" src="{{ handler.avatar('m', int(activity[-6]), activity[-3]) }}"></a>
+    </div>
+    <div class="feed-item-content">
+        <div class="feed-item-title">
+            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
+            <span class="feed-item-title desc">更新了状态:</span>
+        </div>
+        <div class="feed-item-body">
+            <p>{{ handler.br(handler.at(linkify(activity[1], extra_params="target='_blank' rel='nofollow'"))) }}</p>
+        </div>
+        <div class="feed-item-footer">
+            <div style="float:left"><span><a class="footerlink" href="/status/{{ handler.encode(activity[3]) }}">{{ activity[0] }}</a></span>
+            </div>
+            <div style="float:right">
+                {% if str(current_user.name) == activity[-5] %}
+                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[3]) }}', 1);">删除</a></span>
+                <span class="splitter">•</span>
+                <span><a class="footerlink" href="/status/edit?id={{ handler.encode(activity[3]) }}">编辑</a></span>
+                <span class="splitter">•</span>
+                {% end %}
+                <span><a class="footerlink" href="/status/{{ handler.encode(activity[3]) }}">{% if not activity[2] or activity[2]=='0' %}评论{% else %}评论({{ activity[2] }}){% end %}</a></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif activity[-2] == 'note' and activity[3] == '0' %}
+<div id="feed-item{{ activity[-1] }}" class="feed-item">
+    <div class="avatar">
+        <a href="/people/{{ activity[-4] }}"><img width="50px" height="50px" src="{{ handler.avatar('m', int(activity[-6]), activity[-3]) }}"></a>
+    </div>
+    <div class="feed-item-content">
+        <div class="feed-item-title">
+            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
+            <span class="feed-item-title desc">发布了日志:</span>
+            <span><a href="/note/{{ handler.encode(activity[5]) }}">{{ activity[1] }}</a></span>
+        </div>
+        <div class="feed-item-body">
+            <p id="note{{ activity[-1] }}">{{ "".join([handler.at(linkify(activity[2], extra_params="target='_blank' rel='nofollow'")), " <a href='#' onclick=\"return viewnote('" + handler.encode(activity[5]) +"', '" + str(activity[-1]) + "');\">显示全部 »</a>"]) if len(unicode(activity[2])) < 150 and unicode(activity[2])[-4:]==" ..." else handler.br(handler.at(linkify(activity[2], extra_params="target='_blank' rel='nofollow'"))) }}</p>
+            <p id="allnote{{ activity[-1] }}"></p>
+        </div>
+        <div class="feed-item-footer">
+            <div style="float:left"><span><a class="footerlink" href="/note/{{ handler.encode(activity[5]) }}">{{ activity[0] }}</a></span>
+            </div>
+            <div style="float:right">
+                {% if str(current_user.name) == activity[-5] %}
+                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[5]) }}', 2);">删除</a></span>
+                <span class="splitter">•</span>
+                <span><a class="footerlink" href="/note/touch?id={{ handler.encode(activity[5]) }}">编辑</a></span>
+                <span class="splitter">•</span>
+                {% end %}
+                <span><a class="footerlink" href="/note/{{ handler.encode(activity[5]) }}">{% if not activity[4] or activity[4]=='0' %}评论{% else %}评论({{ activity[4] }}){% end %}</a></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif activity[-2] == 'link' and activity[4] == '0' %}
+<div id="feed-item{{ activity[-1] }}" class="feed-item">
+    <div class="avatar">
+        <a href="/people/{{ activity[-4] }}"><img width="50px" height="50px" src="{{ handler.avatar('m', int(activity[-6]), activity[-3]) }}"></a>
+    </div>
+    <div class="feed-item-content">
+        <div class="feed-item-title">
+            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
+            <span class="feed-item-title desc">收藏了链接:</span>
+            <span><a href="/link/{{ handler.encode(activity[6]) }}">{{ activity[2] if activity[2] else activity[1] }}</a></span>
+        </div>
+        <div class="feed-item-body">
+            <p>{{ activity[3] if activity[3] else "" }}</p>
+        </div>
+        <div class="feed-item-footer">
+            <div style="float:left"><span><a class="footerlink" href="/link/{{ handler.encode(activity[6]) }}">{{ activity[0] }}</a></span>
+            </div>
+            <div style="float:right">
+                {% if str(current_user.name) == activity[-5] %}
+                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[6]) }}', 3);">删除</a></span>
+                <span class="splitter">•</span>
+                <span><a class="footerlink" href="/link/edit?id={{ handler.encode(activity[6]) }}">编辑</a></span>
+                <span class="splitter">•</span>
+                {% end %}
+                <span><a class="footerlink" href="/link/{{ handler.encode(activity[6]) }}">{% if not activity[5] or activity[5]=='0' %}评论{% else %}评论({{ activity[5] }}){% end %}</a></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif activity[-2] == 'doc' and activity[4] == '0' %}
+<div id="feed-item{{ activity[-1] }}" class="feed-item">
+    <div class="avatar">
+        <a href="/people/{{ activity[-4] }}"><img width="50px" height="50px" src="{{ handler.avatar('m', int(activity[-6]), activity[-3]) }}"></a>
+    </div>
+    <div class="feed-item-content">
+        <div class="feed-item-title">
+            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
+            <span class="feed-item-title desc">分享了文档:</span>
+            <span><a href="/doc/{{ handler.encode(activity[6]) }}">{{ activity[2] }}</a></span>
+        </div>
+        <div class="feed-item-body">
+            <p>{{ activity[3] if activity[3] else "" }}</p>
+            <a href="/doc/{{ handler.encode(activity[6]) }}"><img src="static/usrdoc/{{ activity[-6] }}/{{ activity[1] }}.jpg"></a>
+        </div>
+        <div class="feed-item-footer">
+            <div style="float:left"><span><a class="footerlink" href="/doc/{{ handler.encode(activity[6]) }}">{{ activity[0] }}</a></span>
+            </div>
+            <div style="float:right">
+                {% if str(current_user.name) == activity[-5] %}
+                <span><a class="footerlink" href="#" onclick="return deleteactivity({{ activity[-1] }},'{{ activity[-5] }}', '{{ handler.encode(activity[6]) }}', 4);">删除</a></span>
+                <span class="splitter">•</span>
+                <span><a class="footerlink" href="/doc/edit?id={{ handler.encode(activity[6]) }}">编辑</a></span>
+                <span class="splitter">•</span>
+                {% end %}
+                <span><a class="footerlink" href="/doc/{{ handler.encode(activity[6]) }}">{% if not activity[5] or activity[5]=='0' %}评论{% else %}评论({{ activity[5] }}){% end %}</a></span>
+            </div>
+        </div>
+    </div>
+</div>
+{% end %}
+{% end %}
