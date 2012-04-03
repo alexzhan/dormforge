@@ -104,7 +104,7 @@
                     <label for="secret" id="secret-label">私密</label>
                 </span>
                 <span class="cancel">
-                    <a type="submit" class="btn" href="/" onclick="return cancelbtn('{{ template_values['id'] if 'id' in template_values and template_values['id'] else "0" }}');">取消</a>
+                    <a type="submit" class="btn" href="{{ '/' if 'id' not in template_values else '/doc/'+template_values['id'] }}">取消</a>
                 </span>
             </div>
             <input id="docid" type="hidden" name="docid" value="{{ template_values['id'] if 'id' in template_values else '' }}">
