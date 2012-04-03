@@ -71,6 +71,7 @@ class Application(tornado.web.Application):
                 (r"/cansug", CansugHandler),
                 (r"/doc/edit", EditdocHandler),
                 (r"/doc/([0-9a-z]+)", DocHandler),
+                (r"/more/([a-z]+)", MoreHandler),
                 (r".*", PNFHandler),
                 ]
         settings = dict(
@@ -98,6 +99,14 @@ class BaseHandler(tornado.web.RequestHandler):
     def rd(self):
         return redis.StrictRedis(host='localhost', port=6379, db=0)
 
+    @property
+    def uag(self):
+        return UserActivityGraph(self.rd)
+
+    @property
+    def ufg(self):
+        return UserFollowGraph(self.rd)
+    
     def avatar(self, avasize, user_id, uuid):
         shard = str(user_id % 40)
         avapath = "".join(["usrimg/", shard, "/", avasize, "_", uuid, ".jpg"])
@@ -157,14 +166,13 @@ class FollowBaseHandler(BaseHandler):
         template_values['username'] = people.name
         template_values['domain'] = people.domain
         template_values['image'] = self.avatar("xl", people.id, people.uuid_)
-        ufg = UserFollowGraph(self.rd)
-        template_values['follow_count'] = ufg.follow_count(people.id)
-        template_values['follower_count'] = ufg.follower_count(people.id)
-        template_values['is_follow'] = ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
+        template_values['follow_count'] = self.ufg.follow_count(people.id)
+        template_values['follower_count'] = self.ufg.follower_count(people.id)
+        template_values['is_follow'] = self.ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
         if follow_type == 'following':
-            follows = ufg.get_follows(template_values['id'])
+            follows = self.ufg.get_follows(template_values['id'])
         elif follow_type == 'follower':
-            follows = ufg.get_followers(template_values['id'])
+            follows = self.ufg.get_followers(template_values['id'])
         if len(follows) == 0:
             follow_people = []
         else:
@@ -176,7 +184,7 @@ class FollowBaseHandler(BaseHandler):
                 orderstr = str(follows)[1:-1].replace(" ","")
                 follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
             for i in range(len(follow_people)):
-                follow_people[i].is_follow = ufg.is_follow(self.current_user.id, follow_people[i].id) if self.current_user else False
+                follow_people[i].is_follow = self.ufg.is_follow(self.current_user.id, follow_people[i].id) if self.current_user else False
                 follow_people[i].image = self.avatar("m", follow_people[i].id, follow_people[i].uuid_)
                 if not self.current_user or self.current_user and self.current_user.id != follow_people[i].id:
                     follow_people[i].is_self = False 
@@ -190,8 +198,7 @@ class HomeHandler(BaseHandler):
     def get(self):
         if self.current_user:
             template_values = {}
-            uag = UserActivityGraph(self.rd)
-            template_values['all_activities'] = uag.get_all_activities(self.db, 0)
+            template_values['all_activities'] = self.uag.get_all_activities(self.db, 0)
             self.render("home.html", template_values=template_values)
         else:
             self.render("index.html")
@@ -200,11 +207,16 @@ class MyhomeHandler(BaseHandler):
     def get(self):
         if self.current_user:
             template_values = {}
-            uag = UserActivityGraph(self.rd)
-            template_values['all_activities'] = uag.get_my_activities(self.db, self.current_user.id, 0)
+            template_values['all_activities'] = self.uag.get_my_activities(self.db, self.current_user.id, 0)
             self.render("myhome.html", template_values=template_values)
         else:
             self.render("index.html")
+
+class MoreHandler(BaseHandler):
+    def get(self, prop):
+        template_values = {}
+        if prop == "home":
+            template_values['all_activities'] = self.uag.get_all_activities(self.db, 0)
 
 class SignupHandler(BaseHandler):
     def get(self):
@@ -830,10 +842,9 @@ class PeopleHandler(BaseHandler):
             zx_province = self.db.get("select name from fd_Province where id = %s", people.zx_province_id)
             template_values['zx_province'] = zx_province.name
 
-        ufg = UserFollowGraph(self.rd)
-        template_values['follow_count'] = ufg.follow_count(people.id)
-        template_values['follower_count'] = ufg.follower_count(people.id)
-        template_values['is_follow'] = ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
+        template_values['follow_count'] = self.ufg.follow_count(people.id)
+        template_values['follower_count'] = self.ufg.follower_count(people.id)
+        template_values['is_follow'] = self.ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
         template_values['image'] = self.static_url("img/no_avatar.jpg")
         template_values['selfdesc'] = ""
         if template_values['has_selfdesc']:
@@ -841,18 +852,17 @@ class PeopleHandler(BaseHandler):
                     template_values['id'])
             if not selfdesc: raise tornado.web.HTTPError(405)
             template_values['selfdesc'] = self.br(selfdesc.selfdesc).strip()
-        uag = UserActivityGraph(self.rd)
         isself = template_values['id'] == self.current_user.id if self.current_user else False
-        template_values['activities'] = uag.get_top_activities(template_values['id'], self.db, isself) 
-        template_values['activity_count'] = uag.count_activity(template_values['id']) 
-        template_values['statuses'] = uag.get_top_sub_activities(template_values['id'], 1, isself) 
-        template_values['status_count'] = uag.count_sub_activity(template_values['id'], 1) 
-        template_values['notes'] = uag.get_top_sub_activities(template_values['id'], 2, isself) 
-        template_values['note_count'] = uag.count_sub_activity(template_values['id'], 2) 
-        template_values['links'] = uag.get_top_sub_activities(template_values['id'], 3, isself) 
-        template_values['link_count'] = uag.count_sub_activity(template_values['id'], 3) 
-        template_values['docs'] = uag.get_top_sub_activities(template_values['id'], 4, isself) 
-        template_values['doc_count'] = uag.count_sub_activity(template_values['id'], 4) 
+        template_values['activities'] = self.uag.get_top_activities(template_values['id'], self.db, isself) 
+        template_values['activity_count'] = self.uag.count_activity(template_values['id']) 
+        template_values['statuses'] = self.uag.get_top_sub_activities(template_values['id'], 1, isself) 
+        template_values['status_count'] = self.uag.count_sub_activity(template_values['id'], 1) 
+        template_values['notes'] = self.uag.get_top_sub_activities(template_values['id'], 2, isself) 
+        template_values['note_count'] = self.uag.count_sub_activity(template_values['id'], 2) 
+        template_values['links'] = self.uag.get_top_sub_activities(template_values['id'], 3, isself) 
+        template_values['link_count'] = self.uag.count_sub_activity(template_values['id'], 3) 
+        template_values['docs'] = self.uag.get_top_sub_activities(template_values['id'], 4, isself) 
+        template_values['doc_count'] = self.uag.count_sub_activity(template_values['id'], 4) 
         self.render("people.html", template_values=template_values)
 
 class FollowingHandler(FollowBaseHandler):
@@ -877,9 +887,8 @@ class CityHandler(BaseHandler):
         template_values['region'] = city
         template_values['type'] = 'city'
         template_values['image'] = self.static_url("img/no_photo.gif")
-        ufg = UserFollowGraph(self.rd)
         for i in range(len(people)):
-            people[i].is_follow = ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
+            people[i].is_follow = self.ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
             people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
             if not self.current_user or self.current_user and self.current_user.id != people[i].id:
                 people[i].is_self = False 
@@ -904,9 +913,8 @@ class CollegeHandler(BaseHandler):
             template_values['image'] = self.static_url("schoolimage/" + image_path)
         else:
             template_values['image'] = self.static_url("img/no_photo.gif")
-        ufg = UserFollowGraph(self.rd)
         for i in range(len(people)):
-            people[i].is_follow = ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
+            people[i].is_follow = self.ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
             people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
             if not self.current_user or self.current_user and self.current_user.id != people[i].id:
                 people[i].is_self = False 
@@ -927,9 +935,8 @@ class MajorHandler(BaseHandler):
         template_values['region'] = major
         template_values['type'] = 'major'
         template_values['image'] = self.static_url("img/no_photo.gif")
-        ufg = UserFollowGraph(self.rd)
         for i in range(len(people)):
-            people[i].is_follow = ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
+            people[i].is_follow = self.ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
             people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
             if not self.current_user or self.current_user and self.current_user.id != people[i].id:
                 people[i].is_self = False 
@@ -973,8 +980,7 @@ class FollowHandler(BaseHandler):
         from_user = self.get_argument("from_user",None)
         to_user = self.get_argument("to_user",None)
         if from_user == to_user or from_user == 0 or to_user == 0: raise tornado.web.HTTPError(405)
-        ufg = UserFollowGraph(self.rd)
-        if ufg.follow(from_user, to_user):
+        if self.ufg.follow(from_user, to_user):
             acttime = time.strftime('%y-%m-%d %H:%M', time.localtime())
             redacttime = acttime[4:] if acttime[3] == '0' else acttime[3:]
             actto = self.db.get("select name from fd_People where id = %s", to_user).name
@@ -989,8 +995,7 @@ class UnfollowHandler(BaseHandler):
         from_user = self.get_argument("from_user",None)
         to_user = self.get_argument("to_user",None)
         if from_user == to_user or from_user == 0 or to_user == 0: raise tornado.web.HTTPError(405)
-        ufg = UserFollowGraph(self.rd)
-        if ufg.unfollow(from_user, to_user):
+        if self.ufg.unfollow(from_user, to_user):
             #actto = self.db.get("select name from fd_People where id = %s", to_user).name
             del_activity(self.rd, from_user, 0, to_user)
         else:
