@@ -1589,7 +1589,11 @@ class EditlinkHandler(BaseHandler):
                         tag_id = tag_id.id
                     else:
                         tag_id = self.db.execute("insert into fd_Tag (tag) values (%s)", t)
-                    ltag_id = self.db.execute("insert into fd_Ltag (link_id,tag_id) values (%s,%s)", link_id, tag_id)
+                    if linkid:
+                        with_link_id = linkid
+                    elif link_id:
+                        with_link_id = link_id
+                    ltag_id = self.db.execute("insert into fd_Ltag (link_id,tag_id) values (%s,%s)", with_link_id, tag_id)
         if linkid: 
             link_key = "link:%s:%s" % (self.current_user.id, linkid)
             actdict = {'url':url, 'status':linktype}
@@ -1760,11 +1764,11 @@ class EditdocHandler(BaseHandler):
                             tag_id = tag_id.id
                         else:
                             tag_id = self.db.execute("insert into fd_Doctag (tag) values (%s)", t)
-                            if endocid:
-                                with_doc_id = decode(endocid)
-                            elif doc_id:
-                                with_doc_id = doc_id
-                            dtag_id = self.db.execute("insert into fd_Dtag (doc_id,tag_id) values (%s,%s)", with_doc_id, tag_id)
+                        if endocid:
+                            with_doc_id = decode(endocid)
+                        elif doc_id:
+                            with_doc_id = doc_id
+                        dtag_id = self.db.execute("insert into fd_Dtag (doc_id,tag_id) values (%s,%s)", with_doc_id, tag_id)
             if endocid:
                 doc_key = "doc:%s:%s" % (self.current_user.id, decode(endocid))
                 actdict = {'status':doctype}
