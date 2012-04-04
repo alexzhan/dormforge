@@ -898,16 +898,18 @@ class RegionHandler(BaseHandler):
         if not region_get: raise tornado.web.HTTPError(404)
         region_id = region_get.id
         if region == "city": 
-            people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3)", region_id, region_id, region_id) 
+            people = self.db.query("SELECT SQL_CALC_FOUND_ROWS id,name,domain,uuid_ FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3) limit 0,%s", region_id, region_id, region_id, people_number) 
         elif region == "college":
             image_path = region_get.image_path
-            people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3)", region_id, region_id, region_id) 
+            people = self.db.query("SELECT SQL_CALC_FOUND_ROWS id,name,domain,uuid_ FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3) limit 0,%s", region_id, region_id, region_id, people_number)
         elif region == "major":
-            people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3)", region_id, region_id, region_id) 
+            people = self.db.query("SELECT SQL_CALC_FOUND_ROWS id,name,domain,uuid_ FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3) limit 0,%s", region_id, region_id, region_id, people_number) 
+        people_count = self.db.get("select found_rows() as length").length
         template_values = {}
         template_values['region_id'] = region_id
         template_values['region'] = name
         template_values['type'] = region
+        template_values['people_count'] = people_count
         template_values['image'] = self.static_url("img/no_photo.gif")
         if region == "college" and image_path:
             template_values['image'] = self.static_url("schoolimage/" + image_path)
@@ -915,10 +917,14 @@ class RegionHandler(BaseHandler):
             people[i].is_follow = self.ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
             people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
             if not self.current_user or self.current_user and self.current_user.id != people[i].id:
-                people[i].is_self = False 
+                people[i].is_self = False
             else:
                 people[i].is_self = True
-        template_values['people'] = people 
+        template_values['people'] = people
+        template_values['lastindex'] = people_number
+        template_values['hasnext'] = 1
+        if template_values['lastindex'] >= people_count:
+            template_values['hasnext'] = 0
         self.render("region.html", template_values=template_values)
 
 class ExistHandler(BaseHandler):
