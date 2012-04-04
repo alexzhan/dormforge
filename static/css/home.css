@@ -54,6 +54,13 @@ i {
     border-bottom: 1px solid #E0E0E0;
     padding: 5px 0 5px;
 }
+.follow-item-content {
+    margin-left: 60px;
+    float: left;
+    width: 510px;
+    border-bottom: 1px solid #E0E0E0;
+    padding: 5px 0 5px;
+}
 .feed-item-title a{
     color: gray;
 }
@@ -78,6 +85,9 @@ i {
 }
 .feed-item-body p a {
     color: #19558D;
+}
+.follow-item-body p a {
+    color: #333;
 }
 .feed-item-footer {
     font-size: 13px;

@@ -116,6 +116,18 @@
         </div>
     </div>
 </div>
+{% elif activity[-2] == 'follow' %}
+<div id="feed-item{{ activity[-1] }}" class="feed-item">
+    <div class="follow-item-content">
+        <div class="follow-item-body">
+            <p>
+            <a href="/people/{{ activity[-5] }}"><img style="vertical-align:middle;" width="25px" height="25px" src="{{ handler.avatar('s', int(activity[-6]), activity[-3]) }}"></a>
+            <a href="/people/{{ activity[-4] }}">{{activity[-5] }}</a> 关注了 
+            <a href="/people/{{ activity[3] }}"><img style="vertical-align:middle;" width="25px" height="25px" src="{{ handler.avatar('s', int(activity[1]), activity[4]) }}"></a>
+            <a href="/people/{{ activity[3] }}">{{ activity[2] }}</a><span class="follow-time"> {{ activity[0] }}</span></p>
+        </div>
+    </div>
+</div>
 {% end %}
 {% end %}
 <div id="hn{{ template_values['lastindex'] }}" style="display: none">{{ template_values['hasnext'] }}</div>
