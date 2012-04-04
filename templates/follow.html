@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>18周 › {% if template_values['is_self'] and template_values['type'] == 'following' %}我关注的人{% elif template_values['is_self'] and template_values['type'] == 'follower' %}关注我的人{% elif not template_values['is_self'] and template_values['type'] == 'following' %}{{ template_values['username'] }}关注的人{% elif not template_values['is_self'] and template_values['type'] == 'follower' %}关注{{ template_values['username'] }}的人{% end %}</title>
+<title>18周 › {{ template_values['page_title'] }}</title>
 <link rel="stylesheet" href="{{ static_url("css/region.css") }}" type="text/css"/>
 {% end %}
 {% block body %}

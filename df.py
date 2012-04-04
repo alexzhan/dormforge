@@ -161,6 +161,15 @@ class FollowBaseHandler(BaseHandler):
             template_values['is_self'] = False
         else:
             template_values['is_self'] = True
+        if template_values['is_self'] and follow_type == "following":
+            page_title = "我关注的人"
+        elif template_values['is_self'] and follow_type == 'follower':
+            page_title = "关注我的人"
+        elif not template_values['is_self'] and follow_type == 'following':
+            page_title = "".join([people.name, "关注的人"])
+        elif not template_values['is_self'] and follow_type == 'follower':
+            page_title = "".join(["关注", people.name, "的人"])
+        template_values['page_title'] = page_title
         template_values['id'] = people.id
         template_values['uuid'] = people.uuid_
         template_values['username'] = people.name
