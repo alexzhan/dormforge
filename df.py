@@ -81,8 +81,6 @@ class Application(tornado.web.Application):
                 autoescape=None,
                 )
         tornado.web.Application.__init__(self, handlers, **settings)
-
-        # Have one global connection to the blog DB across all handlers
         self.db = tornado.database.Connection(
                 host=options.mysql_host, database=options.mysql_database,
                 user=options.mysql_user, password=options.mysql_password)
