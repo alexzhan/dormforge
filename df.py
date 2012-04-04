@@ -24,6 +24,7 @@ from util.encrypt import encrypt_password,validate_password
 from util.getby import get_id_by_name,get_domain_by_name
 from util.encode import encode,decode,key
 from util.redis_activity import add_activity,del_activity
+from util.common import feed_number,people_number
 from db.redis.user_follow_graph import UserFollowGraph
 from db.redis.user_activity_graph import UserActivityGraph
 from base64 import b64encode,b64decode
@@ -203,7 +204,7 @@ class HomeHandler(BaseHandler):
         if self.current_user:
             template_values = {}
             template_values['all_activities'] = self.uag.get_all_activities(self.db, 0)
-            template_values['lastindex'] = 20
+            template_values['lastindex'] = feed_number
             template_values['hasnext'] = 1
             if template_values['lastindex'] >= self.uag.count_all_activity():
                 template_values['hasnext'] = 0
@@ -216,7 +217,7 @@ class MyhomeHandler(BaseHandler):
         if self.current_user:
             template_values = {}
             template_values['all_activities'] = self.uag.get_my_activities(self.db, self.current_user.id, 0)
-            template_values['lastindex'] = 20
+            template_values['lastindex'] = feed_number
             template_values['hasnext'] = 1
             if template_values['lastindex'] >= self.uag.count_my_activity(self.current_user.id):
                 template_values['hasnext'] = 0
@@ -233,7 +234,7 @@ class MoreHandler(BaseHandler):
                 template_values['all_activities'] = self.uag.get_all_activities(self.db, int(startindex))
             elif prop == "myhome":
                 template_values['all_activities'] = self.uag.get_my_activities(self.db, self.current_user.id, int(startindex))
-            template_values['lastindex'] = int(startindex) + 20
+            template_values['lastindex'] = int(startindex) + feed_number
             template_values['hasnext'] = 1
             if template_values['lastindex'] >= self.uag.count_all_activity():
                 template_values['hasnext'] = 0
