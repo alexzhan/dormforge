@@ -49,8 +49,7 @@ class Application(tornado.web.Application):
                 (r"/contact", ContactHandler),
                 (r"/about", AboutHandler),
                 (r"/people/([a-z0-9A-Z\_\-]+)", PeopleHandler),
-                (r"/people/([a-z0-9A-Z\_\-]+)/following", FollowingHandler),
-                (r"/people/([a-z0-9A-Z\_\-]+)/follower", FollowerHandler),
+                (r"/people/([a-z0-9A-Z\_\-]+)/(following|follower)", FollowBaseHandler),
                 (r"/(city|college|major)/(.*)", RegionHandler),
                 (r"/isexist", ExistHandler),
                 (r"/follow", FollowHandler),
@@ -151,10 +150,10 @@ class BaseHandler(tornado.web.RequestHandler):
         return value.replace("\n", "<br>")
 
 class FollowBaseHandler(BaseHandler):
-    def follow(self, domain, follow_type):
+    def get(self, domain, follow_type):
+        template_values = {}
         people = self.db.get("SELECT id,name,domain,uuid_ FROM fd_People WHERE domain = %s", domain) 
         if not people: raise tornado.web.HTTPError(404)
-        template_values = {}
         if not self.current_user or self.current_user and self.current_user.id != people.id:
             template_values['is_self'] = False
         else:
@@ -199,7 +198,7 @@ class FollowBaseHandler(BaseHandler):
                     follow_people[i].is_self = True
         template_values['follow'] = follow_people 
         template_values['type'] = follow_type 
-        return template_values
+        self.render("follow.html", template_values=template_values)
 
 class HomeHandler(BaseHandler):
     def get(self):
@@ -888,16 +887,6 @@ class PeopleHandler(BaseHandler):
         template_values['docs'] = self.uag.get_top_sub_activities(template_values['id'], 4, isself) 
         template_values['doc_count'] = self.uag.count_sub_activity(template_values['id'], 4) 
         self.render("people.html", template_values=template_values)
-
-class FollowingHandler(FollowBaseHandler):
-    def get(self, domain):
-        template_values = self.follow(domain, 'following')
-        self.render("follow.html", template_values=template_values)
-
-class FollowerHandler(FollowBaseHandler):
-    def get(self, domain):
-        template_values = self.follow(domain, 'follower')
-        self.render("follow.html", template_values=template_values)
 
 class RegionHandler(BaseHandler):
     def get(self, region, name):
