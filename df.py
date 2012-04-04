@@ -283,7 +283,6 @@ class MoreHandler(BaseHandler):
                 follows = self.ufg.get_follows(people_id)
             elif follow_type == 'follower':
                 follows = self.ufg.get_followers(people_id)
-            logging.info(len(follows))
             follow_people = []
             for i in range(startindex, startindex+people_number):
                 if i >= len(follows):
