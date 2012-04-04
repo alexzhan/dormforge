@@ -1,4 +1,5 @@
 from util.getby import get_namedomainuuid_by_id
+from util.common import feed_number
 
 class UserActivityGraph(object):
 
@@ -150,7 +151,7 @@ class UserActivityGraph(object):
     #whole-site activities
     def get_all_activities(self, db, startindex):
         all_activities = []
-        activities_list = self.client.lrange("all", startindex, startindex+19)
+        activities_list = self.client.lrange("all", startindex, startindex+feed_number-1)
         index = startindex + 1
         for activity in activities_list:
             acttype, act_userid, actto = activity.split(":")
@@ -177,7 +178,7 @@ class UserActivityGraph(object):
     #my following activities
     def get_my_activities(self, db, user, startindex):
         my_activities = []
-        activities_list = self.client.lrange("my:%s"%user, startindex, startindex+19)
+        activities_list = self.client.lrange("my:%s"%user, startindex, startindex+feed_number-1)
         index = startindex + 1
         for activity in activities_list:
             acttype, act_userid, actto = activity.split(":")

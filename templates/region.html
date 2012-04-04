@@ -21,31 +21,7 @@
                         有{{ len(template_values['people']) }}人在{% if template_values['type'] == 'major'%}修{% end %}{{ template_values['region'] }}{% if template_values['type'] == 'major'%}专业{% end %}
                     </div>
                 </div>
-                {% for follow in template_values['people'] %}
-                <div class="pagelist">
-                    <div class="col_item">
-                        <div class="mavatar">
-                            <a href="/people/{{ follow.domain }}"><img class="mavatar" src="{{ follow.image }}" width="50" alt="{{ follow.name }}" height="50"></a>
-                        </div>
-                        <div class="mdesc">
-                            <div class="mdesc-name">
-                                <a style="color: #19558D" href="/people/{{ follow.domain }}">{{ follow.name }}</a>
-                            </div>
-                        </div>
-                        <div class="mfollow">
-                            {% if not follow.is_self %}
-                            {% if follow.is_follow %}
-                            <a id="following-btn{{ follow.id }}" class="btn btn-small btn-primary" style="display:none" onclick="follow('following-btn{{ follow.id }}', {{ current_user['id'] if current_user else 0 }}, {{ follow.id }})">关注</a>
-                            <a id="unfollowing-btn{{ follow.id }}" class="btn btn-small" onclick="unfollow('following-btn{{ follow.id }}', {{ current_user['id'] if current_user else 0 }}, {{ follow.id }})">取消关注</a>
-                            {% else %}
-                            <a id="following-btn{{ follow.id }}" class="btn btn-small btn-primary" data-toggle="modal" href="#myModal" onclick="return follow('following-btn{{ follow.id }}', {{ current_user['id'] if current_user else 0 }}, {{ follow.id }})">关注</a>
-                            <a id="unfollowing-btn{{ follow.id }}" class="btn btn-small" style="display:none" onclick="unfollow('following-btn{{ follow.id }}', {{ current_user['id'] if current_user else 0 }}, {{ follow.id }})">取消关注</a>
-                            {% end %}
-                            {% end %}
-                        </div>
-                    </div>
-                </div>
-                {% end %}
+                {% module Template("modules/follow_people.html", template_values=template_values) %}
             </div>
         </div>
     </div>
