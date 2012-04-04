@@ -62,3 +62,10 @@
 .btn-small {
     padding:2px 5px;
 }
+.namefollowrow .btn .btn-primary, .namefollowrow .btn {
+    float:right;
+    margin-right:200px;
+    font-size: 12px;
+    width: 50px;
+    padding: 3px 5px 3px;
+}
