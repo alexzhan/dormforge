@@ -30,13 +30,17 @@
                 <div class="col_header">
                     <div class="profile-text">
                         {% if template_values['type'] == 'following' %}
-                        {% if template_values['is_self'] and current_user %}我{% else %}{{ template_values['username'] }}{% end %}关注{{ template_values['follow_count'] }}人
+                        {% if template_values['is_self'] and current_user %}我{% else %}{{ template_values['username'] }}{% end %}关注{{ template_values['people_count'] }}人
                         {% elif template_values['type'] == 'follower' %}
-                        {{ template_values['follower_count'] }}人关注{% if template_values['is_self'] and current_user %}我{% else %}{{ template_values['username'] }}{% end %}
+                        {{ template_values['people_count'] }}人关注{% if template_values['is_self'] and current_user %}我{% else %}{{ template_values['username'] }}{% end %}
                         {% end %}
                     </div>
                 </div>
-                {% module Template("modules/follow_people.html", template_values=template_values) %}
+                <div class="peoplelist">
+                    {% module Template("modules/follow_people.html", template_values=template_values) %}
+                </div>
+                <div id="li" style="display: none">{{ template_values['lastindex'] }}</div>
+                <a href="#" id="morebtn" class="btn" style="width:500px;margin:5px 0 10px 50px;" onclick='return morefeed("{{ template_values['type'] }}","{{ template_values['id'] }}")'>更多</a>
             </div>
         </div>
     </div>
@@ -45,4 +49,5 @@
 {% block bottom %}
 <script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
 <script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
+<script type="text/javascript" src="{{ static_url("js/region.js") }}"></script>
 {% end %}
