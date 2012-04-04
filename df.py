@@ -51,9 +51,7 @@ class Application(tornado.web.Application):
                 (r"/people/([a-z0-9A-Z\_\-]+)", PeopleHandler),
                 (r"/people/([a-z0-9A-Z\_\-]+)/following", FollowingHandler),
                 (r"/people/([a-z0-9A-Z\_\-]+)/follower", FollowerHandler),
-                (r"/city/(.*)", CityHandler),
-                (r"/college/(.*)", CollegeHandler),
-                (r"/major/(.*)", MajorHandler),
+                (r"/(city|college|major)/(.*)", RegionHandler),
                 (r"/isexist", ExistHandler),
                 (r"/follow", FollowHandler),
                 (r"/unfollow", UnfollowHandler),
@@ -901,66 +899,30 @@ class FollowerHandler(FollowBaseHandler):
         template_values = self.follow(domain, 'follower')
         self.render("follow.html", template_values=template_values)
 
-class CityHandler(BaseHandler):
-    def get(self, city):
-        city_id = self.db.get("SELECT id FROM fd_City where name = %s", city)
-        if not city_id: raise tornado.web.HTTPError(404)
-        city_id = city_id.id
-        people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3)", city_id, city_id, city_id) 
-        #if not people: raise tornado.web.HTTPError(404)
+class RegionHandler(BaseHandler):
+    def get(self, region, name):
+        if region == "college":
+            region_get = self.db.get("SELECT id,image_path FROM fd_College where name = %s", name)
+        elif region == "city":
+            region_get = self.db.get("SELECT id FROM fd_City where name = %s", name)
+        elif region == "major":
+            region_get = self.db.get("SELECT id FROM fd_Major where name = %s", name)
+        if not region_get: raise tornado.web.HTTPError(404)
+        region_id = region_get.id
+        if region == "city": 
+            people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3)", region_id, region_id, region_id) 
+        elif region == "college":
+            image_path = region_get.image_path
+            people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3)", region_id, region_id, region_id) 
+        elif region == "major":
+            people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3)", region_id, region_id, region_id) 
         template_values = {}
-        template_values['region_id'] = city_id
-        template_values['region'] = city
-        template_values['type'] = 'city'
+        template_values['region_id'] = region_id
+        template_values['region'] = name
+        template_values['type'] = region
         template_values['image'] = self.static_url("img/no_photo.gif")
-        for i in range(len(people)):
-            people[i].is_follow = self.ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
-            people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
-            if not self.current_user or self.current_user and self.current_user.id != people[i].id:
-                people[i].is_self = False 
-            else:
-                people[i].is_self = True
-        template_values['people'] = people 
-        self.render("region.html", template_values=template_values)
-
-class CollegeHandler(BaseHandler):
-    def get(self, college):
-        college_id = self.db.get("SELECT id,image_path FROM fd_College where name = %s", college)
-        if not college_id: raise tornado.web.HTTPError(404)
-        image_path = college_id.image_path
-        college_id = college_id.id
-        people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3)", college_id, college_id, college_id) 
-        #if not people: raise tornado.web.HTTPError(404)
-        template_values = {}
-        template_values['region_id'] = college_id
-        template_values['region'] = college
-        template_values['type'] = 'college'
-        if image_path:
+        if region == "college" and image_path:
             template_values['image'] = self.static_url("schoolimage/" + image_path)
-        else:
-            template_values['image'] = self.static_url("img/no_photo.gif")
-        for i in range(len(people)):
-            people[i].is_follow = self.ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
-            people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
-            if not self.current_user or self.current_user and self.current_user.id != people[i].id:
-                people[i].is_self = False 
-            else:
-                people[i].is_self = True
-        template_values['people'] = people 
-        self.render("region.html", template_values=template_values)
-
-class MajorHandler(BaseHandler):
-    def get(self, major):
-        major_id = self.db.get("SELECT id FROM fd_Major where name = %s", major)
-        if not major_id: raise tornado.web.HTTPError(404)
-        major_id = major_id.id
-        people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3)", major_id, major_id, major_id) 
-        #if not people: raise tornado.web.HTTPError(404)
-        template_values = {}
-        template_values['region_id'] = major_id
-        template_values['region'] = major
-        template_values['type'] = 'major'
-        template_values['image'] = self.static_url("img/no_photo.gif")
         for i in range(len(people)):
             people[i].is_follow = self.ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
             people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
