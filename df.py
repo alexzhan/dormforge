@@ -171,8 +171,6 @@ class FollowBaseHandler(BaseHandler):
         template_values['username'] = people.name
         template_values['domain'] = people.domain
         template_values['image'] = self.avatar("xl", people.id, people.uuid_)
-        template_values['follow_count'] = self.ufg.follow_count(people.id)
-        template_values['follower_count'] = self.ufg.follower_count(people.id)
         template_values['is_follow'] = self.ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
         if follow_type == 'following':
             follows = self.ufg.get_follows(template_values['id'])
@@ -181,7 +179,9 @@ class FollowBaseHandler(BaseHandler):
         if len(follows) == 0:
             follow_people = []
         else:
-            for i in range(len(follows)):
+            for i in range(people_number):
+                if i >= len(follows):
+                    break
                 follows[i] = int(follows[i])
             if len(follows) == 1:
                 follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id = %s", follows[0]) 
@@ -197,6 +197,11 @@ class FollowBaseHandler(BaseHandler):
                     follow_people[i].is_self = True
         template_values['people'] = follow_people 
         template_values['type'] = follow_type 
+        template_values['people_count'] = len(follows)
+        template_values['lastindex'] = people_number
+        template_values['hasnext'] = 1
+        if template_values['lastindex'] >= len(follows):
+            template_values['hasnext'] = 0
         self.render("follow.html", template_values=template_values)
 
 class HomeHandler(BaseHandler):
@@ -228,17 +233,80 @@ class MyhomeHandler(BaseHandler):
 class MoreHandler(BaseHandler):
     def get(self, prop):
         template_values = {}
+        startindex = self.get_argument("lastindex", None)
+        startindex = int(startindex)
         if prop in ["home", "myhome"]:
-            startindex = self.get_argument("lastindex")
             if prop == "home":
-                template_values['all_activities'] = self.uag.get_all_activities(self.db, int(startindex))
+                template_values['all_activities'] = self.uag.get_all_activities(self.db, startindex)
             elif prop == "myhome":
-                template_values['all_activities'] = self.uag.get_my_activities(self.db, self.current_user.id, int(startindex))
-            template_values['lastindex'] = int(startindex) + feed_number
+                template_values['all_activities'] = self.uag.get_my_activities(self.db, self.current_user.id, startindex)
+            template_values['lastindex'] = startindex + feed_number
             template_values['hasnext'] = 1
             if template_values['lastindex'] >= self.uag.count_all_activity():
                 template_values['hasnext'] = 0
             self.render("modules/activities.html", template_values=template_values)
+        elif prop in ["city", "college", "major"]:
+            name = self.get_argument("name", None)
+            region = prop
+            if region == "college":
+                region_get = self.db.get("SELECT id,image_path FROM fd_College where name = %s", name)
+            elif region == "city":
+                region_get = self.db.get("SELECT id FROM fd_City where name = %s", name)
+            elif region == "major":
+                region_get = self.db.get("SELECT id FROM fd_Major where name = %s", name)
+            if not region_get: raise tornado.web.HTTPError(404)
+            region_id = region_get.id
+            if region == "city": 
+                people = self.db.query("SELECT SQL_CALC_FOUND_ROWS id,name,domain,uuid_ FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3) limit %s,%s", region_id, region_id, region_id, startindex, people_number) 
+            elif region == "college":
+                people = self.db.query("SELECT SQL_CALC_FOUND_ROWS id,name,domain,uuid_ FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3) limit %s,%s", region_id, region_id, region_id, startindex, people_number)
+            elif region == "major":
+                people = self.db.query("SELECT SQL_CALC_FOUND_ROWS id,name,domain,uuid_ FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3) limit %s,%s", region_id, region_id, region_id, startindex, people_number) 
+            people_count = self.db.get("select found_rows() as length").length
+            for i in range(len(people)):
+                people[i].is_follow = self.ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
+                people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
+                if not self.current_user or self.current_user and self.current_user.id != people[i].id:
+                    people[i].is_self = False
+                else:
+                    people[i].is_self = True
+            template_values['people'] = people
+            template_values['lastindex'] = startindex + people_number
+            template_values['hasnext'] = 1
+            if template_values['lastindex'] >= people_count:
+                template_values['hasnext'] = 0
+            self.render("modules/follow_people.html", template_values=template_values)
+        elif prop in ["following", "follower"]:
+            follow_type = prop
+            people_id = self.get_argument("name", None)
+            if follow_type == 'following':
+                follows = self.ufg.get_follows(people_id)
+            elif follow_type == 'follower':
+                follows = self.ufg.get_followers(people_id)
+            logging.info(len(follows))
+            follow_people = []
+            for i in range(startindex, startindex+people_number):
+                if i >= len(follows):
+                    break
+                follows[i] = int(follows[i])
+                if len(follows) == 1:
+                    follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id = %s", follows[0]) 
+                else:
+                    orderstr = str(follows)[1:-1].replace(" ","")
+                    follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
+                    for i in range(len(follow_people)):
+                        follow_people[i].is_follow = self.ufg.is_follow(self.current_user.id, follow_people[i].id) if self.current_user else False
+                        follow_people[i].image = self.avatar("m", follow_people[i].id, follow_people[i].uuid_)
+                        if not self.current_user or self.current_user and self.current_user.id != follow_people[i].id:
+                            follow_people[i].is_self = False 
+                        else:
+                            follow_people[i].is_self = True
+            template_values['people'] = follow_people 
+            template_values['lastindex'] = startindex + people_number
+            template_values['hasnext'] = 1
+            if template_values['lastindex'] >= len(follows):
+                template_values['hasnext'] = 0
+            self.render("modules/follow_people.html", template_values=template_values)
 
 class SignupHandler(BaseHandler):
     def get(self):
@@ -898,16 +966,18 @@ class RegionHandler(BaseHandler):
         if not region_get: raise tornado.web.HTTPError(404)
         region_id = region_get.id
         if region == "city": 
-            people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3)", region_id, region_id, region_id) 
+            people = self.db.query("SELECT SQL_CALC_FOUND_ROWS id,name,domain,uuid_ FROM fd_People WHERE (city_id=%s and college_type=1) or (ss_city_id=%s and college_type=2) or (bs_city_id=%s and college_type=3) limit 0,%s", region_id, region_id, region_id, people_number) 
         elif region == "college":
             image_path = region_get.image_path
-            people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3)", region_id, region_id, region_id) 
+            people = self.db.query("SELECT SQL_CALC_FOUND_ROWS id,name,domain,uuid_ FROM fd_People WHERE (college_id=%s and college_type=1) or (ss_college_id=%s and college_type=2) or (bs_college_id=%s and college_type=3) limit 0,%s", region_id, region_id, region_id, people_number)
         elif region == "major":
-            people = self.db.query("SELECT id,name,domain,uuid_ FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3)", region_id, region_id, region_id) 
+            people = self.db.query("SELECT SQL_CALC_FOUND_ROWS id,name,domain,uuid_ FROM fd_People WHERE (major_id=%s and college_type=1) or (ss_major_id=%s and college_type=2) or (bs_major_id=%s and college_type=3) limit 0,%s", region_id, region_id, region_id, people_number) 
+        people_count = self.db.get("select found_rows() as length").length
         template_values = {}
         template_values['region_id'] = region_id
         template_values['region'] = name
         template_values['type'] = region
+        template_values['people_count'] = people_count
         template_values['image'] = self.static_url("img/no_photo.gif")
         if region == "college" and image_path:
             template_values['image'] = self.static_url("schoolimage/" + image_path)
@@ -915,10 +985,14 @@ class RegionHandler(BaseHandler):
             people[i].is_follow = self.ufg.is_follow(self.current_user.id, people[i].id) if self.current_user else False
             people[i].image = self.avatar("m", people[i].id, people[i].uuid_)
             if not self.current_user or self.current_user and self.current_user.id != people[i].id:
-                people[i].is_self = False 
+                people[i].is_self = False
             else:
                 people[i].is_self = True
-        template_values['people'] = people 
+        template_values['people'] = people
+        template_values['lastindex'] = people_number
+        template_values['hasnext'] = 1
+        if template_values['lastindex'] >= people_count:
+            template_values['hasnext'] = 0
         self.render("region.html", template_values=template_values)
 
 class ExistHandler(BaseHandler):
@@ -1740,7 +1814,6 @@ class EditdocHandler(BaseHandler):
                     doc_sql.append("status_ = %s where id = %s" % (doctype, decode(endocid)))
                 else:
                     doc_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,doctype))
-                logging.info("".join(doc_sql))
                 doc_id = self.db.execute("".join(doc_sql))
                 if tag:
                     if (not endocid) or (endocid and newtag != oldtag):
