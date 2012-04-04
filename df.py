@@ -195,7 +195,7 @@ class FollowBaseHandler(BaseHandler):
                     follow_people[i].is_self = False 
                 else:
                     follow_people[i].is_self = True
-        template_values['follow'] = follow_people 
+        template_values['people'] = follow_people 
         template_values['type'] = follow_type 
         self.render("follow.html", template_values=template_values)
 
