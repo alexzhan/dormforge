@@ -186,8 +186,8 @@ class FollowBaseHandler(BaseHandler):
             if len(follows) == 1:
                 follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id = %s", follows[0]) 
             else:
-                orderstr = str(follows)[1:-1].replace(" ","")
-                follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
+                orderstr = str(follows[0:people_number])[1:-1].replace(" ","")
+                follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows[0:people_number]), orderstr) 
             for i in range(len(follow_people)):
                 follow_people[i].is_follow = self.ufg.is_follow(self.current_user.id, follow_people[i].id) if self.current_user else False
                 follow_people[i].image = self.avatar("m", follow_people[i].id, follow_people[i].uuid_)
@@ -288,18 +288,18 @@ class MoreHandler(BaseHandler):
                 if i >= len(follows):
                     break
                 follows[i] = int(follows[i])
-            if len(follows) == 1:
-                follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id = %s", follows[0]) 
+            if len(follows) - startindex == 1:
+                follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id = %s", follows[startindex]) 
             else:
-                orderstr = str(follows)[1:-1].replace(" ","")
-                follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows), orderstr) 
-                for i in range(len(follow_people)):
-                    follow_people[i].is_follow = self.ufg.is_follow(self.current_user.id, follow_people[i].id) if self.current_user else False
-                    follow_people[i].image = self.avatar("m", follow_people[i].id, follow_people[i].uuid_)
-                    if not self.current_user or self.current_user and self.current_user.id != follow_people[i].id:
-                        follow_people[i].is_self = False 
-                    else:
-                        follow_people[i].is_self = True
+                orderstr = str(follows[startindex:startindex+people_number])[1:-1].replace(" ","")
+                follow_people = self.db.query("SELECT id,name,domain,uuid_ from fd_People where id in %s order by find_in_set(id, %s)", tuple(follows[startindex:startindex+people_number]), orderstr) 
+            for i in range(len(follow_people)):
+                follow_people[i].is_follow = self.ufg.is_follow(self.current_user.id, follow_people[i].id) if self.current_user else False
+                follow_people[i].image = self.avatar("m", follow_people[i].id, follow_people[i].uuid_)
+                if not self.current_user or self.current_user and self.current_user.id != follow_people[i].id:
+                    follow_people[i].is_self = False 
+                else:
+                    follow_people[i].is_self = True
             template_values['people'] = follow_people 
             template_values['lastindex'] = startindex + people_number
             template_values['hasnext'] = 1
