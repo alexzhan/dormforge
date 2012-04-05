@@ -61,7 +61,7 @@
                 <ul>
                     {% for page in range(1, template_values['page_count']+1)%}
                     <li {{ "class='active'" if page == template_values['page'] else "" }}>
-                    <a href="/hero?page={{ page }}">{{ page }}</a>
+                    <a href="/hero/{{ page }}">{{ page }}</a>
                     </li>
                     {% end %}
                 </ul>

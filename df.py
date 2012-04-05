@@ -49,7 +49,7 @@ class Application(tornado.web.Application):
                 (r"/logout", LogoutHandler),
                 (r"/contact", ContactHandler),
                 (r"/about", AboutHandler),
-                (r"/hero", HeroHandler),
+                (r"/hero(/[0-9]+)?", HeroHandler),
                 (r"/people/([a-z0-9A-Z\_\-]+)", PeopleHandler),
                 (r"/people/([a-z0-9A-Z\_\-]+)/(following|follower)", FollowBaseHandler),
                 (r"/(city|college|major)/(.*)", RegionHandler),
@@ -1932,10 +1932,12 @@ class EditstatusHandler(BaseHandler):
                 self.redirect("/status/%s" % encode(statusid))
 
 class HeroHandler(BaseHandler):
-    def get(self):
+    def get(self, page):
         template_values = {}
-        page = self.get_argument("page", 1)
-        page = int(page)
+        if not page:
+            page = 1
+        else:
+            page = int(page[1:])
         people = self.db.query("select SQL_CALC_FOUND_ROWS * from fd_People order by id limit %s,%s", (int(page)-1)*hero_number, hero_number)
         people_count = self.db.get("select found_rows() as length").length
         page_count = (people_count + hero_number - 1)/hero_number
