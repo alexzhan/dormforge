@@ -29,6 +29,7 @@ i {
 }
 .feed-item {
     width:570px;
+    clear: both;
 }
 .feed-title {
     margin-left: 60px;
