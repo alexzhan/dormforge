@@ -54,6 +54,15 @@
                 </li>
                 {% end %}
             </ul>
+            <div class="pagination" style="text-align: center">
+                <ul>
+                    {% for page in range(1, template_values['page_count']+1)%}
+                    <li {{ "class='active'" if page == template_values['page'] else "" }}>
+                    <a href="/hero?page={{ page }}">{{ page }}</a>
+                    </li>
+                    {% end %}
+                </ul>
+            </div>
         </div>
     </div>
 </div>
