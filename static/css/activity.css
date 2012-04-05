@@ -24,6 +24,10 @@
     margin-bottom: 10px;
     word-break: break-all;
 }
+.summary {
+    border-left: 5px solid #E2E2E2;
+    padding-left: 10px;
+}
 .link-text {
     font-size: 15px;
     width: 530px;
