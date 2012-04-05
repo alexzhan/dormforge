@@ -66,6 +66,7 @@ i {
 }
 .feed-item-title a:hover{
     color: #005580;
+    text-decoration: none;
 }
 .feed-item-title .name {
     font-weight: bold;
