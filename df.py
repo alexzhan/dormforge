@@ -1935,7 +1935,10 @@ class HeroHandler(BaseHandler):
     def get(self):
         template_values = {}
         page = self.get_argument("page", 1)
-        people = self.db.query("select * from fd_People order by id limit %s,%s", (int(page)-1)*hero_number, hero_number)
+        page = int(page)
+        people = self.db.query("select SQL_CALC_FOUND_ROWS * from fd_People order by id limit %s,%s", (int(page)-1)*hero_number, hero_number)
+        people_count = self.db.get("select found_rows() as length").length
+        page_count = (people_count + hero_number - 1)/hero_number
         for i in range(len(people)):
             coltype = people[i].college_type
             if coltype == 1:
@@ -1962,6 +1965,10 @@ class HeroHandler(BaseHandler):
                 people[i].c2 = c2.name
                 people[i].c3 = c3.name
         template_values['people'] = people
+        template_values['page'] = page
+        template_values['page_count'] = page_count
+        logging.info(page_count)
+        logging.info(page)
         self.render("hero.html", template_values=template_values)
 
 def main():
