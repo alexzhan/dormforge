@@ -24,7 +24,7 @@ from util.encrypt import encrypt_password,validate_password
 from util.getby import get_id_by_name,get_domain_by_name
 from util.encode import encode,decode,key
 from util.redis_activity import add_activity,del_activity
-from util.common import feed_number,people_number
+from util.common import feed_number,people_number,hero_number
 from db.redis.user_follow_graph import UserFollowGraph
 from db.redis.user_activity_graph import UserActivityGraph
 from base64 import b64encode,b64decode
@@ -1934,7 +1934,35 @@ class EditstatusHandler(BaseHandler):
 class HeroHandler(BaseHandler):
     def get(self):
         template_values = {}
-        self.render("hero.html")
+        page = self.get_argument("page", 1)
+        people = self.db.query("select * from fd_People order by id limit %s,%s", (int(page)-1)*hero_number, hero_number)
+        for i in range(len(people)):
+            coltype = people[i].college_type
+            if coltype == 1:
+                c1 = self.db.get("select name from fd_City where id = %s", people[i].city_id)
+                c2 = self.db.get("select name from fd_College where id = %s", people[i].college_id)
+                c3 = self.db.get("select name from fd_Major where id = %s", people[i].major_id)
+            elif coltype == 2:
+                c1 = self.db.get("select name from fd_City where id = %s", people[i].ss_city_id)
+                c2 = self.db.get("select name from fd_College where id = %s", people[i].ss_college_id)
+                c3 = self.db.get("select name from fd_Major where id = %s", people[i].ss_major_id)
+            elif coltype == 3:
+                c1 = self.db.get("select name from fd_City where id = %s", people[i].bs_city_id)
+                c2 = self.db.get("select name from fd_College where id = %s", people[i].bs_college_id)
+                c3 = self.db.get("select name from fd_Major where id = %s", people[i].bs_major_id)
+            elif coltype == 4:
+                c1 = self.db.get("select name from fd_Province where id = %s", people[i].zx_province_id)
+                c2 = people[i].zx_city
+                c3 = people[i].zx_school
+            people[i].c1 = c1.name
+            if coltype == 4:
+                people[i].c2 = c2
+                people[i].c3 = c3
+            else:
+                people[i].c2 = c2.name
+                people[i].c3 = c3.name
+        template_values['people'] = people
+        self.render("hero.html", template_values=template_values)
 
 def main():
     tornado.options.parse_command_line()
