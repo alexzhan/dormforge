@@ -230,7 +230,7 @@ function submitfunction(){
 function usernameinfo(){
     $("#idcontrol-group").removeClass();
     $("#idcontrol-group").addClass("control-group");
-    $("#usernamehelp").html("");
+    $("#usernamehelp").html("<span style='color: #999'>中英文、数字皆可，2-16个字符</span>");
     if($("#username").val().length == 0){
         return false;
     }
@@ -272,7 +272,7 @@ function usernameinfo(){
 function emailinfo(){
     $("#emailcontrol-group").removeClass();
     $("#emailcontrol-group").addClass("control-group");
-    $("#emailhelp").html("");
+    $("#emailhelp").html("<span style='color: #999'>请使用真实邮箱注册</span>");
     if($("#email").val().length == 0) {
         return false;
     }
@@ -314,7 +314,7 @@ function emailinfo(){
 function domaininfo(){
     $("#domaincontrol-group").removeClass();
     $("#domaincontrol-group").addClass("control-group");
-    $("#domainhelp").html("");
+    $("#domainhelp").html("<span style='color: #999'>可以使用英文或数字，2-16个字符</span>");
     if($("#domain").val().length == 0) {
         return false;
     }
