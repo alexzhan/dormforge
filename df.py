@@ -49,6 +49,7 @@ class Application(tornado.web.Application):
                 (r"/logout", LogoutHandler),
                 (r"/contact", ContactHandler),
                 (r"/about", AboutHandler),
+                (r"/hero", HeroHandler),
                 (r"/people/([a-z0-9A-Z\_\-]+)", PeopleHandler),
                 (r"/people/([a-z0-9A-Z\_\-]+)/(following|follower)", FollowBaseHandler),
                 (r"/(city|college|major)/(.*)", RegionHandler),
@@ -1929,6 +1930,11 @@ class EditstatusHandler(BaseHandler):
             actdict = {'status':statuscontent}
             if self.rd.hmset(status_key, actdict):
                 self.redirect("/status/%s" % encode(statusid))
+
+class HeroHandler(BaseHandler):
+    def get(self):
+        template_values = {}
+        self.render("hero.html")
 
 def main():
     tornado.options.parse_command_line()

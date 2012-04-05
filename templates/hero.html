@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>18周 › 首页</title>
+<style type="text/css">
+    .span3 {
+        width: 150px;
+    }
+    .thumbnails {
+        width: 900px;
+        clear:both;
+        margin-left: 3px;
+    }
+    .thumbnails > li {
+        margin: 0 0 0 30px;
+    }
+    .thumbnail {
+        border: none;
+    }
+    .thumbnail .caption {
+        margin-top: 5px;
+        padding: 0;
+    }
+    .thumbnail .caption h5 {
+        text-align: left;
+        font-size: 13px;
+    }
+    .thumbnail .caption h5 a,.thumbnail .caption p a {
+        color: #333;
+    }
+    .thumbnail .caption h5 a:hover,.thumbnail .caption p a:hover {
+        color: #005580;
+        text-decoration: none;
+    }
+    .thumbnail .caption p {
+        text-align: right;
+    }
+</style>
+{% end %}
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="span10">
+            <ul class="thumbnails">
+                <li class="span3">
+                <div class="thumbnail">
+                    <a href="/people/alex"><img width="150px" height="150px" src="http://18zhou.com/static/usrimg/1/xl_c0e6081431d742cb9dd3387513ca96fc.jpg?v=0af76" alt=""></a>
+                    <div class="caption">
+                        <h5><a href="/people/alex">Alex</a></h5>
+                        <p><a href="/city/成都">成都</a><br><a href="/college/西南交通大学">西南交通大学</a><br><a href="/major/交控">交控</a></p>
+                    </div>
+                </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url('js/home.js') }}"></script>
+{% end %}
