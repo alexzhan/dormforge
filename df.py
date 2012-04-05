@@ -1954,16 +1954,16 @@ class HeroHandler(BaseHandler):
                 c2 = self.db.get("select name from fd_College where id = %s", people[i].bs_college_id)
                 c3 = self.db.get("select name from fd_Major where id = %s", people[i].bs_major_id)
             elif coltype == 4:
-                c1 = self.db.get("select name from fd_Province where id = %s", people[i].zx_province_id)
-                c2 = people[i].zx_city
-                c3 = people[i].zx_school
-            people[i].c1 = c1.name
+                c1 = people[i].zx_city
+                c2 = people[i].zx_school
+                c3 = self.db.get("select name from fd_Province where id = %s", people[i].zx_province_id)
+            people[i].c3 = c3.name
             if coltype == 4:
+                people[i].c1 = c1
                 people[i].c2 = c2
-                people[i].c3 = c3
             else:
+                people[i].c1 = c1.name
                 people[i].c2 = c2.name
-                people[i].c3 = c3.name
         template_values['people'] = people
         template_values['page'] = page
         template_values['page_count'] = page_count
