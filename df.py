@@ -1967,8 +1967,6 @@ class HeroHandler(BaseHandler):
         template_values['people'] = people
         template_values['page'] = page
         template_values['page_count'] = page_count
-        logging.info(page_count)
-        logging.info(page)
         self.render("hero.html", template_values=template_values)
 
 def main():
