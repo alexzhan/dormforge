@@ -44,7 +44,7 @@
 {% end %}
 {% block body %}
 <div class="page-header">
-    <h1>注册</h1>
+    <h1>注册</h1><span>(以下均为必填项)</span>
 </div>
 <div class="row">
     <div class="span10">
@@ -54,14 +54,14 @@
                     <label class="control-label" for="username">用户名</label>
                     <div class="controls">
                         <input  id="username" name="username" size="30" type="text" value="{{ escape(template_values['username']) if 'username' in template_values and template_values['username'] else "" }}" onblur="usernameinfo();">
-                        <span id="usernamehelp" class="help-inline">{{ escape(template_values['username_error_message']) if 'username_error' in template_values and template_values['username_error'] else "" }}</span>
+                        <span id="usernamehelp" class="help-inline"><span style="color: #999">中英文、数字皆可，2-16个字符</span>{{ escape(template_values['username_error_message']) if 'username_error' in template_values and template_values['username_error'] else "" }}</span>
                     </div>
                 </div>
                 <div id="emailcontrol-group" class="control-group {{ _('error') if 'email_error' in template_values and template_values['email_error'] else '' }}">
                     <label class="control-label" for="email">邮箱</label>
                     <div class="controls">
                         <input  id="email" name="email" size="30" type="text" value="{{ escape(template_values['email']) if 'email' in template_values and template_values['email'] else "" }}" onblur="emailinfo();">
-                        <span id="emailhelp" class="help-inline">{{ escape(template_values['email_error_message']) if 'email_error' in template_values and template_values['email_error'] else "" }}</span>
+                        <span id="emailhelp" class="help-inline"><span style="color: #999">请使用真实邮箱注册</span>{{ escape(template_values['email_error_message']) if 'email_error' in template_values and template_values['email_error'] else "" }}</span>
                     </div>
                 </div>
                 <div id='passwordcontrol-group' class="control-group {{ _('error') if 'password_error' in template_values and template_values['password_error'] and template_values['password_error'] != 3 else '' }}">
@@ -206,7 +206,7 @@
                     <label class="control-label" for="domain">个性域名</label>
                     <div class="controls">
                         http://18zhou.com/people/<input class="input-mini" id="domain" name="domain" size="30" type="text" value="{{ escape(template_values['domain']) if 'domain' in template_values and template_values['domain'] else '' }}" onblur="domaininfo();">
-                        <span id="domainhelp" class="help-inline">{{ escape(template_values['domain_error_message']) if 'domain_error' in template_values and template_values['domain_error'] else "" }}</span>
+                        <span id="domainhelp" class="help-inline"><span style="color: #999">可以使用英文或数字，2-16个字符</span>{{ escape(template_values['domain_error_message']) if 'domain_error' in template_values and template_values['domain_error'] else "" }}</span>
                     </div>
                 </div>
             </fieldset>
@@ -215,14 +215,6 @@
             </div>
             {{ xsrf_form_html() }}
         </form>
-    </div>
-    <div class="span4">
-        <h3>关于注册18周</h3>
-        <ul>
-            <li>注册并登录后，你可以和别人分享发现，共同学习，认识其他同学</li>
-            <li>原则上，18周只允许学生注册</li>
-            <li>请使用真实邮箱注册</li>
-        </ul>            
     </div>
 </div>
 {% end %}
