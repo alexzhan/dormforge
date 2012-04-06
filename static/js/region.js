@@ -10,7 +10,7 @@ function morefeed(prop, name) {
     $.ajax({
         type:'GET',
         url:'/more/' + prop,
-        data:{lastindex:lastindex,name:name,_xsrf:getCookie('_xsrf')},
+        data:{lastindex:lastindex,name:name},
         success:function(data){
             $(".peoplelist").append(data);
             $("#li").text(parseInt(lastindex) + 10);
