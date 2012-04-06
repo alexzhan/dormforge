@@ -96,7 +96,7 @@ function morefeed(prop) {
     $.ajax({
     type:'GET',
     url:'/more/' + prop,
-    data:{lastindex:lastindex,_xsrf:getCookie('_xsrf')},
+    data:{lastindex:lastindex},
     success:function(data){
         $(".feed-body").append(data);
         $("#li").text(parseInt(lastindex) + 20);
