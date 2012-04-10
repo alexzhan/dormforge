@@ -1635,6 +1635,7 @@ class EditlinkHandler(BaseHandler):
         else:
             link_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
         fd_link_sql = "".join(link_sql)
+        logging.info(fd_link_sql)
         link_id = self.db.execute(fd_link_sql)
         if tag:
             if pubtype != 2 or pubtype == 2 and newtag != oldtag:
