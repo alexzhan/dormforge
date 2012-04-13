@@ -1,9 +1,3 @@
-$(document).ready(function() {
-    if($("#hn10").text() == "0") {
-        $("#morebtn").hide();
-    }
-});
-
 function morefeed(prop, name) {
     var lastindex = $("#li").text();
     $("#morebtn").text("加载中...");

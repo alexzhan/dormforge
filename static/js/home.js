@@ -4,9 +4,6 @@ $(document).ready(function() {
         $("#pubtextarea").val("你在想什么?");
         $("#pubtextarea").css("color","#A9A9A9");
     }
-    if($("#hn20").text() == "0") {
-        $("#morebtn").hide();
-    }
 });
 
 $('#pubtextarea').focus(function() {
