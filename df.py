@@ -1609,13 +1609,13 @@ class EditlinkHandler(BaseHandler):
         url = url[7:] if url.startswith("http://") else url
         url = url[8:] if url.startswith("https://") else url
         if linkid:
-            link_sql = ["update fd_Link set url = '%s'," % url]
+            link_sql = ["update fd_Link set url = '{0}',".format(url.replace('%','%%'))]
         else:
-            link_sql = ["insert into fd_Link set url = '%s'," % url]
+            link_sql = ["insert into fd_Link set url = '{0}',".format(url.replace('%','%%'))]
         if title:
-            link_sql.append("title = '%s'," % title.replace("'", "''"))
+            link_sql.append("title = '{0}',".format(title.replace("'", "''").replace('%','%%')))
         if summary:
-            link_sql.append("summary = '%s'," % summary.replace("'", "''"))
+            link_sql.append("summary = '{0}',".format(summary.replace("'", "''").replace('%','%%')))
         if tag:
             tag = tag.strip().replace(' ',',')
             tag = tag.strip().replace('，',',')
@@ -1627,15 +1627,14 @@ class EditlinkHandler(BaseHandler):
                 taglists.append(t)
             newtag = " ".join(taglists)
             if not (pubtype == 2 and newtag == oldtag):
-                link_sql.append("tags = '%s'," % newtag.replace("'", "''"))
+                link_sql.append("tags = '{0}',".format(newtag.replace("'", "''").replace('%','%%')))
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
         redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
         if pubtype == 2:
-            link_sql.append("status_ = %s where id = %s" % (linktype,linkid))
+            link_sql.append("status_ = {0} where id = {1}".format(linktype,linkid))
         else:
-            link_sql.append("user_id = %s,pubdate = '%s',status_ = %s" % (self.current_user.id,pubdate,linktype))
+            link_sql.append("user_id = {0},pubdate = '{1}',status_ = {2}".format(self.current_user.id,pubdate,linktype))
         fd_link_sql = "".join(link_sql)
-        logging.info(fd_link_sql)
         link_id = self.db.execute(fd_link_sql)
         if tag:
             if pubtype != 2 or pubtype == 2 and newtag != oldtag:
@@ -1790,10 +1789,10 @@ class EditdocHandler(BaseHandler):
                     doc_sql = ["update fd_Doc set "]
                 else:
                     if os.path.exists(usrjpg) and os.path.exists(usrswf):
-                        doc_sql = ["insert into fd_Doc set doc_id = '%s',name = '%s',content_type = '%s',md5 = '%s', docsize = %s," % (docid,name.replace("'", "''"),content_type,md5,int(size))]
-                doc_sql.append("title = '%s'," % title.replace("'", "''"))
+                        doc_sql = ["insert into fd_Doc set doc_id = '%s',name = '%s',content_type = '%s',md5 = '%s', docsize = %s," % (docid,name.replace("'", "''").replace("%", "%%"),content_type,md5,int(size))]
+                doc_sql.append("title = '%s'," % title.replace("'", "''").replace("%", "%%"))
                 if summary:
-                    doc_sql.append("summary = '%s'," % summary.replace("'", "''"))
+                    doc_sql.append("summary = '%s'," % summary.replace("'", "''").replace("%", "%%"))
                 if tag:
                     tag = tag.strip().replace(' ',',')
                     tag = tag.strip().replace('，',',')
@@ -1805,7 +1804,7 @@ class EditdocHandler(BaseHandler):
                         taglists.append(t)
                     newtag = " ".join(taglists)
                     if not (endocid and newtag == oldtag):
-                        doc_sql.append("tags = '%s'," % newtag.replace("'", "''"))
+                        doc_sql.append("tags = '%s'," % newtag.replace("'", "''").replace("%", "%%"))
                 pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
                 redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
                 doctype = 0
