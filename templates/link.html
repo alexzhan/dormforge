@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>链接：{{ template_values['activity'].title if  template_values['activity'].title else template_values['activity'].url }}</title>
+<title>链接：{{ escape(template_values['activity'].title) if  template_values['activity'].title else template_values['activity'].url }}</title>
 <link rel="stylesheet" href="{{ static_url("css/activity.css") }}" type="text/css"/>
 {% end %}
 {% block body %}
@@ -12,13 +12,13 @@
                 <a href="/people/{{ template_values['activity'].domain }}"><img src="{{ handler.avatar('m', template_values['activity'].id, template_values['activity'].uuid_) }}" width="50px" height="50px"></a>
             </div>
             <div class="activity-text link-text url">
-                <a href="http://{{ template_values['activity'].url }}" target="_blank">{{ template_values['activity'].title if template_values['activity'].title else template_values['activity'].url }}</a>
+                <a href="http://{{ template_values['activity'].url }}" target="_blank">{{ escape(template_values['activity'].title) if template_values['activity'].title else template_values['activity'].url }}</a>
             </div>
             <div class="activity-text summary" style="">
                 {{ handler.br(handler.at(linkify(template_values['activity'].summary, extra_params="target='_blank' rel='nofollow'"))) if template_values['activity'].summary else "" }}
             </div>
             <div class="activity-info">
-                <a href="/people/{{ template_values['activity'].domain }}">{{ template_values['activity'].name }}</a> 收藏于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
+                <a href="/people/{{ template_values['activity'].domain }}">{{ escape(template_values['activity'].name) }}</a> 收藏于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
                 {% if current_user and current_user.name == template_values['activity'].name %}
                 <span class="splitter"> • </span>
                 <span><a href="/link/edit?id={{ request.path.split("/")[-1] }}">编辑</a></span>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="comment-item-content linkstatus-content">
                     <div class="comment-item-title">
-                        <a class="name" href="/people/{{ comments.domain }}">{{ comments.name }}</a>
+                        <a class="name" href="/people/{{ comments.domain }}">{{ escape(comments.name) }}</a>
                         <span class="time">
                             {{ str(comments.pubdate)[5:-3] if str(comments.pubdate)[5] != '0' else str(comments.pubdate)[6:-3] }}   
                             <img src="{{ static_url('img/reply.png') }}" align="absmiddle" border="0" alt="回复 {{ comments.name }}" onclick="replyOne('{{ comments.name }}')" class="clickable">

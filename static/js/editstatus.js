@@ -5,8 +5,4 @@ function submitsta() {
         $("#statuscontrol").addClass("error")
             return false;
     }
-    if ($("#oldstatus").text() == statuscontent){
-        window.location.href="/status/" + statusid;
-        return false;
-    }
 }

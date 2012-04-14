@@ -6,7 +6,7 @@
     </div>
     <div class="feed-item-content">
         <div class="feed-item-title">
-            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
+            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ escape(activity[-5]) }}</a>
             <span class="feed-item-title desc">更新了状态:</span>
         </div>
         <div class="feed-item-body">
@@ -34,7 +34,7 @@
     </div>
     <div class="feed-item-content">
         <div class="feed-item-title">
-            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
+            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ escape(activity[-5]) }}</a>
             <span class="feed-item-title desc">发布了日志:</span>
             <span><a href="/note/{{ handler.encode(activity[5]) }}">{{ activity[1] }}</a></span>
         </div>
@@ -64,12 +64,12 @@
     </div>
     <div class="feed-item-content">
         <div class="feed-item-title">
-            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
+            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ escape(activity[-5]) }}</a>
             <span class="feed-item-title desc">收藏了链接:</span>
             <span><a href="http://{{ activity[1] }}" target="_blank">{{ activity[2] if activity[2] else activity[1] }}</a></span>
         </div>
         <div class="feed-item-body">
-            <p>{{ activity[3] if activity[3] else "" }}</p>
+            <p>{{ escape(activity[3]) if activity[3] else "" }}</p>
         </div>
         <div class="feed-item-footer">
             <div style="float:left"><span><a class="footerlink" href="/link/{{ handler.encode(activity[6]) }}">{{ activity[0] }}</a></span>
@@ -93,12 +93,12 @@
     </div>
     <div class="feed-item-content">
         <div class="feed-item-title">
-            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ activity[-5] }}</a>
+            <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ escape(activity[-5]) }}</a>
             <span class="feed-item-title desc">分享了文档:</span>
             <span><a href="/doc/{{ handler.encode(activity[6]) }}">{{ activity[2] }}</a></span>
         </div>
         <div class="feed-item-body">
-            <p>{{ activity[3] if activity[3] else "" }}</p>
+            <p>{{ escape(activity[3]) if activity[3] else "" }}</p>
             <a href="/doc/{{ handler.encode(activity[6]) }}"><img src="/static/usrdoc/{{ activity[-6] }}/{{ activity[1] }}.jpg"></a>
         </div>
         <div class="feed-item-footer">
@@ -122,9 +122,9 @@
         <div class="follow-item-body">
             <p>
             <a href="/people/{{ activity[-5] }}"><img style="vertical-align:middle;" width="25px" height="25px" src="{{ handler.avatar('s', int(activity[-6]), activity[-3]) }}"></a>
-            <a href="/people/{{ activity[-4] }}">{{activity[-5] }}</a> 关注了 
+            <a href="/people/{{ activity[-4] }}">{{ escape(activity[-5]) }}</a> 关注了 
             <a href="/people/{{ activity[3] }}"><img style="vertical-align:middle;" width="25px" height="25px" src="{{ handler.avatar('s', int(activity[1]), activity[4]) }}"></a>
-            <a href="/people/{{ activity[3] }}">{{ activity[2] }}</a><span class="follow-time"> {{ activity[0] }}</span></p>
+            <a href="/people/{{ activity[3] }}">{{ escape(activity[2]) }}</a><span class="follow-time"> {{ activity[0] }}</span></p>
         </div>
     </div>
 </div>

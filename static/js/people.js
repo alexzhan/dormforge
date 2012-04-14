@@ -13,7 +13,6 @@ function changedesc() {
     $("#textdesc").hide();
     $(".the-icons").hide();
     $(".descform").show();
-    $('#description').val($("#textdesc").html().replace(/<br>/gi,'\n'));
     return false;
 }
 function canceldesc() {
@@ -30,12 +29,6 @@ function submitdesc() {
     var selfdesc = $('#description').val();
     if(selfdesc == '')
         return false;
-    if($("#textdesc").text() != "" && $("#textdesc").html().replace(/<br>/gi,'\n') == selfdesc){
-        $(".descform").hide();
-        $("#textdesc").css("display", "inline");
-        $(".the-icons").show();
-        return false;
-    }
     $.ajax({
         type:"POST",
         url:"/selfdesc",
