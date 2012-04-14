@@ -18,7 +18,7 @@
             <div class="span7">
                 <div class="col_header">
                     <div class="profile-text">
-                        有{{ template_values['people_count'] }}人在{% if template_values['type'] == 'major'%}修{% end %}{{ template_values['region'] }}{% if template_values['type'] == 'major'%}专业{% end %}
+                        有{{ template_values['people_count'] }}人在{% if template_values['type'] == 'major'%}修{% end %}{{ escape(template_values['region']) }}{% if template_values['type'] == 'major'%}专业{% end %}
                     </div>
                 </div>
                 <div class="peoplelist">

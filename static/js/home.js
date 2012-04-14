@@ -4,6 +4,12 @@ $(document).ready(function() {
         $("#pubtextarea").val("你在想什么?");
         $("#pubtextarea").css("color","#A9A9A9");
     }
+    $backToTopFun = function() {
+        var st = $(document).scrollTop(), winh = $(window).height();
+        (st > 0)?$('#totop').show():$('#totop').hide();
+    };
+    $(window).bind("scroll", $backToTopFun);
+    $(function() { $backToTopFun(); });
 });
 
 $('#pubtextarea').focus(function() {
@@ -106,5 +112,9 @@ function morefeed(prop) {
         }
     }       
     });
+    return false;
+}
+function backtotop() {
+    $('html, body').animate({scrollTop:0}, 'fast');
     return false;
 }

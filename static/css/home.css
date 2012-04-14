@@ -116,3 +116,12 @@ i {
     margin: 5px 0 10px 60px;
     width: 490px;
 }
+.totop {
+    height: 36px;
+    width: 38px;
+    position: fixed;
+    bottom: 58px;
+    left: 50%;
+    margin-left: 200px;
+    background: url("/static/img/back-to-top.png") 11px 8px no-repeat #EBEBEB;
+}
