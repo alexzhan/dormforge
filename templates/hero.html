@@ -50,8 +50,8 @@
                 <div class="thumbnail">
                     <a href="/people/{{ hero.domain }}"><img width="150px" height="150px" src="{{ handler.avatar('xl', hero.id, hero.uuid_) }}" alt=""></a>
                     <div class="caption">
-                        <h5><a href="/people/{{ hero.domain }}">{{ hero.name }}</a></h5>
-                        <p><a href="/city/{{ hero.c1 }}">{{ hero.c1 }}</a><br><a href="/college/{{ hero.c2 }}">{{ hero.c2 }}</a><br><a href="/major/{{ hero.c3 }}">{{ hero.c3 }}</a></p>
+                        <h5><a href="/people/{{ hero.domain }}">{{ escape(hero.name) }}</a></h5>
+                        <p><a href="/city/{{ hero.c1 }}">{{ escape(hero.c1) }}</a><br><a href="/college/{{ hero.c2 }}">{{ escape(hero.c2) }}</a><br><a href="/major/{{ hero.c3 }}">{{ escape(hero.c3) }}</a></p>
                     </div>
                 </div>
                 </li>

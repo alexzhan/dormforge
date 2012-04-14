@@ -9,14 +9,14 @@
     <div class="span7">
         <div class="activity-item docnote-item">
             <div class="activity-title">
-                {{ template_values['activity'].title }}
+                {{ escape(template_values['activity'].title) }}
             </div>
             <div class="activity-text note-text">
                 {{ handler.br(handler.at(linkify(template_values['activity'].note, extra_params="target='_blank' rel='nofollow'"))) }}
             </div>
             <div class="activity-bottom">
                 <span class="activity-info">
-                <a href="/people/{{ template_values['activity'].domain }}">{{ template_values['activity'].name }}</a> 发布于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
+                <a href="/people/{{ template_values['activity'].domain }}">{{ escape(template_values['activity'].name) }}</a> 发布于 {{ str(template_values['activity'].pubdate)[5:-3] if str(template_values['activity'].pubdate)[5] != '0' else str(template_values['activity'].pubdate)[6:-3] }}
                 </span>
                 {% if current_user and current_user.name == template_values['activity'].name %}
                 <span class="activity-action">
@@ -40,7 +40,7 @@
                 </div>
                 <div class="comment-item-content docnote-content">
                     <div class="comment-item-title">
-                        <a class="name" href="/people/{{ comments.domain }}">{{ comments.name }}</a>
+                        <a class="name" href="/people/{{ comments.domain }}">{{ escape(comments.name) }}</a>
                         <span class="time">
                             {{ str(comments.pubdate)[5:-3] if str(comments.pubdate)[5] != '0' else str(comments.pubdate)[6:-3] }}   
                             <img src="{{ static_url('img/reply.png') }}" align="absmiddle" border="0" alt="回复 {{ comments.name }}" onclick="replyOne('{{ comments.name }}')" class="clickable">

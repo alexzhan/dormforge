@@ -19,7 +19,7 @@ import tempfile
 import shutil
 
 from tornado.options import define, options
-from tornado.escape import linkify
+from tornado.escape import linkify,xhtml_escape
 from util.encrypt import encrypt_password,validate_password
 from util.getby import get_id_by_name,get_domain_by_name
 from util.encode import encode,decode,key
@@ -941,7 +941,7 @@ class PeopleHandler(BaseHandler):
             selfdesc = self.db.get("select selfdesc from fd_Selfdesc where user_id = %s", 
                     template_values['id'])
             if not selfdesc: raise tornado.web.HTTPError(405)
-            template_values['selfdesc'] = self.br(selfdesc.selfdesc).strip()
+            template_values['selfdesc'] = selfdesc.selfdesc
         isself = template_values['id'] == self.current_user.id if self.current_user else False
         template_values['activities'] = self.uag.get_top_activities(template_values['id'], self.db, isself) 
         template_values['activity_count'] = self.uag.count_activity(template_values['id']) 
@@ -1065,7 +1065,7 @@ class SelfdescHandler(BaseHandler):
             if selfdesc_id:
                 self.db.execute("update fd_People set has_selfdesc"
                         " = 1 where id = %s", self.current_user.id)
-        self.write(self.br(selfdesc).strip())
+        self.write(self.br(xhtml_escape(selfdesc)).strip())
 
 class PubstatusHandler(BaseHandler):
     @tornado.web.authenticated
@@ -1258,7 +1258,7 @@ class PubnoteHandler(BaseHandler):
 
 class ViewnoteHandler(BaseHandler):
     @tornado.web.authenticated
-    def post(self):
+    def get(self):
         noteid = self.get_argument("note_id",None)
         if not noteid or len(noteid) < 8:
             raise tornado.web.HTTPError(404)

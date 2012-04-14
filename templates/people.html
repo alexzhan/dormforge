@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>18周 › {{ template_values['username'] }}</title>
+<title>18周 › {{ escape(template_values['username']) }}</title>
 <style type="text/css">
     .hero-unit .avatar {
         float: left;
@@ -180,13 +180,13 @@
             <span class="the-icons" style="display:none"><a href="#" style="color:#788887;" onclick="return changedesc();"><i class="icon-edit"></i>修改</a></span>
             {% end %}
             {% if template_values['has_selfdesc'] %}
-            <p class="profile-text" id="textdesc" style="display:inline">{{ template_values['selfdesc'] }}</p>
+            <p class="profile-text" id="textdesc" style="display:inline">{{ handler.br(escape(template_values['selfdesc'])) }}</p>
             {% if current_user and template_values['id'] == current_user.id %}
             <span class="the-icons" style="display:inline-block"><a href="#" style="color:#788887;" onclick="return changedesc();"><i class="icon-edit"></i>修改</a></span>
             {% end %}
             {% end %}
             <div class="descform" style="display:none">
-                <textarea id="description"></textarea>
+                <textarea id="description">{{ template_values['selfdesc'] }}</textarea>
                 <div class="descaction">
                     <a href="#" id="canceldesc" onclick="return canceldesc();">取消</a>
                     <a class="btn btn-primary" onclick="return submitdesc();">提交</a>
@@ -241,15 +241,15 @@
                     {% for activity in template_values['activities']%}
                     <p class="light_gray">
                     {% if activity[-1] == 0 %}
-                    <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> 关注了 <a href="{{ activity[2] }}">{{ activity[1] }}</a>. <span class="timestamp">{{ activity[0] }}</span>
+                    <a href="/people/{{ template_values['domain'] }}">{{ escape(template_values['username']) }}</a> 关注了 <a href="{{ activity[2] }}">{{ escape(activity[1]) }}</a>. <span class="timestamp">{{ activity[0] }}</span>
                     {% elif activity[-1] == 1 %}
-                    <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/status/{{ handler.encode(activity[2]) }}">更新了状态</a>. <span class="timestamp">{{ activity[0] }}</span>
+                    <a href="/people/{{ template_values['domain'] }}">{{ escape(template_values['username']) }}</a> <a href="/status/{{ handler.encode(activity[2]) }}">更新了状态</a>. <span class="timestamp">{{ activity[0] }}</span>
                     {% elif activity[-1] == 2 %}
-                    <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/note/{{ handler.encode(activity[4]) }}">发布了日志</a>. <span class="timestamp">{{ activity[0] }}</span>
+                    <a href="/people/{{ template_values['domain'] }}">{{ escape(template_values['username']) }}</a> <a href="/note/{{ handler.encode(activity[4]) }}">发布了日志</a>. <span class="timestamp">{{ activity[0] }}</span>
                     {% elif activity[-1] == 3 %}
-                    <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/link/{{ handler.encode(activity[4]) }}">收藏了链接</a>. <span class="timestamp">{{ activity[0] }}</span>
+                    <a href="/people/{{ template_values['domain'] }}">{{ escape(template_values['username']) }}</a> <a href="/link/{{ handler.encode(activity[4]) }}">收藏了链接</a>. <span class="timestamp">{{ activity[0] }}</span>
                     {% elif activity[-1] == 4 %}
-                    <a href="/people/{{ template_values['domain'] }}">{{ template_values['username'] }}</a> <a href="/doc/{{ handler.encode(activity[4]) }}">分享了文档</a>. <span class="timestamp">{{ activity[0] }}</span>
+                    <a href="/people/{{ template_values['domain'] }}">{{ escape(template_values['username']) }}</a> <a href="/doc/{{ handler.encode(activity[4]) }}">分享了文档</a>. <span class="timestamp">{{ activity[0] }}</span>
                     {% end %}
                     </p>
                     {% end %}         
@@ -266,7 +266,7 @@
                         <span class="cell">
                             <a href="/link/{{ handler.encode(link[4]) }}">
                                 <div class="status_preview">
-                                    {{ link[2] if link[2] else link[1] }} 
+                                    {{ escape(link[2]) if link[2] else escape(link[1]) }} 
                                 </div>
                                 <div class="timestamp">
                                     {{ link[0] }}

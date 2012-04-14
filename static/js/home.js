@@ -69,9 +69,9 @@ function viewnote(note_id, note_index) {
         return false;
     }
     $.ajax({
-    type:'POST',
+    type:'GET',
     url:'/viewnote',
-    data:{note_id:note_id,_xsrf:getCookie('_xsrf')},
+    data:{note_id:note_id},
     success:function(data){
         if(data != "wrong"){
             data = data + "<a href='#' onclick='return togglenote(" + note_index + ")'>« 收起</a>";
