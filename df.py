@@ -71,6 +71,7 @@ class Application(tornado.web.Application):
                 (r"/doc/edit", EditdocHandler),
                 (r"/doc/([0-9a-z]+)", DocHandler),
                 (r"/more/([a-z]+)", MoreHandler),
+                (r"/people/([a-z0-9A-Z\_\-]+)/(activity|status|note|link|doc)", ActivityHandler),
                 (r".*", PNFHandler),
                 ]
         settings = dict(
@@ -111,7 +112,8 @@ class BaseHandler(tornado.web.RequestHandler):
             avatarpath = avapath
         else:
             avatarpath = "".join(["img/", avasize, "_noavatar.jpg"])
-        return self.static_url(avatarpath)
+        #return self.static_url(avatarpath)
+        return "/static/" + avatarpath
 
     def get_current_user(self):
         user_id = self.get_secure_cookie("user")
@@ -1970,6 +1972,32 @@ class HeroHandler(BaseHandler):
         template_values['page'] = page
         template_values['page_count'] = page_count
         self.render("hero.html", template_values=template_values)
+
+class ActivityHandler(BaseHandler):
+    def get(self, domain, activity_type):
+        Activities = ["活动","状态","日志","链接","文档"]
+        activities = ["activity","status","note","link","doc"]
+        template_values = {}
+        people = self.db.get("SELECT id,name,domain,uuid_ FROM fd_People WHERE domain = %s", domain) 
+        if not people: raise tornado.web.HTTPError(404)
+        if not self.current_user or self.current_user and self.current_user.id != people.id:
+            template_values['is_self'] = False
+        else:
+            template_values['is_self'] = True
+        page_title = "%s - %s" % (people.name, Activities[activities.index(activity_type)])
+        template_values['page_title'] = page_title
+        template_values['id'] = people.id
+        template_values['uuid'] = people.uuid_
+        template_values['username'] = people.name
+        template_values['domain'] = people.domain
+        template_values['image'] = self.avatar("xl", people.id, people.uuid_)
+        template_values['is_follow'] = self.ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
+        if activity_type == "activity":
+            activity_count = self.uag.count_activity(template_values['id'])
+        else:
+            activity_count = self.uag.count_sub_activity(template_values['id'], activities.index(activity_type)) 
+        template_values['profile_text'] = "%s %s" % (Activities[activities.index(activity_type)], activity_count)
+        self.render("activity.html", template_values=template_values)
 
 def main():
     tornado.options.parse_command_line()

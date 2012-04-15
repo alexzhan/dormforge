@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{ template_values['page_title'] }}</title>
+<link rel="stylesheet" href="{{ static_url("css/region.css") }}" type="text/css"/>
+{% end %}
+{% block body %}
+<div class="container">
+    {% if not current_user %}{% module Template("modules/followpopup.html") %}{% end %}
+    <div class="hero-unit" style="margin-left:40px;padding:0;background-color:#FFF">
+        <div class="namefollowrow">
+            <h3 style="display:inline"><a style="color: #19558D" href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a></h3>
+            {% if not template_values['is_self'] %}
+            {% if not template_values['is_follow'] %}
+            <a id="follow-btn" class="btn btn-primary" data-toggle="modal" href="#myModal" onclick="{% if current_user %}return follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
+            <a id="unfollow-btn" class="btn" style="display:none" onclick="{% if current_user %}unfollow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">取消关注</a>
+            {% else %}
+            <a id="follow-btn" class="btn btn-primary" style="display:none" onclick="{% if current_user %}follow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">关注</a>
+            <a id="unfollow-btn" class="btn" onclick="{% if current_user %}unfollow('follow-btn', {{ current_user['id'] }}, {{ template_values['id'] }}){% end %}">取消关注</a>
+            {% end  %}
+            {% end  %}
+        </div>
+        <div class="avatar">
+            <a href="/people/{{ escape(template_values['domain']) }}">
+                <img width="150px" height="150px" src="{{ template_values['image'] }}">
+            </a>
+        </div>
+        <div class="profile">
+            <div class="span7">
+                <div class="col_header">
+                    <div class="profile-text">
+                        {{ template_values['profile_text'] }}
+                    </div>
+                </div>
+                <div class="peoplelist">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
+<script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
+{% end %}

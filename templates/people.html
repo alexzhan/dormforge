@@ -235,7 +235,7 @@
         <div class="col1">
             <div class="span4">
                 <div class="col_header">
-                    <a href="#" class="tabtitle">活动 {{ template_values['activity_count'] }}</a>
+                    <a href="/people/{{ escape(template_values['domain']) }}/activity" class="tabtitle">活动 {{ template_values['activity_count'] }}</a>
                 </div>
                 <div class="latest_activity">
                     {% for activity in template_values['activities']%}
@@ -258,7 +258,7 @@
             {% if template_values['link_count'] != 0 %}
             <div class="span4">
                 <div class="col_header">
-                    <a href="#" class="tabtitle">链接 {{ template_values['link_count'] }}</a>
+                    <a href="/people/{{ escape(template_values['domain']) }}/link" class="tabtitle">链接 {{ template_values['link_count'] }}</a>
                 </div>
                 {% for link in template_values['links'] %}
                 <div class="row">
@@ -283,7 +283,7 @@
             {% if template_values['doc_count'] != 0 %}
             <div class="span4">
                 <div class="col_header">
-                    <a href="#" class="tabtitle">文档 {{ template_values['doc_count'] }}</a>
+                    <a href="/people/{{ escape(template_values['domain']) }}/doc" class="tabtitle">文档 {{ template_values['doc_count'] }}</a>
                 </div>
                 {% for doc in template_values['docs'] %}
                 <div class="row">
@@ -308,7 +308,7 @@
             {% if template_values['status_count'] != 0 %}
             <div class="span4">
                 <div class="col_header">
-                    <a href="#" class="tabtitle">状态 {{ template_values['status_count'] }}</a>
+                    <a href="/people/{{ escape(template_values['domain']) }}/status" class="tabtitle">状态 {{ template_values['status_count'] }}</a>
                 </div>
                 {% for status in template_values['statuses'] %}
                 <div class="row">
@@ -329,7 +329,7 @@
             {% if template_values['note_count'] != 0 %}
             <div class="span4">
                 <div class="col_header">
-                    <a href="#" class="tabtitle">日志 {{ template_values['note_count'] }}</a>
+                    <a href="/people/{{ escape(template_values['domain']) }}/note" class="tabtitle">日志 {{ template_values['note_count'] }}</a>
                 </div>
                 {% for note in template_values['notes'] %}
                 <div class="row">
