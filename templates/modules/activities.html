@@ -36,7 +36,7 @@
         <div class="feed-item-title">
             <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ escape(activity[-5]) }}</a>
             <span class="feed-item-title desc">发布了日志:</span>
-            <span><a href="/note/{{ handler.encode(activity[5]) }}">{{ activity[1] }}</a></span>
+            <span><a href="/note/{{ handler.encode(activity[5]) }}">{{ escape(activity[1]) }}</a></span>
         </div>
         <div class="feed-item-body">
             <p id="note{{ activity[-1] }}">{{ "".join([handler.at(linkify(activity[2], extra_params="target='_blank' rel='nofollow'")), " <a href='#' onclick=\"return viewnote('" + handler.encode(activity[5]) +"', '" + str(activity[-1]) + "');\">显示全部 »</a>"]) if len(unicode(activity[2])) < 150 and unicode(activity[2])[-4:]==" ..." else handler.br(handler.at(linkify(activity[2], extra_params="target='_blank' rel='nofollow'"))) }}</p>
@@ -66,7 +66,7 @@
         <div class="feed-item-title">
             <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ escape(activity[-5]) }}</a>
             <span class="feed-item-title desc">收藏了链接:</span>
-            <span><a href="http://{{ activity[1] }}" target="_blank">{{ activity[2] if activity[2] else activity[1] }}</a></span>
+            <span><a href="http://{{ activity[1] }}" target="_blank">{{ escape(activity[2]) if activity[2] else escape(activity[1]) }}</a></span>
         </div>
         <div class="feed-item-body">
             <p>{{ escape(activity[3]) if activity[3] else "" }}</p>
@@ -95,7 +95,7 @@
         <div class="feed-item-title">
             <a class="feed-item-title name" href="/people/{{ activity[-4] }}">{{ escape(activity[-5]) }}</a>
             <span class="feed-item-title desc">分享了文档:</span>
-            <span><a href="/doc/{{ handler.encode(activity[6]) }}">{{ activity[2] }}</a></span>
+            <span><a href="/doc/{{ handler.encode(activity[6]) }}">{{ escape(activity[2]) }}</a></span>
         </div>
         <div class="feed-item-body">
             <p>{{ escape(activity[3]) if activity[3] else "" }}</p>

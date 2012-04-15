@@ -3,6 +3,30 @@
 {% block head %}
 <title>{{ template_values['page_title'] }}</title>
 <link rel="stylesheet" href="{{ static_url("css/region.css") }}" type="text/css"/>
+<style type="text/css">
+    .col_item {
+        margin: 0;
+        padding: 5px 0;
+    }
+    .mdesc {
+        margin: 0;
+        float: none;
+    }
+    .mdesc-name a {
+        color: #333;
+        font-size:14px;
+    }
+    .mdesc-act {
+        color: #999;
+        font-size:13px;
+    }
+    .mdesc-act a { 
+        color: #999;
+    }
+    .mact a {
+        color: #19558D;
+    }
+</style>
 {% end %}
 {% block body %}
 <div class="container">
@@ -32,7 +56,98 @@
                         {{ template_values['profile_text'] }}
                     </div>
                 </div>
-                <div class="peoplelist">
+                <div class="activitylist">
+                    <div class="pagelist">
+                        {% for activity in template_values['activities'] %}
+                        {% if activity[-1] == 0 %}
+                        <div class="col_item">
+                            <div class="mdesc">
+                                <span class="mdesc-name">
+                                    <a href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a>
+                                </span>
+                                <span class="mdesc-act">
+                                    关注了 
+                                    <a href="/people/{{ escape(activity[2]) }}"><img style="vertical-align:middle;" width="25px" height="25px" src="{{ handler.avatar('s', int(activity[3]), activity[4]) }}"></a>
+                                    <a href="/people/{{ escape(activity[2]) }}">{{ escape(activity[1]) }}</a>
+                                    <span>{{ activity[0] }}</span>
+                                </span>
+                            </div>
+                        </div>
+                        {% elif activity[-1] == 1 %}
+                        <div class="col_item">
+                            <div class="mdesc">
+                                <span class="mdesc-name">
+                                    <a href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a>
+                                </span>
+                                <span class="mdesc-act">
+                                    <span>更新了状态. </span>
+                                    <span><a class="footerlink" href="/status/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
+                                </span>
+                            </div>
+                            <div class="mact">
+                                {{ handler.br(handler.at(linkify(activity[1], extra_params="target='_blank' rel='nofollow'"))) }}
+                            </div>
+                            <span class="mdesc-act">
+                                <span> <a class="footerlink" href="/link/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
+                            </span>
+                        </div>
+                        {% elif activity[-1] == 2 %}
+                        <div class="col_item">
+                            <div class="mdesc">
+                                <span class="mdesc-name">
+                                    <a href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a>
+                                </span>
+                                <span class="mdesc-act">
+                                    <span>发布了日志. </span>
+                                    <span><a class="footerlink" href="/note/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
+                                </span>
+                            </div>
+                            <div class="mact">
+                                <a href="/note/{{ handler.encode(activity[-2]) }}">{{ escape(activity[1]) }}</a>
+                            </div>
+                            <span class="mdesc-act">
+                                <span> <a class="footerlink" href="/note/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
+                            </span>
+                        </div>
+                        {% elif activity[-1] == 3 %}
+                        <div class="col_item">
+                            <div class="mdesc">
+                                <span class="mdesc-name">
+                                    <a href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a>
+                                </span>
+                                <span class="mdesc-act">
+                                    <span>收藏了链接. </span>
+                                    <span><a class="footerlink" href="/link/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
+                                </span>
+                            </div>
+                            <div class="mact">
+                                <a href="http://{{ activity[1] }}" target="_blank">{{ escape(activity[2]) if activity[2] else escape(activity[1]) }}</a>
+                            </div>
+                            <span class="mdesc-act">
+                                <span> <a class="footerlink" href="/link/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
+                            </span>
+                        </div>
+                        {% elif activity[-1] == 4 %}
+                        <div class="col_item">
+                            <div class="mdesc">
+                                <span class="mdesc-name">
+                                    <a href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a>
+                                </span>
+                                <span class="mdesc-act">
+                                    <span>分享了文档. </span>
+                                    <span><a class="footerlink" href="/doc/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
+                                </span>
+                            </div>
+                            <div class="mact">
+                                <a href="/doc/{{ handler.encode(activity[-2]) }}">{{ escape(activity[2]) }}</a>
+                            </div>
+                            <span class="mdesc-act">
+                                <span> <a class="footerlink" href="/doc/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
+                            </span>
+                        </div>
+                        {% end %}
+                        {% end %}
+                    </div>
                 </div>
             </div>
         </div>

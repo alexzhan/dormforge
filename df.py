@@ -112,8 +112,8 @@ class BaseHandler(tornado.web.RequestHandler):
             avatarpath = avapath
         else:
             avatarpath = "".join(["img/", avasize, "_noavatar.jpg"])
-        #return self.static_url(avatarpath)
-        return "/static/" + avatarpath
+        return self.static_url(avatarpath)
+        #return "/static/" + avatarpath
 
     def get_current_user(self):
         user_id = self.get_secure_cookie("user")
@@ -945,15 +945,15 @@ class PeopleHandler(BaseHandler):
             if not selfdesc: raise tornado.web.HTTPError(405)
             template_values['selfdesc'] = selfdesc.selfdesc
         isself = template_values['id'] == self.current_user.id if self.current_user else False
-        template_values['activities'] = self.uag.get_top_activities(template_values['id'], self.db, isself) 
+        template_values['activities'] = self.uag.get_top_activities(template_values['id'], self.db, isself, 0, 5) 
         template_values['activity_count'] = self.uag.count_activity(template_values['id']) 
-        template_values['statuses'] = self.uag.get_top_sub_activities(template_values['id'], 1, isself) 
+        template_values['statuses'] = self.uag.get_top_sub_activities(template_values['id'], 1, isself, 0, 3) 
         template_values['status_count'] = self.uag.count_sub_activity(template_values['id'], 1) 
-        template_values['notes'] = self.uag.get_top_sub_activities(template_values['id'], 2, isself) 
+        template_values['notes'] = self.uag.get_top_sub_activities(template_values['id'], 2, isself, 0, 3) 
         template_values['note_count'] = self.uag.count_sub_activity(template_values['id'], 2) 
-        template_values['links'] = self.uag.get_top_sub_activities(template_values['id'], 3, isself) 
+        template_values['links'] = self.uag.get_top_sub_activities(template_values['id'], 3, isself, 0, 3) 
         template_values['link_count'] = self.uag.count_sub_activity(template_values['id'], 3) 
-        template_values['docs'] = self.uag.get_top_sub_activities(template_values['id'], 4, isself) 
+        template_values['docs'] = self.uag.get_top_sub_activities(template_values['id'], 4, isself, 0, 3) 
         template_values['doc_count'] = self.uag.count_sub_activity(template_values['id'], 4) 
         self.render("people.html", template_values=template_values)
 
@@ -1997,6 +1997,7 @@ class ActivityHandler(BaseHandler):
         else:
             activity_count = self.uag.count_sub_activity(template_values['id'], activities.index(activity_type)) 
         template_values['profile_text'] = "%s %s" % (Activities[activities.index(activity_type)], activity_count)
+        template_values['activities'] = self.uag.get_top_activities(template_values['id'], self.db, template_values['is_self'], 0, 20) 
         self.render("activity.html", template_values=template_values)
 
 def main():
