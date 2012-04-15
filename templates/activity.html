@@ -33,6 +33,15 @@
         margin: 5px 0 10px;
         width: 480px;
     }
+    .totop {
+        height: 36px;
+        width: 38px;
+        position: fixed;
+        bottom: 58px;
+        left: 50%;
+        margin-left: 400px;
+        background: url("/static/img/back-to-top.png") 11px 8px no-repeat #EBEBEB;
+    }
 </style>
 {% end %}
 {% block body %}
@@ -71,10 +80,12 @@
             </div>
         </div>
     </div>
+    <a id="totop" href="javascript:void(0);" class="totop" style="opacity: 1;" onclick="return backtotop();"></a>
 </div>
 {% end %}
 {% block bottom %}
 <script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
 <script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
 <script type="text/javascript" src="{{ static_url("js/region.js") }}"></script>
+<script type="text/javascript" src="{{ static_url("js/people_activities.js") }}"></script>
 {% end %}
