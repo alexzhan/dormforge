@@ -27,7 +27,7 @@
                     最新动态
                 </div>
                 <div class="feed-body">
-                    {% module Template("modules/activities.html", template_values=template_values) %}                    
+                    {% module Template("modules/home_activities.html", template_values=template_values) %}                    
                 </div>
                 <div id="li" style="display: none">{{ template_values['lastindex'] }}</div>
                 <a href="#" id="morebtn" class="btn" style='{{ "display: none" if template_values['hasnext'] == 0 else "" }}' onclick="return morefeed('home')">更多</a>

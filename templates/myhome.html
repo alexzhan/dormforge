@@ -34,7 +34,7 @@
                     暂时没有你关注的信息，去<a href="/">首页</a>看看吧^_^
                     </div>
                     {% end %}
-                    {% module Template("modules/activities.html", template_values=template_values) %}
+                    {% module Template("modules/home_activities.html", template_values=template_values) %}
                 </div>
                 <div id="li" style="display: none">{{ template_values['lastindex'] }}</div>
                 <a href="#" id="morebtn" class="btn" style='{{ "display: none" if template_values['hasnext'] == 0 else "" }}' onclick="return morefeed('myhome')">更多</a>
