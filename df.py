@@ -21,10 +21,10 @@ import shutil
 from tornado.options import define, options
 from tornado.escape import linkify,xhtml_escape
 from util.encrypt import encrypt_password,validate_password
-from util.getby import get_id_by_name,get_domain_by_name
+from util.getby import get_id_by_name,get_domain_by_name,get_namedomainuuid_by_id
 from util.encode import encode,decode,key
 from util.redis_activity import add_activity,del_activity
-from util.common import feed_number,people_number,hero_number
+from util.common import feed_number,people_number,hero_number,activity_number
 from db.redis.user_follow_graph import UserFollowGraph
 from db.redis.user_activity_graph import UserActivityGraph
 from base64 import b64encode,b64decode
@@ -309,6 +309,28 @@ class MoreHandler(BaseHandler):
             if template_values['lastindex'] >= len(follows):
                 template_values['hasnext'] = 0
             self.render("modules/follow_people.html", template_values=template_values)
+        elif prop in ["activity", "status", "note", "link", "doc"]:
+            activities = ["activity","status","note","link","doc"]
+            people_id = self.get_argument("name", None)
+            isself = self.get_argument("isself", None)
+            if isself == "True": isself = True
+            elif isself == "False": isself = False
+            else: raise tornado.web.HTTPError(404)
+            username,domain,uuid = get_namedomainuuid_by_id(self.db, self.rd, people_id)
+            template_values['domain'] = domain
+            template_values['username'] = username
+            if prop == "activity":
+                activity_count = self.uag.count_activity(people_id)
+                template_values['activities'] = self.uag.get_top_activities(people_id, self.db, isself, startindex, activity_number) 
+            else:
+                activity_count = self.uag.count_sub_activity(people_id, activities.index(prop)) 
+                template_values['activities'] = self.uag.get_top_sub_activities(people_id, activities.index(prop), isself, startindex, activity_number) 
+            template_values['activity_type'] = prop
+            template_values['lastindex'] = startindex + activity_number
+            template_values['hasnext'] = 1
+            if template_values['lastindex'] >= activity_count:
+                template_values['hasnext'] = 0
+            self.render("modules/people_activities.html", template_values=template_values)
 
 class SignupHandler(BaseHandler):
     def get(self):
@@ -1994,12 +2016,16 @@ class ActivityHandler(BaseHandler):
         template_values['is_follow'] = self.ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
         if activity_type == "activity":
             activity_count = self.uag.count_activity(template_values['id'])
-            template_values['activities'] = self.uag.get_top_activities(template_values['id'], self.db, template_values['is_self'], 0, 20) 
+            template_values['activities'] = self.uag.get_top_activities(template_values['id'], self.db, template_values['is_self'], 0, activity_number) 
         else:
             activity_count = self.uag.count_sub_activity(template_values['id'], activities.index(activity_type)) 
-            template_values['activities'] = self.uag.get_top_sub_activities(template_values['id'], activities.index(activity_type), template_values['is_self'], 0, 20) 
+            template_values['activities'] = self.uag.get_top_sub_activities(template_values['id'], activities.index(activity_type), template_values['is_self'], 0, activity_number) 
         template_values['profile_text'] = "%s %s" % (Activities[activities.index(activity_type)], activity_count)
         template_values['activity_type'] = activity_type
+        template_values['lastindex'] = activity_number
+        template_values['hasnext'] = 1
+        if template_values['lastindex'] >= activity_count:
+            template_values['hasnext'] = 0
         self.render("activity.html", template_values=template_values)
 
 def main():

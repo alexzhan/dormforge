@@ -25,7 +25,7 @@
                     {% module Template("modules/follow_people.html", template_values=template_values) %}
                 </div>
                 <div id="li" style="display: none">{{ template_values['lastindex'] }}</div>
-                <a href="#" id="morebtn" class="btn" style='width:500px;margin:5px 0 10px 50px;{{ "display: none" if template_values['hasnext'] == 0 else "" }}' onclick='return morefeed("{{ template_values['type'] }}","{{ template_values['region'] }}")'>更多</a>
+                <a href="#" id="morebtn" class="btn" style='width:500px;margin:5px 0 10px 50px;{{ "display: none" if template_values['hasnext'] == 0 else "" }}' onclick='return morefeed("{{ template_values['type'] }}","{{ template_values['region'] }}","any",10)'>更多</a>
             </div>
         </div>
     </div>
