@@ -1,6 +1,6 @@
 <h1>Project Dormforge</h1> 
 <p>Project Dormforge is an open source software package for creating and supporting students' communities.</p>
-<p><a href="http://18zhou.com">18zhou.com</a> is a students' community powered by Project Dormforge.</p>
+<p><a href="http://18zhou.openpk.org">18zhou.openpk.org</a> is a students' community powered by Project Dormforge.</p>
 
 <p>Project Dormforge is written by Tornado in Python, and it also makes use of a lot of open source software,including but not resricted to Twitter Bootstrap,mysql,redis,redis-py,so after you clone or download Project Dormforge,you have to install the previous software before run it.</p>
 

@@ -6,29 +6,11 @@
 {% end %}
 {% block body %}
 <div class="container">
-    <div id="myModal" class="modal hide fade">
-        <div class="modal-header">
-            <a class="close" data-dismiss="modal" >&times;</a>
-            <h3>关于查看18周代码</h3>
-        </div>
-        <div class="modal-body">
-            <h4>18周暂不开放代码</h4>
-            <p>现在18周的代码还很不成熟，近期内会有一次重构。<br>不久，你就可以在这里看到18周的代码:<a href="http://github.com/alexzhan/dormforge" target="_blank">http://github.com/alexzhan/dormforge</a></p>
-            <h4>如果你想参与开发</h4>
-            <p>如果你认识我(<a href="http://weibo.com/alexzhan" target="_blank">alexzhan</a>)，直接告诉我你的邮箱，我会把你加入开发组。<br/>
-            如果你不认识我，在<a href="/contact">反馈</a>里描述下你的情况，我再把你加入开发组。
-            </p>
-        </div>
-        <div class="modal-footer">
-            <a href="/signup" class="btn btn-primary">去注册</a>
-            <a href="#" class="btn" data-dismiss="modal" >关闭</a>
-        </div>
-    </div>
     <div class="hero-unit">
         <h1><img src="{{ static_url("img/logo.png") }}">18周</h1>
         <p>18周是一个开源的大学生社区</p>
         <p>
-        <a class="btn btn-primary btn-large" data-toggle="modal" href="#myModal">查看代码</a>
+        <a class="btn btn-primary btn-large" href="https://github.com/alexzhan/dormforge" target="_blank">查看代码</a>
         <a class="btn btn-large" href="/about">了解更多</a>
         </p>
     </div>
@@ -64,5 +46,4 @@
 {% end %}
 {% block bottom %}
 <script type="text/javascript" src="{{ static_url("js/index.js") }}"></script>
-<script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
 {% end %}
