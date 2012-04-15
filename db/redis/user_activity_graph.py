@@ -76,11 +76,11 @@ class UserActivityGraph(object):
         return sub_activity_key
 
     #get top 5 activities
-    def get_top_activities(self, user, db, isself):
+    def get_top_activities(self, user, db, isself, startindex, item_num):
         Activity_list = []
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
-        All_Activity_list = self.client.lrange(Activity_key, 0, -1)
-        index = 0
+        All_Activity_list = self.client.lrange(Activity_key, startindex, -1)
+        index = startindex
         for sub_activity_key in All_Activity_list:
             acttype,actuser,actto = sub_activity_key.split(":")
             if acttype == 'follow':
@@ -88,6 +88,8 @@ class UserActivityGraph(object):
                 username,domain,uuid = get_namedomainuuid_by_id(db, self.client, actto)
                 sub_activity.append(username)#follow who
                 sub_activity.append(domain)#domain
+                sub_activity.append(actto)#actto id
+                sub_activity.append(uuid)#actto uuid
                 sub_activity.append(0)#type:0
             elif acttype == 'status':
                 sub_activity = self.client.hmget(sub_activity_key, ["time","status"])
@@ -113,38 +115,42 @@ class UserActivityGraph(object):
                 sub_activity.append(4)#type:4
             Activity_list.append(sub_activity)                    
             index = index + 1
-            if index == 5:
+            if index == item_num:
                 break
         return Activity_list
 
     #get top 3 sub_activities
-    def get_top_sub_activities(self, user, acttype, isself):
+    def get_top_sub_activities(self, user, acttype, isself, startindex, item_num):
         Sub_Activity_list = []
         Sub_Activity_key = "u:%s:%s" % (self.Sub_Activity_KEYS[acttype], user)
-        index = 0
-        for sub_activity_key in self.client.lrange(Sub_Activity_key, 0, -1):
+        index = startindex
+        for sub_activity_key in self.client.lrange(Sub_Activity_key, startindex, -1):
             actto = sub_activity_key.split(":")[-1]
             if acttype == 1:
                 sub_activity = self.client.hmget(sub_activity_key, ["time",'status'])
                 sub_activity.append(actto)
+                sub_activity.append(1)
             if acttype == 2:
                 sub_activity = self.client.hmget(sub_activity_key, ["time","title","content","status"])
                 if not isself and sub_activity[3] != '0':
                     continue
                 sub_activity.append(actto)
+                sub_activity.append(2)
             if acttype == 3:
                 sub_activity = self.client.hmget(sub_activity_key, ["time","url","title","status"])
                 if not isself and sub_activity[3] != '0':
                     continue
                 sub_activity.append(actto)
+                sub_activity.append(3)
             if acttype == 4:
                 sub_activity = self.client.hmget(sub_activity_key, ["time","docid","title","status"])
                 if not isself and sub_activity[3] != '0':
                     continue
                 sub_activity.append(actto)
+                sub_activity.append(4)
             Sub_Activity_list.append(sub_activity)
             index = index + 1
-            if index == 3:
+            if index == item_num:
                 break
         return Sub_Activity_list
 
