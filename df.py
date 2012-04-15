@@ -247,7 +247,7 @@ class MoreHandler(BaseHandler):
             template_values['hasnext'] = 1
             if template_values['lastindex'] >= self.uag.count_all_activity():
                 template_values['hasnext'] = 0
-            self.render("modules/activities.html", template_values=template_values)
+            self.render("modules/home_activities.html", template_values=template_values)
         elif prop in ["city", "college", "major"]:
             name = self.get_argument("name", None)
             region = prop
