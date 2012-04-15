@@ -129,21 +129,25 @@ class UserActivityGraph(object):
             if acttype == 1:
                 sub_activity = self.client.hmget(sub_activity_key, ["time",'status'])
                 sub_activity.append(actto)
+                sub_activity.append(1)
             if acttype == 2:
                 sub_activity = self.client.hmget(sub_activity_key, ["time","title","content","status"])
                 if not isself and sub_activity[3] != '0':
                     continue
                 sub_activity.append(actto)
+                sub_activity.append(2)
             if acttype == 3:
                 sub_activity = self.client.hmget(sub_activity_key, ["time","url","title","status"])
                 if not isself and sub_activity[3] != '0':
                     continue
                 sub_activity.append(actto)
+                sub_activity.append(3)
             if acttype == 4:
                 sub_activity = self.client.hmget(sub_activity_key, ["time","docid","title","status"])
                 if not isself and sub_activity[3] != '0':
                     continue
                 sub_activity.append(actto)
+                sub_activity.append(4)
             Sub_Activity_list.append(sub_activity)
             index = index + 1
             if index == item_num:

@@ -75,6 +75,7 @@
                         </div>
                         {% elif activity[-1] == 1 %}
                         <div class="col_item">
+                            {% if template_values['activity_type'] == "activity" %}
                             <div class="mdesc">
                                 <span class="mdesc-name">
                                     <a href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a>
@@ -84,15 +85,19 @@
                                     <span><a class="footerlink" href="/status/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
                                 </span>
                             </div>
+                            {% end %}
                             <div class="mact">
                                 {{ handler.br(handler.at(linkify(activity[1], extra_params="target='_blank' rel='nofollow'"))) }}
                             </div>
+                            {% if template_values['activity_type'] != "activity" %}
                             <span class="mdesc-act">
                                 <span> <a class="footerlink" href="/link/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
                             </span>
+                            {% end %}
                         </div>
                         {% elif activity[-1] == 2 %}
                         <div class="col_item">
+                            {% if template_values['activity_type'] == "activity" %}
                             <div class="mdesc">
                                 <span class="mdesc-name">
                                     <a href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a>
@@ -102,15 +107,19 @@
                                     <span><a class="footerlink" href="/note/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
                                 </span>
                             </div>
+                            {% end %}
                             <div class="mact">
                                 <a href="/note/{{ handler.encode(activity[-2]) }}">{{ escape(activity[1]) }}</a>
                             </div>
+                            {% if template_values['activity_type'] != "activity" %}
                             <span class="mdesc-act">
                                 <span> <a class="footerlink" href="/note/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
                             </span>
+                            {% end %}
                         </div>
                         {% elif activity[-1] == 3 %}
                         <div class="col_item">
+                            {% if template_values['activity_type'] == "activity" %}
                             <div class="mdesc">
                                 <span class="mdesc-name">
                                     <a href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a>
@@ -120,15 +129,19 @@
                                     <span><a class="footerlink" href="/link/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
                                 </span>
                             </div>
+                            {% end %}
                             <div class="mact">
                                 <a href="http://{{ activity[1] }}" target="_blank">{{ escape(activity[2]) if activity[2] else escape(activity[1]) }}</a>
                             </div>
+                            {% if template_values['activity_type'] != "activity" %}
                             <span class="mdesc-act">
                                 <span> <a class="footerlink" href="/link/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
                             </span>
+                            {% end %}
                         </div>
                         {% elif activity[-1] == 4 %}
                         <div class="col_item">
+                            {% if template_values['activity_type'] == "activity" %}
                             <div class="mdesc">
                                 <span class="mdesc-name">
                                     <a href="/people/{{ escape(template_values['domain']) }}">{{ escape(template_values['username']) }}</a>
@@ -138,12 +151,15 @@
                                     <span><a class="footerlink" href="/doc/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
                                 </span>
                             </div>
+                            {% end %}
                             <div class="mact">
                                 <a href="/doc/{{ handler.encode(activity[-2]) }}">{{ escape(activity[2]) }}</a>
                             </div>
+                            {% if template_values['activity_type'] != "activity" %}
                             <span class="mdesc-act">
                                 <span> <a class="footerlink" href="/doc/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
                             </span>
+                            {% end %}
                         </div>
                         {% end %}
                         {% end %}

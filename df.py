@@ -1994,10 +1994,12 @@ class ActivityHandler(BaseHandler):
         template_values['is_follow'] = self.ufg.is_follow(self.current_user.id, people.id) if self.current_user else False
         if activity_type == "activity":
             activity_count = self.uag.count_activity(template_values['id'])
+            template_values['activities'] = self.uag.get_top_activities(template_values['id'], self.db, template_values['is_self'], 0, 20) 
         else:
             activity_count = self.uag.count_sub_activity(template_values['id'], activities.index(activity_type)) 
+            template_values['activities'] = self.uag.get_top_sub_activities(template_values['id'], activities.index(activity_type), template_values['is_self'], 0, 20) 
         template_values['profile_text'] = "%s %s" % (Activities[activities.index(activity_type)], activity_count)
-        template_values['activities'] = self.uag.get_top_activities(template_values['id'], self.db, template_values['is_self'], 0, 20) 
+        template_values['activity_type'] = activity_type
         self.render("activity.html", template_values=template_values)
 
 def main():
