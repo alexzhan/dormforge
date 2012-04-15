@@ -75,12 +75,11 @@ class UserActivityGraph(object):
         addresult = self.client.lpush(Sub_Activity_key, sub_activity_key)
         return sub_activity_key
 
-    #get top 5 activities
     def get_top_activities(self, user, db, isself, startindex, item_num):
         Activity_list = []
         Activity_key = 'u:%s:%s' % (self.Activity_KEY, user)
         All_Activity_list = self.client.lrange(Activity_key, startindex, -1)
-        index = startindex
+        index = 0
         for sub_activity_key in All_Activity_list:
             acttype,actuser,actto = sub_activity_key.split(":")
             if acttype == 'follow':
@@ -119,11 +118,10 @@ class UserActivityGraph(object):
                 break
         return Activity_list
 
-    #get top 3 sub_activities
     def get_top_sub_activities(self, user, acttype, isself, startindex, item_num):
         Sub_Activity_list = []
         Sub_Activity_key = "u:%s:%s" % (self.Sub_Activity_KEYS[acttype], user)
-        index = startindex
+        index = 0
         for sub_activity_key in self.client.lrange(Sub_Activity_key, startindex, -1):
             actto = sub_activity_key.split(":")[-1]
             if acttype == 1:

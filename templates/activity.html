@@ -13,7 +13,7 @@
         float: none;
     }
     .mdesc-name a {
-        color: #333;
+        color: gray;
         font-size:14px;
     }
     .mdesc-act {
@@ -23,8 +23,15 @@
     .mdesc-act a { 
         color: #999;
     }
+    .mact {
+        word-break: break-all;
+    }
     .mact a {
         color: #19558D;
+    }
+    .btn {
+        margin: 5px 0 10px;
+        width: 480px;
     }
 </style>
 {% end %}
@@ -56,9 +63,11 @@
                         {{ template_values['profile_text'] }}
                     </div>
                 </div>
-                <div class="activitylist">                    
+                <div class="peoplelist">                    
                     {% module Template("modules/people_activities.html", template_values=template_values) %}
                 </div>
+                <div id="li" style="display: none">{{ template_values['lastindex'] }}</div>
+                <a href="#" id="morebtn" class="btn" style='{{ "display: none" if template_values['hasnext'] == 0 else "" }}' onclick='return morefeed("{{ template_values['activity_type'] }}","{{ template_values['id'] }}","{{ template_values['is_self'] }}",20)'>更多</a>
             </div>
         </div>
     </div>
@@ -67,4 +76,5 @@
 {% block bottom %}
 <script type="text/javascript" src="{{ static_url("js/people.js") }}"></script>
 <script type="text/javascript" src="{{ static_url("js/bootstrap-modal.js") }}"></script>
+<script type="text/javascript" src="{{ static_url("js/region.js") }}"></script>
 {% end %}

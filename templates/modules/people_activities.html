@@ -8,8 +8,14 @@
             </span>
             <span class="mdesc-act">
                 关注了 
+            </span>
+            <span>
                 <a href="/people/{{ escape(activity[2]) }}"><img style="vertical-align:middle;" width="25px" height="25px" src="{{ handler.avatar('s', int(activity[3]), activity[4]) }}"></a>
+            </span>
+            <span class="mdesc-name">
                 <a href="/people/{{ escape(activity[2]) }}">{{ escape(activity[1]) }}</a>
+            </span>
+            <span class="mdesc-act">
                 <span>{{ activity[0] }}</span>
             </span>
         </div>
@@ -105,3 +111,4 @@
     {% end %}
     {% end %}
 </div>
+<div id="hn{{ template_values['lastindex'] }}" style="display: none">{{ template_values['hasnext'] }}</div>
