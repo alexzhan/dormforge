@@ -38,7 +38,7 @@
         </div>
         {% if template_values['activity_type'] != "activity" %}
         <span class="mdesc-act">
-            <span> <a class="footerlink" href="/link/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
+            <span> <a class="footerlink" href="/status/{{ handler.encode(activity[-2]) }}">{{ activity[0] }}</a></span>
         </span>
         {% end %}
     </div>
