@@ -130,4 +130,8 @@
 </div>
 {% end %}
 {% end %}
+{% if 'ifnext' not in template_values %}
 <div id="hn{{ template_values['lastindex'] }}" style="display: none">{{ template_values['hasnext'] }}</div>
+{% else %}
+<div id="lastitem" style="display: none">{{ template_values['lastitem'] }}</div>
+{% end %}

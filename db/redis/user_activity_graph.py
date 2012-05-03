@@ -153,9 +153,11 @@ class UserActivityGraph(object):
         return Sub_Activity_list
 
     #whole-site activities
-    def get_all_activities(self, db, startindex):
+    def get_all_activities(self, db, startindex, ispoll):
         all_activities = []
-        activities_list = self.client.lrange("all", startindex, startindex+feed_number-1)
+        startindex = 0 if ispoll else startindex
+        lastindex = ispoll-1 if ispoll else startindex+feed_number-1
+        activities_list = self.client.lrange("all", startindex, lastindex)
         index = startindex + 1
         for activity in activities_list:
             acttype, act_userid, actto = activity.split(":")
