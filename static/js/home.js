@@ -37,7 +37,8 @@ $(document).ready(function() {
              console.log("Poll error;");
          }
     };
-    updater.poll();
+    if(document.URL.indexOf("my") == -1) //just support homepage now
+        updater.poll();
 });
 
 $('#pubtextarea').focus(function() {
