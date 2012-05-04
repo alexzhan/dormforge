@@ -112,9 +112,14 @@ i {
 .noinfo {
     margin:10px 0 0 60px;
 }
-#morebtn {
+#morebtn, #newbtn {
     margin: 5px 0 10px 60px;
     width: 490px;
+}
+#newbtn {
+    background-color: #E1F0F7;
+    border: 1px solid #CCE1EF;
+    background-image: none;
 }
 .totop {
     height: 36px;

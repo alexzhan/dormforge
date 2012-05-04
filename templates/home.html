@@ -26,10 +26,12 @@
                 <div class="feed-title">
                     最新动态
                 </div>
+                <!--<a href="#" id="newbtn" class="btn">1条新动态</a>-->
                 <div class="feed-body">
                     {% module Template("modules/home_activities.html", template_values=template_values) %}                    
                 </div>
                 <div id="li" style="display: none">{{ template_values['lastindex'] }}</div>
+                <div id="litem" style="display: none">{{ template_values['lastitem'] }}</div>
                 <a href="#" id="morebtn" class="btn" style='{{ "display: none" if template_values['hasnext'] == 0 else "" }}' onclick="return morefeed('home')">更多</a>
             </div>
         </div>

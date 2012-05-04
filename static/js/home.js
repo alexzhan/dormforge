@@ -10,6 +10,34 @@ $(document).ready(function() {
     };
     $(window).bind("scroll", $backToTopFun);
     $(function() { $backToTopFun(); });
+    
+    var updater = {
+        poll: function(){
+                  $.ajax({url: "/homepoll", 
+                      type: "POST", 
+                      data: {
+                          lastitem:$("#lastitem").length?$("#lastitem").text():$("#litem").text(),
+                          _xsrf:getCookie('_xsrf')
+                      },
+                      datatype: "text",
+                      success: updater.onSuccess,
+                      error: updater.onError});
+              },
+        onSuccess: function(data, dataStatus){
+               try{
+                   $(".feed-body").prepend(data);
+               }
+               catch(e){
+                   updater.onError();
+                   return;
+               }
+               interval = window.setTimeout(updater.poll, 0);
+           },
+        onError: function(){
+             console.log("Poll error;");
+         }
+    };
+    updater.poll();
 });
 
 $('#pubtextarea').focus(function() {
@@ -64,6 +92,12 @@ function deleteactivity(item_id, user, actid, acttype){
     data:{user:user,actto:actid,acttype:acttype,_xsrf:getCookie('_xsrf')},
     success:function(data){
         $("#feed-item" + item_id).hide('slow');
+        if($("#lastitem").length){
+            $("#lastitem").text(parseInt($("#lastitem").text())-1);
+        }
+        if($("#litem").length){
+            $("#litem").text(parseInt($("#litem").text())-1);
+        }
     }       
     });
     return false;

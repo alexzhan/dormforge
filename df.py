@@ -72,6 +72,7 @@ class Application(tornado.web.Application):
                 (r"/doc/([0-9a-z]+)", DocHandler),
                 (r"/more/([a-z]+)", MoreHandler),
                 (r"/people/([a-z0-9A-Z\_\-]+)/(activity|status|note|link|doc)", ActivityHandler),
+                (r"/homepoll", HomepollHandler),
                 (r".*", PNFHandler),
                 ]
         settings = dict(
@@ -211,11 +212,12 @@ class HomeHandler(BaseHandler):
     def get(self):
         if self.current_user:
             template_values = {}
-            template_values['all_activities'] = self.uag.get_all_activities(self.db, 0)
+            template_values['all_activities'] = self.uag.get_all_activities(self.db, 0, False)
             template_values['lastindex'] = feed_number
             template_values['hasnext'] = 1
             if template_values['lastindex'] >= self.uag.count_all_activity():
                 template_values['hasnext'] = 0
+            template_values['lastitem'] = self.uag.count_all_activity()
             self.render("home.html", template_values=template_values)
         else:
             self.render("index.html")
@@ -240,7 +242,7 @@ class MoreHandler(BaseHandler):
         startindex = int(startindex)
         if prop in ["home", "myhome"]:
             if prop == "home":
-                template_values['all_activities'] = self.uag.get_all_activities(self.db, startindex)
+                template_values['all_activities'] = self.uag.get_all_activities(self.db, startindex, False)
             elif prop == "myhome":
                 template_values['all_activities'] = self.uag.get_my_activities(self.db, self.current_user.id, startindex)
             template_values['lastindex'] = startindex + feed_number
@@ -2027,6 +2029,35 @@ class ActivityHandler(BaseHandler):
         if template_values['lastindex'] >= activity_count:
             template_values['hasnext'] = 0
         self.render("activity.html", template_values=template_values)
+
+class HomepollHandler(BaseHandler):
+    @tornado.web.asynchronous
+    def post(self):
+        self.get_data(callback=self.to_finish)
+    def get_data(self, callback):
+        if self.request.connection.stream.closed():
+            return
+        template_values = {}
+        lastitem = self.get_argument("lastitem",None)
+        lastitem = int(lastitem)
+        newcount = self.uag.count_all_activity()
+        if lastitem < newcount: #something added,add the feed and refresh the lastitem number
+            template_values['all_activities'] = self.uag.get_all_activities(self.db, lastitem, newcount-lastitem)
+            template_values['ifnext'] = 0
+            template_values['lastitem'] = newcount
+        elif lastitem > newcount: #something deleted,refresh the lastitem number
+            template_values['all_activities'] = {}
+            template_values['ifnext'] = 0
+            template_values['lastitem'] = newcount
+        callback(template_values)
+    def to_finish(self, data):
+        if 'lastitem' in data:
+            self.render("modules/home_activities.html", template_values=data)
+        else:
+            tornado.ioloop.IOLoop.instance().add_timeout(
+                    time.time()+5,
+                    lambda: self.get_data(callback=self.to_finish),
+                    )
 
 def main():
     tornado.options.parse_command_line()
