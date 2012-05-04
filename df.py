@@ -2039,17 +2039,18 @@ class HomepollHandler(BaseHandler):
             return
         template_values = {}
         lastitem = self.get_argument("lastitem",None)
-        logging.info(lastitem)
         lastitem = int(lastitem)
         newcount = self.uag.count_all_activity()
-        if lastitem < newcount:
-            logging.info("YES")
+        if lastitem < newcount: #something added,add the feed and refresh the lastitem number
             template_values['all_activities'] = self.uag.get_all_activities(self.db, lastitem, newcount-lastitem)
+            template_values['ifnext'] = 0
+            template_values['lastitem'] = newcount
+        elif lastitem > newcount: #something deleted,refresh the lastitem number
+            template_values['all_activities'] = {}
             template_values['ifnext'] = 0
             template_values['lastitem'] = newcount
         callback(template_values)
     def to_finish(self, data):
-        logging.info("pending...")
         if 'lastitem' in data:
             self.render("modules/home_activities.html", template_values=data)
         else:

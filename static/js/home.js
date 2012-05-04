@@ -16,7 +16,7 @@ $(document).ready(function() {
                   $.ajax({url: "/homepoll", 
                       type: "POST", 
                       data: {
-                          lastitem:$("#lastitem").length>0?$("#lastitem").text():$("#litem").text(),
+                          lastitem:$("#lastitem").length?$("#lastitem").text():$("#litem").text(),
                           _xsrf:getCookie('_xsrf')
                       },
                       datatype: "text",
