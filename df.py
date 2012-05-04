@@ -2042,7 +2042,9 @@ class HomepollHandler(BaseHandler):
         lastitem = int(lastitem)
         newcount = self.uag.count_all_activity()
         if lastitem < newcount: #something added,add the feed and refresh the lastitem number
-            template_values['all_activities'] = self.uag.get_all_activities(self.db, lastitem, newcount-lastitem)
+            new_activities = self.uag.get_all_activities(self.db, lastitem, newcount-lastitem)
+            new_activities = filter(lambda activity:activity[-2] != 'status' and activity[-6] != self.current_user.id, new_activities) #if user add a status,it's been shown just after it's been published,so it cannot be shown again by longpolling even the user opens another browser window.
+            template_values['all_activities'] = new_activities
             template_values['ifnext'] = 0
             template_values['lastitem'] = newcount
         elif lastitem > newcount: #something deleted,refresh the lastitem number
