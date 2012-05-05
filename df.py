@@ -2057,7 +2057,7 @@ class HomepollHandler(BaseHandler):
             self.render("modules/home_activities.html", template_values=data)
         else:
             tornado.ioloop.IOLoop.instance().add_timeout(
-                    time.time()+5,
+                    time.time()+5, #recheck after 5 seconds
                     lambda: self.get_data(callback=self.to_finish),
                     )
 
