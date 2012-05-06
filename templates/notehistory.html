@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>编辑记录</title>
+<link rel="stylesheet" href="{{ static_url("css/activity.css") }}" type="text/css"/>
+<style type="text/css">
+    .insert { background-color: #aaffaa }
+    .delete { background-color: #ff8888; text-decoration: line-through }
+</style>
+{% end %}
+{% block body %}
+<div class="container">
+    <div class="span7">
+        {% for note in template_values['notes'] %}
+        <div class="activity-item docnote-item">
+            <div class="activity-title">
+                {{ note.title }}
+            </div>
+            <div class="activity-text note-text">
+                {{ note.note }}
+            </div>
+            <div class="activity-bottom">
+                <span class="activity-info">
+                <a href="/people/{{ note.domain }}">{{ escape(note.name) }}</a> 修改于 {{ str(note.revdate)[5:-3] if str(note.revdate)[5] != '0' else str(note.revdate)[6:-3] }}
+                </span>
+                <span class="activity-action">
+                    <span>#{{ note.rev_num }}</span>
+                    <span class="splitter"> • </span>
+                    {% if note.rev == 1 %}
+                    <span>当前版本</span>
+                    {% elif note.rev == 0 %}
+                    <span><a href="#" onclick="return revert({{ note.rev_num }});">回溯至该版本</a></span>
+                    {% end %}
+                </span>
+            </div>
+        </div>
+        {% end %}
+    </div>
+</div>
+{% end %}
+{% block bottom %}
+<script type="text/javascript" src="{{ static_url('js/activity.js') }}"></script>
+{% end %}
