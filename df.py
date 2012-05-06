@@ -1253,6 +1253,7 @@ class PubnoteHandler(BaseHandler):
             rednotecontent = notecontent[:140] + " ..."
         status_ = int(notetype)
         user_id = self.current_user.id
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
         if noteid:
             noteid = decode(noteid)
             note_user = self.db.get("select user_id from fd_Note where id = %s", noteid)
@@ -1260,6 +1261,11 @@ class PubnoteHandler(BaseHandler):
                 raise tornado.web.HTTPError(404)
             self.db.execute("update fd_Note set title = %s, note = %s,"
                     "status_ = %s where id = %s", notetitle, notecontent, status_, noteid)
+            rev_user_text = get_namedomainuuid_by_id(self.db,self.rd,str(user_id))[0]
+            rev_num = int(self.db.get("select max(rev_num) as rev_num from fd_NoteHistory where note_id = %s", noteid).rev_num)
+            self.db.execute("insert into fd_NoteHistory(note_id,title,note,rev_num,rev_user_id,"
+                    "rev_user_text,revdate) values (%s,%s,%s,%s,%s,%s,%s)", noteid, notetitle,
+                    notecontent, rev_num+1, user_id, rev_user_text, pubdate)
             note_key = "note:%s:%s" % (user_id, noteid)
             actdict = {'title':notetitle, 'content':rednotecontent, 'status':status_}
             if self.rd.hmset(note_key, actdict):
@@ -1267,7 +1273,6 @@ class PubnoteHandler(BaseHandler):
             else:
                 self.write("wrong")
         else:
-            pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
             redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
             note_id = self.db.execute("insert into fd_Note (user_id, title, "
                     "note, pubdate, status_) values (%s,%s,%s,%s,%s)", user_id,
