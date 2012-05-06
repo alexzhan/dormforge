@@ -2109,7 +2109,7 @@ class NotehistoryHandler(BaseHandler):
         user = self.db.get("select user_id from fd_Note where id = %s", note_id)
         #only owner and administrator can revert
         if user.user_id != self.current_user.id and self.current_user.actlevel != 0:
-            raise tornado.web.HTTPError(404)
+            return self.write("nopermit")
         self.db.execute("update fd_NoteHistory set rev_status = 1 where note_id = %s and rev_num > %s"
                 , note_id, version)
         note = self.db.get("select title,note from fd_NoteHistory where note_id = %s and rev_num = %s"
