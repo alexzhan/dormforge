@@ -19,12 +19,13 @@ import tempfile
 import shutil
 
 from tornado.options import define, options
-from tornado.escape import linkify,xhtml_escape
+from tornado.escape import linkify,xhtml_escape,xhtml_unescape
 from util.encrypt import encrypt_password,validate_password
 from util.getby import get_id_by_name,get_domain_by_name,get_namedomainuuid_by_id
 from util.encode import encode,decode,key
 from util.redis_activity import add_activity,del_activity
 from util.common import feed_number,people_number,hero_number,activity_number
+from util.textdiff import textdiff
 from db.redis.user_follow_graph import UserFollowGraph
 from db.redis.user_activity_graph import UserActivityGraph
 from base64 import b64encode,b64decode
@@ -73,6 +74,7 @@ class Application(tornado.web.Application):
                 (r"/more/([a-z]+)", MoreHandler),
                 (r"/people/([a-z0-9A-Z\_\-]+)/(activity|status|note|link|doc)", ActivityHandler),
                 (r"/homepoll", HomepollHandler),
+                (r"/note/([0-9a-z]+)/log", NotehistoryHandler),
                 (r".*", PNFHandler),
                 ]
         settings = dict(
@@ -1253,6 +1255,7 @@ class PubnoteHandler(BaseHandler):
             rednotecontent = notecontent[:140] + " ..."
         status_ = int(notetype)
         user_id = self.current_user.id
+        pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
         if noteid:
             noteid = decode(noteid)
             note_user = self.db.get("select user_id from fd_Note where id = %s", noteid)
@@ -1260,6 +1263,11 @@ class PubnoteHandler(BaseHandler):
                 raise tornado.web.HTTPError(404)
             self.db.execute("update fd_Note set title = %s, note = %s,"
                     "status_ = %s where id = %s", notetitle, notecontent, status_, noteid)
+            rev_user = get_namedomainuuid_by_id(self.db,self.rd,str(user_id))
+            rev_num = int(self.db.get("select max(rev_num) as rev_num from fd_NoteHistory where note_id = %s", noteid).rev_num)
+            self.db.execute("insert into fd_NoteHistory(note_id,title,note,rev_num,rev_user_id,"
+                    "rev_user_name,rev_user_domain,revdate) values (%s,%s,%s,%s,%s,%s,%s,%s)", noteid, notetitle,
+                    notecontent, rev_num+1, user_id, rev_user[0], rev_user[1], pubdate)
             note_key = "note:%s:%s" % (user_id, noteid)
             actdict = {'title':notetitle, 'content':rednotecontent, 'status':status_}
             if self.rd.hmset(note_key, actdict):
@@ -1267,7 +1275,6 @@ class PubnoteHandler(BaseHandler):
             else:
                 self.write("wrong")
         else:
-            pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
             redpubdate = pubdate[4:] if pubdate[3] == '0' else pubdate[3:]
             note_id = self.db.execute("insert into fd_Note (user_id, title, "
                     "note, pubdate, status_) values (%s,%s,%s,%s,%s)", user_id,
@@ -2057,9 +2064,50 @@ class HomepollHandler(BaseHandler):
             self.render("modules/home_activities.html", template_values=data)
         else:
             tornado.ioloop.IOLoop.instance().add_timeout(
-                    time.time()+5,
+                    time.time()+5, #recheck after 5 seconds
                     lambda: self.get_data(callback=self.to_finish),
                     )
+
+class NotehistoryHandler(BaseHandler):
+    def get(self, note_id):
+        template_values = {}
+        if len(note_id) < 8:
+            raise tornado.web.HTTPError(404)
+        note_id = decode(note_id)
+        notes = self.db.query(
+                "select title,note,rev_num,rev_user_name as name,rev_user_domain as domain"
+                ", revdate from fd_NoteHistory where note_id = %s and rev_status = 0"
+                " order by rev_num desc", note_id)
+        if not notes:
+            raise tornado.web.HTTPError(404)
+        for i in range(len(notes)):
+            next_note = {}
+            if i == len(notes)-1:
+                next_note['title'] = ''
+                next_note['note'] = ''
+            else:
+                next_note['title'] = notes[i+1].title
+                next_note['note'] = notes[i+1].note
+            notes[i].title = textdiff(xhtml_escape(next_note['title']), xhtml_escape(notes[i].title))
+            note1 = self.br(linkify(next_note['note'], extra_params="target='_blank' rel='nofollow'"))
+            note2 = self.br(linkify(notes[i].note, extra_params="target='_blank' rel='nofollow'"))
+            notes[i].note = self.at(textdiff(note1, note2))
+            notes[i]['rev'] = 0
+            if i == 0:
+                notes[i]['rev'] = 1
+        template_values['notes'] = notes
+        self.render("notehistory.html", template_values=template_values)
+    @tornado.web.authenticated
+    def post(self, note_id):
+        version = self.get_argument("version",None)
+        if len(note_id) < 8 or not version:
+            raise tornado.web.HTTPError(404)
+        note_id = decode(note_id)
+        self.db.execute("update fd_NoteHistory set rev_status = 1 where note_id = %s and rev_num > %s"
+                , note_id, version)
+        note = self.db.get("select title,note from fd_NoteHistory where note_id = %s and rev_num = %s"
+                , note_id, version)
+        self.db.execute("update fd_Note set title = %s, note = %s where id = %s", note.title, note.note, note_id)
 
 def main():
     tornado.options.parse_command_line()

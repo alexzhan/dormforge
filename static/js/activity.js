@@ -50,3 +50,14 @@ function replyOne(username) {
     replyContent.focus();
     replyContent.val(newContent);
 }
+function revert(version) {
+    $.ajax({
+    type:'POST',
+    url:window.location,
+    data:{version:version,_xsrf:getCookie('_xsrf')},
+    success:function(data){
+        window.location.reload();
+    }       
+    });
+    return false;
+}

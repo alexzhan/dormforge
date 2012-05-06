@@ -337,7 +337,7 @@
                         <span class="cell">
                             <a href="/note/{{ handler.encode(note[4]) }}">
                                 <div class="status_preview">
-                                    {{ note[1] }} 
+                                    {{ escape(note[1]) }} 
                                 </div>
                                 <div class="timestamp">
                                     {{ note[0] }}
