@@ -1255,6 +1255,7 @@ class PubnoteHandler(BaseHandler):
             rednotecontent = notecontent[:140] + " ..."
         status_ = int(notetype)
         user_id = self.current_user.id
+        rev_user = get_namedomainuuid_by_id(self.db,self.rd,str(user_id))
         pubdate = time.strftime('%y-%m-%d %H:%M', time.localtime())
         if noteid:
             noteid = decode(noteid)
@@ -1263,7 +1264,6 @@ class PubnoteHandler(BaseHandler):
                 raise tornado.web.HTTPError(404)
             self.db.execute("update fd_Note set title = %s, note = %s,"
                     "status_ = %s where id = %s", notetitle, notecontent, status_, noteid)
-            rev_user = get_namedomainuuid_by_id(self.db,self.rd,str(user_id))
             rev_num = int(self.db.get("select max(rev_num) as rev_num from fd_NoteHistory where note_id = %s", noteid).rev_num)
             self.db.execute("insert into fd_NoteHistory(note_id,title,note,rev_num,rev_user_id,"
                     "rev_user_name,rev_user_domain,revdate) values (%s,%s,%s,%s,%s,%s,%s,%s)", noteid, notetitle,
@@ -1280,6 +1280,9 @@ class PubnoteHandler(BaseHandler):
                     "note, pubdate, status_) values (%s,%s,%s,%s,%s)", user_id,
                     notetitle, notecontent, pubdate, status_)
             if note_id:
+                self.db.execute("insert into fd_NoteHistory(note_id,title,note,rev_num,rev_user_id,"
+                        "rev_user_name,rev_user_domain,revdate) values (%s,%s,%s,%s,%s,%s,%s,%s)", note_id, notetitle,
+                        notecontent, 1, user_id, rev_user[0], rev_user[1], pubdate)
                 actdict = {'time':redpubdate, 'title':notetitle, 
                         'content':rednotecontent, 'status':status_}
                 addresult = add_activity(self.rd, user_id, note_id, 2, actdict)
@@ -2103,11 +2106,21 @@ class NotehistoryHandler(BaseHandler):
         if len(note_id) < 8 or not version:
             raise tornado.web.HTTPError(404)
         note_id = decode(note_id)
+        user = self.db.get("select user_id from fd_Note where id = %s", note_id)
+        #only owner and administrator can revert
+        if user.user_id != self.current_user.id and self.current_user.actlevel != 0:
+            raise tornado.web.HTTPError(404)
         self.db.execute("update fd_NoteHistory set rev_status = 1 where note_id = %s and rev_num > %s"
                 , note_id, version)
         note = self.db.get("select title,note from fd_NoteHistory where note_id = %s and rev_num = %s"
                 , note_id, version)
         self.db.execute("update fd_Note set title = %s, note = %s where id = %s", note.title, note.note, note_id)
+        note_key = "note:%s:%s" % (user.user_id, note_id)
+        rednotecontent = note.note
+        if len(note.note) > 150:
+            rednotecontent = note.note[:140] + " ..."
+        actdict = {'title':note.title, 'content':rednotecontent}
+        self.rd.hmset(note_key, actdict)
 
 def main():
     tornado.options.parse_command_line()
