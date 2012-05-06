@@ -56,7 +56,12 @@ function revert(version) {
     url:window.location,
     data:{version:version,_xsrf:getCookie('_xsrf')},
     success:function(data){
-        window.location.reload();
+        if(data == "nopermit") {
+            alert("没有权限")
+        }        
+        else {
+            window.location.reload();
+        }
     }       
     });
     return false;
