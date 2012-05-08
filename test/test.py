@@ -37,8 +37,8 @@ class VersionTestCase(AsyncHTTPTestCase):
                body=body
                ) 
        response = self.fetch('/note/6b364d3d/log')
-       after reverting,the version number must be less than 3
-       self.assertIn("#3", response.body)
+       #after reverting,the version number must be less than 3
+       self.assertNotIn("#3", response.body)
 
 if __name__ == '__main__': 
     unittest.main() 
