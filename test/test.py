@@ -16,7 +16,7 @@ class VersionTestCase(AsyncHTTPTestCase):
    def test_beforerevert(self):
        response = self.fetch('/note/6b364d3d/log')
        #assume that before reverting the version number is 3
-       self.assertIn("#2", response.body)
+       self.assertIn("#3", response.body)
 
    def test_afterrevert(self):
        post_data = { 'username': 'alex', 'password': 'alex' }
@@ -38,7 +38,7 @@ class VersionTestCase(AsyncHTTPTestCase):
                ) 
        response = self.fetch('/note/6b364d3d/log')
        after reverting,the version number must be less than 3
-       self.assertIn("#2", response.body)
+       self.assertIn("#3", response.body)
 
 if __name__ == '__main__': 
     unittest.main() 
