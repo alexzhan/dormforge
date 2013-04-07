@@ -3,7 +3,7 @@
 import os.path
 import sys
 import string
-import tornado.database
+import torndb
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
@@ -79,7 +79,7 @@ class Application(tornado.web.Application):
                 autoescape=None,
                 )
         tornado.web.Application.__init__(self, handlers, **settings)
-        self.db = tornado.database.Connection(
+        self.db = torndb.Connection(
                 host=options.mysql_host, database=options.mysql_database,
                 user=options.mysql_user, password=options.mysql_password)
 

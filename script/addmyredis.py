@@ -1,4 +1,4 @@
-import tornado.database
+import torndb
 import redis
 
 from tornado.options import define, options
@@ -8,7 +8,7 @@ define("mysql_database", default="df", help="blog database name")
 define("mysql_user", default="df", help="blog database user")
 define("mysql_password", default="df", help="blog database password")
 
-db = tornado.database.Connection(
+db = torndb.Connection(
         host=options.mysql_host, database=options.mysql_database,
         user=options.mysql_user, password=options.mysql_password)
 
